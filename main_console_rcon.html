@@ -1252,7 +1252,6 @@
                 <div class="stats-chart-area">
                     <div class="stats-chart-header">
                         <span>在线人数趋势</span>
-                        <span id="live-online-summary" style="flex:1;text-align:center;color:#0fc;font-size:13px;margin:0 10px;min-width:0;"></span>
                         <div class="range-selector" id="range-selector">
                             <button class="range-btn active" data-range="1d">1天</button>
                             <button class="range-btn" data-range="3d">3天</button>
@@ -1260,7 +1259,10 @@
                             <button class="range-btn" data-range="all">全部</button>
                         </div>
                     </div>
-                    <div id="online-chart" style="width:100%;height:320px;overflow:hidden;"></div>
+                    <div id="online-chart-area" style="position:relative;width:100%;height:320px;">
+                        <div id="online-chart" style="width:100%;height:320px;overflow:hidden;"></div>
+                        <div id="live-online-summary" style="position:absolute;top:28px;right:0;width:15%;box-sizing:border-box;padding:0 8px;text-align:left;color:#0fc;font-size:12px;line-height:1.7;z-index:5;pointer-events:none;overflow-wrap:anywhere;"></div>
+                    </div>
                     <!-- <div id="online-chart" style="width:100%;height:290px;"></div> -->
                 </div>
 
@@ -3217,15 +3219,16 @@
                             return;
                         }
                         var d = data.data;
-                        var parts = [];
+                        var totalText = (d.total === null || d.total === undefined) ? '--' : d.total;
+                        var html = '<div style="color:#ff0;">当前总在线: ' + totalText + ' 人</div>';
                         if (d.servers && d.servers.length) {
                             for (var i = 0; i < d.servers.length; i++) {
                                 var sv = d.servers[i];
-                                parts.push(sv.address + ': ' + (sv.online === null ? '--' : sv.online));
+                                var onlineText = (sv.online === null || sv.online === undefined) ? '--' : sv.online;
+                                html += '<div style="color:#fff;">- ' + S.escapeHtml(sv.address) + ': ' + onlineText + ' 人</div>';
                             }
                         }
-                        var totalText = (d.total === null || d.total === undefined) ? '--' : d.total;
-                        el.textContent = '当前总在线: ' + totalText + (parts.length ? '（' + parts.join(' | ') + '）' : '');
+                        el.innerHTML = html;
                     } catch (err) {
                         el.textContent = '';
                     }
