@@ -1,0 +1,115 @@
+# 这是主配置文件。所有设置在这里修改。
+
+# ==================== 初始化配置 ====================
+# 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。或用内网穿透(TCP)穿透 127.0.0.1:5000。
+host: "127.0.0.1"          # 本地 IP地址
+port: 5000                 # 本地 端口号
+log_dir: 'C:\.MC_server\MSL\Server1\logs'  # 服务器日志目录（包含 latest.log）   (用'单引号'，而不是"双引号")
+server_properties_path: 'C:\.MC_server\MSL\Server1\server.properties'  # 服务器 server.properties 文件绝对路径   (用'单引号'，而不是"双引号")
+
+sample_interval_seconds: 300  # 人数采样间隔（秒）  多少秒采集一次人数，并绘制成曲线图。 建议一次性设置好 不要随便改
+
+# 你的服务器公网IP或域名（可配置多个），用于查询各服务器在线玩家。
+# 系统会分别查询每个服务器的人数，再相加得到总在线人数并记录到数据库。
+public_server_addresses:
+  - "7891.ovvo.space"
+  - "1145.ovvo.space"
+
+filter_keywords: # 日志过滤关键词（包含这些词 的日志行 不会显示在前端）
+  - "failed to"
+  - "voicechat"
+  - "PacketEvents caught an unhandled exception while calling your listener"
+  - "java.lang."
+
+
+# ======================================== 邮件告警配置 ========================================
+email:
+  enabled: true   # 若不需要，设为 false,下面这些配置 就可以不用管了.
+
+  smtp_server: "smtp.163.com"     # 网易163邮箱的smtp服务器 地址  (如果用的是网易163邮箱，保持默认即可)
+  smtp_port: 25     # 网易163邮箱的smtp服务器 端口
+
+
+  user: ""     # 发件人的用户名
+  from: ""    # 发件人邮箱号
+  to: ""   # 收件人邮箱
+
+
+  # 发件人 的 发件授权码（不是邮箱登录密码）
+  # 以网易163邮箱为例：电脑端前往 发件人的邮箱 > 设置 > POP3/SMTP/IMAP > 开启 [POP3(或IMAP)/SMTP] 服务 > 获取授权码 > 填入下面这个{password}中。
+  password: ""
+
+
+  # 邮件 标题
+  subject: "【警告】服务器爆炸了"
+  # 邮件 正文
+  body: |
+    服务器似乎爆炸了！
+    服务端异常关闭，
+    请立即检查！！！！
+
+# 邮件告警 触发关键词（当日志中 出现下列关键词 会触发 发送邮件报警）
+alert_keywords:
+  - "shutdown"
+  - "crash"
+
+# 当 检测到服务器崩溃，除了邮件警告，还要执行下列.cmd命令，用于 强制重启服务器。
+crash_recovery_commands:
+  - "taskkill /F /T /IM java.exe"
+  - "taskkill /F /T /IM frpc_custom.exe"
+  - "taskkill /F /T /IM MSL.exe"
+  - 'C:\.MC_server\MSL.exe'     # [注意反斜杠] 如果要运行 C:/.MC_server/MSL.exe，应该写成 C:\.MC_server\MSL.exe。
+
+alert_cooldown_seconds: 20  # 邮件告警冷却时间（秒）    触发邮件报警后，n秒之内不会再次发送邮件
+# ==============================================================================================
+
+
+
+
+# ==================== 前端 日志高亮 规则 ====================
+# [优先级问题] 顺序不同 可能会导致颜色配置失效，需自行检查优先级。从上到下，优先级就是从高到低。    不区分大小写
+highlight_rules:
+# 红色:#ff0000
+  - keyword: "Server empty for"
+    color: "#ff0000"
+  - keyword: "error"
+    color: "#ff0000"
+# 黄色:#fbff00
+  - keyword: "warn"
+    color: "#fbff00"
+  - keyword: "java.lang"
+    color: "#fbff00"
+# 艳青色:#00ffea
+  - keyword: "IP limit exceeded"
+    color: "#00ffea"
+  - keyword: "触发了"
+    color: "#00ffea"
+  - keyword: "Grim"
+    color: "#00ffea"
+# 灰色:#666666
+  - keyword: "lost connection"
+    color: "#666666"
+  - keyword: "left the game"
+    color: "#666666"
+  - keyword: "voicechat"
+    color: "#666666"
+  - keyword: "Disconnecting"
+    color: "#666666"
+  - keyword: "Thread RCON"
+    color: "#666666"
+# 绿色:#3BF010
+  - keyword: "logged in with entity"
+    color: "#3BF010"
+# 白色:#ffffff
+  - keyword: "info"
+    color: "#ffffff"
+
+# 反作弊日志关键词（包含这些词的日志行，会出现在前端“反作弊日志”标签页，并同步写入 AntiCheatLog.txt）
+anticheat_keywords:
+  - "触发了"
+  - "[Server]"
+
+
+# ==================== 一般不用管这个 ====================
+db_path: "stats.db"   # (不用管这个)  数据库文件路径（留空则自动使用当前目录下的 stats.db）
+crash_confirm_delay_seconds: 10   # 崩溃确认延迟（秒） 当日志行出现"crash"时，间隔 {crash_confirm_delay_seconds}(默认10) 秒检查是否出现crash日志，判断是否真崩溃了。
