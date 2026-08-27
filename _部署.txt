@@ -1,0 +1,17 @@
+# 创建虚拟环境
+D:\_Project\Python\python_main\x64\python.exe -m venv myenv
+
+# 激活虚拟环境（Windows 批处理）
+myenv\Scripts\activate
+
+# 升级 pip、setuptools、wheel
+myenv\Scripts\python.exe -m pip install --upgrade pip setuptools wheel
+
+# 安装项目依赖（先安装其他包，再单独处理 gevent）
+myenv\Scripts\python.exe -m pip install flask flask-socketio flask-compress mcrcon pyyaml psutil mcstatus -i https://pypi.tuna.tsinghua.edu.cn/simple/
+
+# 安装 setuptools 指定版本（gevent 编译需要）
+myenv\Scripts\python.exe -m pip install setuptools==58.0.0
+
+# 安装 gevent（强制使用预编译二进制，避免编译）
+myenv\Scripts\python.exe -m pip install gevent --only-binary gevent -i https://pypi.tuna.tsinghua.edu.cn/simple/

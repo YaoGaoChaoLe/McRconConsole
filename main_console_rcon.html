@@ -1,0 +1,3685 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
+    <title>YaoGaoChaoLe_MiniGameServer</title>
+    <style>
+        /* ===== 全局重置 & 布局 ===== */
+        * {
+            box-sizing: border-box;
+            font-family: '微软雅黑', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #0a0a0a;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #e0e0e0;
+        }
+
+        /* ===== 顶部状态栏 ===== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e1e1e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .5);
+            gap: 12px;
+            flex-wrap: wrap;
+            min-height: 48px;
+            border: 1px solid #2c2c2c;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #0fc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .auto-scroll-check,
+        .auto-wrap-check {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            color: #ccc;
+        }
+
+        .auto-scroll-check input,
+        .auto-wrap-check input {
+            accent-color: #00ffcc;
+        }
+
+        /* ===== 标签栏 ===== */
+        .tab-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            background: #1a1a1a;
+            padding: 5px 5px 0 5px;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .tab-button {
+            padding: 8px 16px;
+            background: #2c2c2c;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: .2s;
+            color: #ddd;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        .tab-button.active {
+            background: #0f0f0f;
+            border-bottom-color: #0fc;
+            font-weight: 600;
+            color: #0fc;
+        }
+
+        /* ===== 面板容器 ===== */
+        .panel-container {
+            flex: 1;
+            background: #0f0f0f;
+            border-radius: 0 6px 6px 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #2c2c2c;
+            border-top: none;
+        }
+
+        .tab-content {
+            flex: 1;
+            display: none;
+            background: #0f0f0f;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* ===== 控制台相关 ===== */
+        .console-log-container {
+            flex: 1;
+            background: #1a1a1a;
+            font-family: Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 8px;
+            overflow: auto;
+        }
+
+        .console-log-line {
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+        }
+
+        .log-textarea {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            resize: none;
+            font-family: Consolas, monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            outline: 0;
+            padding: 8px;
+            min-height: 0;
+        }
+
+        .split-panel {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .split-half {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            min-height: 0;
+            border: 1px solid #2c2c2c;
+        }
+
+        /* ===== 通用子标题 ===== */
+        .console-log-area .sub-header,
+        .ip-query-area .sub-header,
+        .ip-record-area .sub-header,
+        .split-half .sub-header,
+        .stats-area .sub-header {
+            padding: 5px 10px;
+            background: #252525;
+            font-weight: 600;
+            border-bottom: 1px solid #3a3a3a;
+            flex-shrink: 0;
+            color: #0fc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* ===== IP 记录面板 ===== */
+        .player-ip-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .ip-record-area {
+            flex: 2;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #2c2c2c;
+        }
+
+        .ip-record-area .sub-header {
+            flex-shrink: 0;
+        }
+
+        .collapse-all-btn {
+            padding: 4px 12px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: .2s;
+        }
+
+        .collapse-all-btn:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        .ip-panel {
+            flex: 1;
+            overflow: auto;
+            padding: 8px;
+        }
+
+        .ip-card {
+            margin-bottom: 8px;
+            border: 1px solid #2c2c2c;
+            border-radius: 4px;
+            background: #0f0f0f;
+        }
+
+        .ip-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2c2c2c;
+            user-select: none;
+        }
+
+        .ip-header:hover {
+            background: #252525;
+        }
+
+        .ip-header .toggle-icon {
+            font-size: 16px;
+            margin-right: 8px;
+            color: #fff;
+        }
+
+        .ip-header .ip-address {
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-right: 12px;
+        }
+
+        .ip-header .ip-address.single-player {
+            color: #fff;
+        }
+
+        .ip-header .ip-address.multi-player {
+            color: #ff0;
+        }
+
+        .ip-header .ip-address:hover {
+            color: #fff;
+        }
+
+        .ip-header .stats {
+            color: #aaa;
+            font-size: 13px;
+            word-break: break-all;
+            white-space: normal;
+            flex: 1;
+        }
+
+        .ip-details {
+            padding: 8px 12px;
+            display: none;
+        }
+
+        .ip-details.expanded {
+            display: block;
+        }
+
+        .login-record-row {
+            font-family: monospace;
+            font-size: 13px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #2c2c2c;
+            display: flex;
+        }
+
+        .login-record-time {
+            color: #0fc;
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .login-record-player {
+            color: #fff;
+            margin-left: 12px;
+        }
+
+        /* ===== IP 查询区 ===== */
+        .console-log-area,
+        .ip-query-area {
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #2c2c2c;
+        }
+
+        .ip-query-area {
+            flex: 1;
+            min-height: 180px;
+        }
+
+        .console-log-area {
+            flex: 3;
+            min-height: 0;
+        }
+
+        .ip-query-row {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .ip-query-row input {
+            flex: 3;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: 1px solid #3a3a3a;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .ip-query-row input:focus {
+            outline: 0;
+            border-color: #0fc;
+            box-shadow: 0 0 2px #0fc;
+        }
+
+        .ip-query-row button {
+            flex: 1;
+            padding: 8px 16px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .ip-query-row button:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        .ip-query-result {
+            flex: 1;
+            background: #0f0f0f;
+            border: 1px solid #2c2c2c;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow: auto;
+            margin: 0 10px 10px 10px;
+            color: #ccc;
+        }
+
+        /* ===== 控制台子标题内的控件 ===== */
+        .console-log-area .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .line-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .line-control button,
+        .scroll-btn {
+            padding: 4px 12px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .line-control button:hover,
+        .scroll-btn:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        .scroll-buttons {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
+
+        /* ===== 统计面板 ===== */
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 1px;
+            padding: 1px;
+            overflow: auto;
+        }
+
+        .stats-chart-area {
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid #2c2c2c;
+            padding: 12px;
+            min-height: 300px;
+            overflow: hidden;   /* 防止子元素溢出 */
+            position: relative; /* 确保内部定位生效 */
+        }
+
+        .stats-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stats-chart-header span {
+            color: #0fc;
+        }
+
+        .range-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .range-btn {
+            padding: 4px 12px;
+            background: #2c2c2c;
+            color: #ccc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .range-btn.active {
+            background: #0fc;
+            color: #0a0a0a;
+            border-color: #0fc;
+        }
+
+        .range-btn:hover:not(.active) {
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        .performance-charts-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .performance-charts-row .stats-chart-area {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .performance-chart-container {
+            min-height: auto;
+        }
+
+        /* ===== 模态框 ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+            border: 1px solid #0fc;
+            box-shadow: 0 0 10px rgba(0, 255, 204, .2);
+        }
+
+        .modal-card h3 {
+            color: #0fc;
+            margin-top: 0;
+        }
+
+        .modal-card input {
+            width: 100%;
+            padding: 8px;
+            margin: 15px 0;
+            border: 1px solid #3a3a3a;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .modal-card input:focus {
+            outline: 0;
+            border-color: #0fc;
+        }
+
+        .modal-card button {
+            padding: 8px 16px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .modal-card button:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        /* ===== RCON 浮动窗口 ===== */
+        .rcon-floating-window {
+            position: fixed;
+            width: 450px;
+            max-width: 85vw;
+            height: 400px;
+            background: #1a1a1a;
+            border: 1px solid #2c2c2c;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, .5);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            resize: both;
+            overflow: hidden;
+            min-width: 300px;
+            min-height: 200px;
+            opacity: .9;
+        }
+
+        .rcon-floating-window .rcon-header {
+            padding: 8px 12px;
+            background: #252525;
+            font-weight: 600;
+            color: #0fc;
+            border-bottom: 1px solid #3a3a3a;
+            cursor: move;
+            user-select: none;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .rcon-floating-window .rcon-content {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .rcon-floating-window .command-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .rcon-floating-window .command-input-row input {
+            flex: 3;
+            padding: 8px 12px;
+            border: 1px solid #3a3a3a;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .rcon-floating-window .command-input-row input:focus {
+            outline: 0;
+            border-color: #0fc;
+            box-shadow: 0 0 2px #0fc;
+        }
+
+        .rcon-floating-window .command-input-row button {
+            flex: 1;
+            padding: 8px 16px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .rcon-floating-window .command-input-row button:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        .rcon-floating-window .result-content {
+            background: #0f0f0f;
+            border: 1px solid #2c2c2c;
+            border-radius: 4px;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            overflow: auto;
+            flex: 1;
+            color: #ccc;
+        }
+
+        /* ===== 沉浸式仪表盘 ===== */
+        .immersive-dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: none;
+            flex-direction: row;
+            gap: 2px;
+            padding: 10px;
+            box-sizing: border-box;
+            z-index: 9999;
+        }
+
+        body.immersive-mode {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        body.immersive-mode .console-log-area .sub-header,
+        body.immersive-mode .panel-container,
+        body.immersive-mode .tab-bar,
+        body.immersive-mode .top-bar {
+            display: none !important;
+        }
+
+        body.immersive-mode .rcon-floating-window {
+            display: none;
+        }
+
+        body.immersive-mode .immersive-dashboard {
+            display: flex !important;
+        }
+
+        .floating-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10000;
+        }
+
+        .floating-btn {
+            padding: 5px 5px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: .2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-btn:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+
+        .immersive-dashboard .left-panel {
+            flex: 7;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .immersive-dashboard .right-panel {
+            flex: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .immersive-dashboard .left-panel .panel:first-child {
+            flex: 2;
+        }
+        .immersive-dashboard .left-panel .panel:last-child {
+            flex: 1;
+        }
+        .immersive-dashboard .right-panel .panel:first-child {
+            flex: 2;
+        }
+        .immersive-dashboard .right-panel .panel:last-child {
+            flex: 1;
+        }
+
+        .immersive-dashboard .panel {
+            background: #1a1a1a;
+            border: 1px solid #2c2c2c;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+            min-width: 0;
+        }
+
+        .immersive-dashboard .panel-header {
+            background: #252525;
+            padding: 6px 10px;
+            font-weight: 600;
+            color: #0fc;
+            border-bottom: 1px solid #3a3a3a;
+            flex-shrink: 0;
+        }
+
+        .immersive-dashboard .panel-content {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        #immersive-stats {
+            padding: 0;
+            height: 100% !important;
+            width: 100%;
+            min-height: 200px;
+        }
+
+        /* ===== IP 组折叠 ===== */
+        .ip-group {
+            margin-bottom: 12px;
+            border: 1px solid #2c2c2c;
+            border-radius: 4px;
+            background: #0f0f0f;
+        }
+
+        .ip-group-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2c2c2c;
+            font-weight: 700;
+        }
+
+        .ip-group-header:hover {
+            background: #252525;
+        }
+
+        .group-toggle-icon {
+            font-size: 16px;
+            margin-right: 8px;
+            color: #fff;
+        }
+
+        .group-title {
+            color: #fff;
+            margin-right: 12px;
+        }
+
+        .group-stats {
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .ip-group-content {
+            padding: 8px;
+            background: #0f0f0f;
+        }
+
+        /* ===== 控制台缩略图 ===== */
+        .minimap-window-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+        }
+
+        .minimap-window-input {
+            width: 60px;
+            padding: 2px 4px;
+            background: #0f0f0f;
+            color: #0fc;
+            border: 1px solid #2c2c2c;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: monospace;
+            text-align: center;
+            opacity: .8;
+            transition: opacity .2s, border-color .2s;
+        }
+
+        .minimap-window-input:focus,
+        .minimap-window-input:hover {
+            opacity: 1;
+            border-color: #0fc;
+            outline: 0;
+        }
+
+        .minimap-window-input::-webkit-inner-spin-button {
+            opacity: .6;
+            height: 16px;
+        }
+
+        .console-log-row {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .console-minimap {
+            width: 10%;
+            min-width: 80px;
+            max-width: 200px;
+            flex-shrink: 0;
+            background: #1a1a1a;
+            border-left: 1px solid #2c2c2c;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: inset 2px 0 8px rgba(0, 0, 0, .4);
+        }
+
+        .console-minimap:hover {
+            filter: brightness(1.05);
+        }
+
+        .console-minimap .minimap-viewport {
+            position: absolute;
+            top: 8px;
+            left: 6px;
+            right: 6px;
+            bottom: auto;
+            overflow: hidden;
+        }
+
+        .console-minimap .minimap-content {
+            transform-origin: top left;
+            pointer-events: none;
+            font-size: 15px;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        .console-minimap .minimap-content .minimap-line {
+            display: block;
+            line-height: inherit;
+            white-space: pre;
+        }
+
+        .console-minimap .minimap-indicator {
+            position: absolute;
+            left: 4px;
+            right: 4px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .3);
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 5;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+        }
+
+        .console-minimap:hover .minimap-indicator {
+            background: rgba(255, 255, 255, .2);
+            border-color: rgba(255, 255, 255, .5);
+        }
+
+        /* ===== 滚动条 ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0fc;
+        }
+
+        textarea {
+            scrollbar-width: thin;
+        }
+
+        #console-log-container::-webkit-scrollbar {
+            width: 12px;
+        }
+        #console-log-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        #console-log-container::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 6px;
+        }
+        #console-log-container::-webkit-scrollbar-thumb:hover {
+            background: #0fc;
+        }
+        #console-log-container {
+            scrollbar-width: auto;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 768px) {
+            .console-minimap {
+                width: 60px;
+            }
+            .minimap-window-input {
+                width: 50px;
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tab-button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .ip-query-row input {
+                flex: 1;
+            }
+            .split-panel {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .console-minimap {
+                display: none;
+            }
+            .minimap-window-label {
+                display: none;
+            }
+        }
+
+        @media (min-width: 501px) {
+            .player-ip-container {
+                flex-direction: row;
+            }
+            .player-ip-container .ip-record-area {
+                flex: 7.5;
+            }
+            .player-ip-container .ip-query-area {
+                flex: 2.5;
+            }
+        }
+
+        /* ===== Grim 面板分割 ===== */
+        .grim-split-container {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .grim-panel {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .grim-left {
+            flex-shrink: 0;
+            width: 50%;
+        }
+        .grim-right {
+            flex: 1;
+        }
+
+        .grim-divider {
+            width: 6px;
+            flex-shrink: 0;
+            cursor: col-resize;
+            background: #2c2c2c;
+            position: relative;
+            transition: background .15s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .grim-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 32px;
+            background: #666;
+            border-radius: 1px;
+            transition: all .15s ease;
+        }
+
+        .grim-divider.dragging,
+        .grim-divider:hover {
+            background: #00e5ff;
+            box-shadow: 0 0 20px rgba(0, 229, 255, .4);
+        }
+
+        .grim-divider.dragging::before,
+        .grim-divider:hover::before {
+            background: #0a0a0a;
+            height: 44px;
+        }
+
+        @media (max-width: 600px) {
+            .grim-split-container {
+                flex-direction: column;
+            }
+            .grim-left {
+                width: 100% !important;
+                flex: 1;
+            }
+            .grim-right {
+                flex: 1;
+            }
+            .grim-divider {
+                display: none;
+            }
+        }
+    </style>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
+    </script>
+</head>
+
+<body>
+    <!-- ===== 顶部状态栏 ===== -->
+    <div class="top-bar">
+        <div class="status-text" id="status"></div>
+        <label class="auto-scroll-check">
+            <input id="auto-scroll" type="checkbox" checked> 自动滚动
+        </label>
+        <label class="auto-wrap-check">
+            <input id="auto-wrap" type="checkbox"> 自动换行
+        </label>
+    </div>
+
+    <!-- ===== 标签栏 ===== -->
+    <div class="tab-bar" id="tab-bar">
+        <button class="tab-button" data-tab="console">控制台</button>
+        <button class="tab-button" data-tab="chat">聊天记录</button>
+        <button class="tab-button" data-tab="grim">反作弊日志</button>
+        <button class="tab-button" data-tab="playerip">登录查询</button>
+        <button class="tab-button" data-tab="stats">统计</button>
+        <button class="tab-button" data-tab="joinquit">退出</button>
+    </div>
+
+    <!-- ===== 面板容器 ===== -->
+    <div class="panel-container">
+
+        <!-- 控制台 -->
+        <div class="tab-content" id="tab-console">
+            <div class="console-container" style="display:flex;flex-direction:column;height:100%;gap:12px;flex:1;min-height:0;">
+                <div class="console-log-area">
+                    <div class="sub-header">
+                        <span>Latest Log</span>
+                        <div class="line-control">
+                            <button id="copy-console-btn">复制</button>
+                            <div class="scroll-buttons">
+                                <button class="scroll-btn" id="scroll-top-btn" title="滚动到顶部">↑</button>
+                                <button class="scroll-btn" id="scroll-bottom-btn" title="滚动到底部">↓</button>
+                            </div>
+                            <div id="log-load-progress" style="font-size:12px;margin-left:auto;color:#aaa;white-space:nowrap;"></div>
+                            <label class="minimap-window-label">
+                                <span style="font-size:12px;color:#aaa;white-space:nowrap;">缩略图行数:</span>
+                                <input id="minimap-window-size" type="number" class="minimap-window-input" max="100000" min="50" step="50" title="缩略图显示行数" value="1000">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="console-log-row">
+                        <div class="console-log-container" id="console-log-container"></div>
+                        <div class="console-minimap" id="console-minimap">
+                            <div class="minimap-viewport">
+                                <div class="minimap-content" id="minimap-content"></div>
+                            </div>
+                            <div class="minimap-indicator" id="minimap-indicator"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天记录 -->
+        <div class="tab-content" id="tab-chat">
+            <div class="console-log-area">
+                <div class="sub-header">
+                    <span>聊天记录</span>
+                    <div class="scroll-buttons">
+                        <button class="scroll-btn" id="chat-scroll-top" title="滚动到顶部">↑</button>
+                        <button class="scroll-btn" id="chat-scroll-bottom" title="滚动到底部">↓</button>
+                    </div>
+                </div>
+                <textarea class="log-textarea" id="chat-text" readonly wrap="off"></textarea>
+            </div>
+        </div>
+
+        <!-- 退出记录 -->
+        <div class="tab-content" id="tab-joinquit">
+            <div class="console-log-area">
+                <div class="sub-header">
+                    <span>加入/退出</span>
+                    <div class="scroll-buttons">
+                        <button class="scroll-btn" id="joinquit-scroll-top" title="滚动到顶部">↑</button>
+                        <button class="scroll-btn" id="joinquit-scroll-bottom" title="滚动到底部">↓</button>
+                    </div>
+                </div>
+                <textarea class="log-textarea" id="joinquit-text" readonly wrap="off"></textarea>
+            </div>
+        </div>
+
+        <!-- 反作弊 + Server -->
+        <div class="tab-content" id="tab-grim">
+            <div class="grim-split-container">
+                <div class="grim-panel grim-left" id="grim-left-panel">
+                    <div class="sub-header">反作弊日志</div>
+                    <textarea class="log-textarea" id="grim-text" readonly wrap="off"></textarea>
+                </div>
+                <div class="grim-divider" id="grim-divider" title="拖动调整左右宽度"></div>
+                <div class="grim-panel grim-right">
+                    <div class="sub-header">[Server]</div>
+                    <textarea class="log-textarea" id="server-text" readonly wrap="off"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- IP 登录查询 -->
+        <div class="tab-content" id="tab-playerip">
+            <div class="player-ip-container">
+                <div class="ip-record-area">
+                    <div class="sub-header">
+                        <span>玩家登录IP记录</span>
+                        <div style="display:flex;gap:8px;">
+                            <button class="collapse-all-btn" id="collapse-all-btn">[-]</button>
+                            <button class="collapse-all-btn" id="expand-all-btn">[+]</button>
+                            <button class="collapse-all-btn" id="batch-query-ip-btn">查询IP地址</button>
+                            <div class="scroll-buttons">
+                                <button class="scroll-btn" id="ip-scroll-top" title="滚动到顶部">↑</button>
+                                <button class="scroll-btn" id="ip-scroll-bottom" title="滚动到底部">↓</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ip-panel" id="ip-panel"></div>
+                </div>
+                <div class="ip-query-area">
+                    <div class="sub-header">IP归属地查询</div>
+                    <div class="ip-query-row">
+                        <input id="ip-input" placeholder="输入 IPv4 地址，例如 117.159.10.44">
+                        <button id="query-ip-btn">查询</button>
+                    </div>
+                    <div class="ip-query-result" id="ip-query-result">等待查询</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计 -->
+        <div class="tab-content" id="tab-stats">
+            <div class="stats-container">
+                <div class="stats-chart-area">
+                    <div class="stats-chart-header">
+                        <span>在线人数趋势</span>
+                        <span id="live-online-summary" style="flex:1;text-align:center;color:#0fc;font-size:13px;margin:0 10px;min-width:0;"></span>
+                        <div class="range-selector" id="range-selector">
+                            <button class="range-btn active" data-range="1d">1天</button>
+                            <button class="range-btn" data-range="3d">3天</button>
+                            <button class="range-btn" data-range="7d">7天</button>
+                            <button class="range-btn" data-range="all">全部</button>
+                        </div>
+                    </div>
+                    <div id="online-chart" style="width:100%;height:320px;overflow:hidden;"></div>
+                    <!-- <div id="online-chart" style="width:100%;height:290px;"></div> -->
+                </div>
+
+                <div class="performance-charts-row">
+                    <div class="stats-chart-area performance-chart-container" style="flex:1;min-width:280px;">
+                        <div class="stats-chart-header"><span>系统资源</span></div>
+                        <div style="display:flex;flex-direction:column;gap:1px;">
+                            <div style="width:100%;">
+                                <div style="text-align:center;color:#0fc;font-size:13px;margin-bottom:4px;">网络速率 (Mbps)</div>
+                                <div id="net-chart" style="width:100%;height:220px;"></div>
+                            </div>
+                            <div style="width:100%;">
+                                <div style="text-align:center;color:#0fc;font-size:13px;margin-bottom:4px;">内存使用率</div>
+                                <div id="mem-chart" style="width:100%;height:180px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-chart-area performance-chart-container">
+                        <div class="stats-chart-header"><span>CPU使用率</span></div>
+                        <div id="cpu-charts-container" style="display:flex;flex-wrap:wrap;gap:1px;min-height:1px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /panel-container -->
+
+    <!-- ===== 沉浸式仪表盘 ===== -->
+    <div class="immersive-dashboard" id="immersive-dashboard">
+        <div class="left-panel">
+            <div class="panel">
+                <div class="panel-header">控制台日志</div>
+                <div class="panel-content" id="immersive-console"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">反作弊日志</div>
+                <div class="panel-content" id="immersive-grim"></div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="panel">
+                <div class="panel-header">聊天记录</div>
+                <div class="panel-content" id="immersive-chat"></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">在线玩家</div>
+                <div class="panel-content" id="immersive-stats" style="padding:0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== RCON 浮动窗口 ===== -->
+    <div class="rcon-floating-window" id="rcon-floating">
+        <div class="rcon-header" id="rcon-header">RCON 命令</div>
+        <div class="rcon-content">
+            <div class="command-input-row">
+                <input id="rcon-command" placeholder="例如 /list 或 /say Hello" autocomplete="off">
+                <button id="send-command-btn">发送命令</button>
+            </div>
+            <div class="result-content" id="rcon-result">等待命令执行...</div>
+        </div>
+    </div>
+
+    <!-- ===== 浮动按钮 ===== -->
+    <div class="floating-buttons">
+        <button class="floating-btn" id="rcon-toggle-btn" title="显示/隐藏 RCON 窗口" style="display:none;">R</button>
+        <button class="floating-btn" id="immersive-floating-btn" title="沉浸模式" style="display:none;">[+]</button>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ===== JavaScript ===== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            // 全局状态 w
+            // ============================================================
+            const w = {
+                apiPassword: null,
+                currentTab: 'console',
+                chatLines: [],
+                joinQuitLines: [],
+                grimLines: [],
+                serverLines: [],
+                ipLoginRecords: [],
+                cmdHistory: [],
+                historyIdx: -1,
+                highlightRules: [],
+                expandedIps: new Set(),
+                expandedGroups: new Set(),
+                immersiveMode: false,
+                autoScrollEnabled: true,
+                autoWrapEnabled: false,
+                onlineChart: null,
+                cpuCharts: [],
+                memChart: null,
+                netChart: null,
+                performanceData: {
+                    cpu: [],
+                    mem: [],
+                    upload: [],
+                    download: [],
+                    cpuPerCore: []
+                },
+                currentStatsRange: '1d',
+                statsRefreshTimer: null,
+                resizeHandlerAttached: false,
+                ipLocationCache: new Map(),
+                immersiveChart: null,
+                immersiveStatsTimer: null,
+                anticheatKeywords: [],
+                minimapRefreshTimer: null,
+                minimapDragging: false,
+                minimapStartY: 0,
+                minimapHasMoved: false,
+                // 新增：缓存的完整数据（用于滑块）
+                fullTimes: [],
+                fullCounts: [],
+                fullMissingRanges: []
+            };
+
+            // ============================================================
+            // 工具函数 S
+            // ============================================================
+            const S = {
+                escapeHtml: function(text) {
+                    return text.replace(/[&<>]/g, function(m) {
+                        if (m === '&') return '&amp;';
+                        if (m === '<') return '&lt;';
+                        if (m === '>') return '&gt;';
+                        return m;
+                    });
+                },
+
+                getHighlightColor: function(line, rules) {
+                    for (const rule of rules) {
+                        if (line.toLowerCase().includes(rule.keyword.toLowerCase())) {
+                            return rule.color;
+                        }
+                    }
+                    return '';
+                },
+
+                isContainerAtBottom: function(el) {
+                    if (!el) return true;
+                    return (el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
+                },
+
+                scrollContainerToBottom: function(el) {
+                    if (el) el.scrollTop = el.scrollHeight;
+                },
+
+                smoothScrollToBottomDynamic: function(el, duration) {
+                    if (!el) return;
+                    if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
+                    var startScroll = el.scrollTop;
+                    var startTime = performance.now();
+                    var that = this;
+
+                    function animate(time) {
+                        var progress = Math.min((time - startTime) / duration, 1);
+                        var eased = progress * (2 - progress); // easeOutQuad
+                        var targetScroll = el.scrollHeight - el.clientHeight;
+                        var newTop = startScroll + (targetScroll - startScroll) * eased;
+                        el.scrollTop = Math.min(Math.max(newTop, 0), targetScroll);
+                        if (progress < 1) {
+                            el._scrollAnim = requestAnimationFrame(animate);
+                        } else {
+                            el.scrollTop = targetScroll;
+                            delete el._scrollAnim;
+                            w.autoScrollEnabled = true;
+                            var cb = document.getElementById('auto-scroll');
+                            if (cb) cb.checked = true;
+                        }
+                    }
+                    el._scrollAnim = requestAnimationFrame(animate);
+                },
+
+                smoothScrollToTop: function(el, duration) {
+                    if (!el) return;
+                    if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
+                    var startScroll = el.scrollTop;
+                    if (startScroll === 0) return;
+                    var startTime = performance.now();
+
+                    function animate(time) {
+                        var progress = Math.min((time - startTime) / duration, 1);
+                        var eased = progress * (2 - progress);
+                        el.scrollTop = startScroll * (1 - eased);
+                        if (progress < 1) {
+                            el._scrollAnim = requestAnimationFrame(animate);
+                        } else {
+                            delete el._scrollAnim;
+                            w.autoScrollEnabled = false;
+                            var cb = document.getElementById('auto-scroll');
+                            if (cb) cb.checked = false;
+                        }
+                    }
+                    el._scrollAnim = requestAnimationFrame(animate);
+                },
+
+                extractProvinceCity: function(location) {
+                    if (!location) return { province: '未知', city: '', full: '未知' };
+                    var cleaned = location.replace(/^中国\s*/, '');
+                    var province = '未知';
+                    var provList = [
+                        '北京', '天津', '上海', '重庆',
+                        '河北', '山西', '辽宁', '吉林', '黑龙江',
+                        '江苏', '浙江', '安徽', '福建', '江西', '山东',
+                        '河南', '湖北', '湖南', '广东', '海南',
+                        '四川', '贵州', '云南', '陕西', '甘肃', '青海',
+                        '台湾', '内蒙古', '广西', '西藏', '宁夏', '新疆',
+                        '香港', '澳门'
+                    ];
+                    for (var i = 0; i < provList.length; i++) {
+                        if (cleaned.startsWith(provList[i])) {
+                            province = provList[i];
+                            break;
+                        }
+                    }
+                    return { province: province, city: '', full: cleaned };
+                }
+            };
+
+            // province mapping (english -> chinese)
+            var provMap = {
+                'Anhui': '安徽',
+                'Beijing': '北京',
+                'Chongqing': '重庆',
+                'Fujian': '福建',
+                'Gansu': '甘肃',
+                'Guangdong': '广东',
+                'Guangxi': '广西',
+                'Guizhou': '贵州',
+                'Hainan': '海南',
+                'Hebei': '河北',
+                'Heilongjiang': '黑龙江',
+                'Henan': '河南',
+                'Hubei': '湖北',
+                'Hunan': '湖南',
+                'Inner Mongolia': '内蒙古',
+                'Jiangsu': '江苏',
+                'Jiangxi': '江西',
+                'Jilin': '吉林',
+                'Liaoning': '辽宁',
+                'Ningxia': '宁夏',
+                'Qinghai': '青海',
+                'Shaanxi': '陕西',
+                'Shandong': '山东',
+                'Shanghai': '上海',
+                'Shanxi': '山西',
+                'Sichuan': '四川',
+                'Tianjin': '天津',
+                'Tibet': '西藏',
+                'Xinjiang': '新疆',
+                'Yunnan': '云南',
+                'Zhejiang': '浙江',
+                'Hong Kong': '香港',
+                'Macao': '澳门',
+                'Taiwan': '台湾'
+            };
+
+            // ============================================================
+            // 日志处理器 r
+            // ============================================================
+            var r = {
+                extractPlayerName: function(line) {
+                    var match = line.match(/([a-zA-Z0-9_]+)\s*\[\/\d+\.\d+\.\d+\.\d+:\d+\]/);
+                    return match ? match[1] : '';
+                },
+
+                processLine: function(line) {
+                    var raw = line;
+                    var isChat = raw.includes('聊') || raw.includes('[Not Secure]') || raw.includes('[Server]') ||
+                        raw.includes('[Rcon]') || raw.includes('[TEAM_ONLY]') || raw.includes('[SHOUT]') ||
+                        /<[a-zA-Z0-9_]+>/.test(raw);
+                    var isJoinQuit = raw.includes('lost connection');
+                    var isGrim = w.anticheatKeywords.some(function(kw) { return raw.includes(kw); });
+                    var isServer = raw.includes('[Server]');
+                    var isLogin = raw.includes('logged in');
+
+                    // 清理前缀
+                    raw = raw.replace('[Server thread/INFO]: [Not Secure] ', '');
+                    raw = raw.replace('[Server thread/INFO]: ', '');
+
+                    if (isChat) w.chatLines.push(raw);
+                    if (isJoinQuit) w.joinQuitLines.push(raw);
+                    if (isGrim) w.grimLines.push(raw);
+                    if (isServer) w.serverLines.push(raw);
+
+                    if (isLogin) {
+                        var timeMatch = raw.match(/\[(\d{2}:\d{2}:\d{2})\]/);
+                        var player = this.extractPlayerName(raw);
+                        var ipMatch = raw.match(/\/(\d+\.\d+\.\d+\.\d+):\d+\]/);
+                        if (timeMatch && player && ipMatch) {
+                            w.ipLoginRecords.push({
+                                time: timeMatch[1],
+                                player: player,
+                                ip: ipMatch[1]
+                            });
+                            if (w.currentTab === 'playerip') {
+                                h.scheduleIpPanelRender();
+                            }
+                        }
+                    }
+
+                    h.updateImmersiveDashboard();
+                },
+
+                processBatch: function(lines) {
+                    for (var i = 0; i < lines.length; i++) {
+                        this.processLine(lines[i]);
+                    }
+                },
+
+                refreshAllDataFromRaw: function(rawText) {
+                    w.chatLines = [];
+                    w.joinQuitLines = [];
+                    w.grimLines = [];
+                    w.serverLines = [];
+                    w.ipLoginRecords = [];
+                    var lines = rawText.split(/\r?\n/);
+                    for (var i = 0; i < lines.length; i++) {
+                        this.processLine(lines[i]);
+                    }
+                    if (w.currentTab !== 'console') {
+                        h.updateNonConsoleTab();
+                    }
+                }
+            };
+
+            // ============================================================
+            // IP 批量查询工具 i
+            // ============================================================
+            var i = {
+                batchQuery: async function(ips, onProgress) {
+                    var cache = w.ipLocationCache;
+                    var resultMap = new Map();
+                    var total = ips.length;
+                    var done = 0;
+
+                    // 分批，每批100个
+                    var batches = [];
+                    for (var idx = 0; idx < ips.length; idx += 100) {
+                        batches.push(ips.slice(idx, idx + 100));
+                    }
+
+                    for (var b = 0; b < batches.length; b++) {
+                        var batch = batches[b];
+                        var needQuery = batch.filter(function(ip) { return !cache.has(ip); });
+
+                        if (needQuery.length > 0) {
+                            try {
+                                var resp = await fetch('http://ip-api.com/batch', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(needQuery)
+                                });
+                                var data = await resp.json();
+                                if (!Array.isArray(data)) throw new Error('批量查询返回格式错误');
+
+                                for (var k = 0; k < needQuery.length; k++) {
+                                    var ip = needQuery[k];
+                                    var info = data[k];
+                                    var locationInfo = { province: '未知', city: '', full: '未知' };
+                                    if (info && info.status === 'success') {
+                                        var region = info.regionName || '';
+                                        if (provMap[region]) region = provMap[region];
+                                        var full = info.country + ' ' + region + ' ' + info.city;
+                                        var extracted = S.extractProvinceCity(full);
+                                        if (extracted.province === '未知' && region) {
+                                            extracted.province = region;
+                                            extracted.full = info.country + ' ' + region;
+                                        } else if (extracted.province !== '未知') {
+                                            extracted.full = info.country + ' ' + extracted.province;
+                                        }
+                                        locationInfo = extracted;
+                                    }
+                                    cache.set(ip, locationInfo);
+                                    resultMap.set(ip, locationInfo);
+                                    done++;
+                                    if (onProgress) onProgress(done, total);
+                                }
+                            } catch (err) {
+                                console.error('批量查询失败:', err);
+                                for (var p = 0; p < needQuery.length; p++) {
+                                    var ip2 = needQuery[p];
+                                    var fallback = { province: '未知', city: '', full: '未知' };
+                                    cache.set(ip2, fallback);
+                                    resultMap.set(ip2, fallback);
+                                    done++;
+                                    if (onProgress) onProgress(done, total);
+                                }
+                            }
+                        } else {
+                            // 全部命中缓存
+                            for (var q = 0; q < batch.length; q++) {
+                                var ip3 = batch[q];
+                                resultMap.set(ip3, cache.get(ip3));
+                                done++;
+                                if (onProgress) onProgress(done, total);
+                            }
+                        }
+
+                        if (batches.length > 1) {
+                            await new Promise(function(resolve) { setTimeout(resolve, 1000); });
+                        }
+                    }
+
+                    return resultMap;
+                }
+            };
+
+            // ============================================================
+            // 控制台缩略图 d
+            // ============================================================
+            var d = {
+                elements: {
+                    panel: document.getElementById('console-minimap'),
+                    viewport: null,
+                    content: document.getElementById('minimap-content'),
+                    indicator: document.getElementById('minimap-indicator')
+                },
+                _windowStart: 0,
+                _windowEnd: 0,
+                _totalLines: 0,
+                _resizeTimer: null,
+                _rafId: null,
+                resizeObserver: null,
+
+                init: function() {
+                    var panel = this.elements.panel;
+                    if (!panel || !this.elements.content || !this.elements.indicator) return;
+                    this.elements.viewport = panel.querySelector('.minimap-viewport');
+                    this.elements.windowSizeInput = document.getElementById('minimap-window-size');
+                    this.bindEvents();
+
+                    if (window.ResizeObserver) {
+                        this.resizeObserver = new ResizeObserver(function() {
+                            d.refresh();
+                        });
+                        this.resizeObserver.observe(h.elements.consoleContainer);
+                    } else {
+                        window.addEventListener('resize', function() {
+                            clearTimeout(d._resizeTimer);
+                            d._resizeTimer = setTimeout(function() { d.refresh(); }, 150);
+                        });
+                    }
+
+                    var input = this.elements.windowSizeInput;
+                    if (input) {
+                        input.addEventListener('input', function() { d.refresh(); });
+                    }
+                },
+
+                bindEvents: function() {
+                    var panel = this.elements.panel;
+                    var that = this;
+                    panel.addEventListener('mousedown', function(e) {
+                        e.preventDefault();
+                        w.minimapDragging = true;
+                        w.minimapHasMoved = false;
+                        var rect = that.elements.viewport.getBoundingClientRect();
+                        w.minimapStartY = e.clientY - rect.top;
+                        document.addEventListener('mousemove', that.onMouseMove);
+                        document.addEventListener('mouseup', that.onMouseUp);
+                    });
+                },
+
+                onMouseMove: function(e) {
+                    if (!w.minimapDragging) return;
+                    e.preventDefault();
+                    var rect = d.elements.viewport.getBoundingClientRect();
+                    var y = e.clientY - rect.top;
+                    if (Math.abs(y - w.minimapStartY) > 3) {
+                        w.minimapHasMoved = true;
+                    }
+                    if (w.minimapHasMoved) {
+                        d.scrollToMouseY(y);
+                    }
+                },
+
+                onMouseUp: function(e) {
+                    if (w.minimapDragging) {
+                        w.minimapDragging = false;
+                        document.removeEventListener('mousemove', d.onMouseMove);
+                        document.removeEventListener('mouseup', d.onMouseUp);
+                        var rect = d.elements.viewport.getBoundingClientRect();
+                        var y = e.clientY - rect.top;
+                        d.scrollToMouseY(y, true);
+                    }
+                },
+
+                _findFirstVisibleLine: function(lines, scrollTop) {
+                    var lo = 0,
+                        hi = lines.length - 1;
+                    while (lo < hi) {
+                        var mid = Math.floor((lo + hi) / 2);
+                        if (lines[mid].offsetTop >= scrollTop) {
+                            hi = mid;
+                        } else {
+                            lo = mid + 1;
+                        }
+                    }
+                    return Math.min(lo, lines.length - 1);
+                },
+
+                scrollToMouseY: function(y, smooth) {
+                    var viewport = this.elements.viewport;
+                    if (!viewport) return;
+                    var viewportHeight = viewport.clientHeight;
+                    var container = h.elements.consoleContainer;
+                    if (!container) return;
+                    var lines = container.querySelectorAll('.console-log-line');
+                    if (lines.length === 0 || this._windowEnd <= this._windowStart) return;
+
+                    var ratio = Math.max(0, Math.min(1, y / viewportHeight));
+                    var visibleRange = this._windowEnd - this._windowStart;
+                    var targetLineIdx = this._windowStart + Math.floor(ratio * visibleRange);
+                    targetLineIdx = Math.max(0, Math.min(targetLineIdx, lines.length - 1));
+                    var targetTop = lines[targetLineIdx].offsetTop - 0.3 * container.clientHeight;
+                    var maxTop = container.scrollHeight - container.clientHeight;
+                    targetTop = Math.max(0, Math.min(targetTop, maxTop));
+
+                    if (smooth) {
+                        container.scrollTo({ top: targetTop, behavior: 'smooth' });
+                    } else {
+                        container.scrollTop = targetTop;
+                    }
+                },
+
+                refresh: function() {
+                    if (!this.elements.panel || !this.elements.content || !this.elements.indicator) return;
+                    if (!h.elements.consoleContainer) return;
+                    if (this._rafId) return;
+                    this._rafId = requestAnimationFrame(function() {
+                        d._rafId = null;
+                        d._doRefresh();
+                    });
+                },
+
+                _doRefresh: function() {
+                    var container = h.elements.consoleContainer;
+                    if (!container) return;
+                    var lines = container.querySelectorAll('.console-log-line');
+                    this._totalLines = lines.length;
+                    if (this._totalLines === 0) {
+                        this.elements.content.innerHTML = '';
+                        this.updateScaleAndIndicator();
+                        return;
+                    }
+
+                    var scrollTop = container.scrollTop;
+                    var clientH = container.clientHeight;
+                    var scrollH = container.scrollHeight;
+
+                    // 找到第一个可见行
+                    var firstVisible = this._findFirstVisibleLine(lines, scrollTop);
+                    // 估算可见行数
+                    var avgLineH = scrollH / this._totalLines;
+                    var visibleLines = Math.ceil(clientH / avgLineH);
+                    var centerLine = firstVisible + Math.floor(visibleLines / 2);
+
+                    var windowSize = parseInt(this.elements.windowSizeInput ? this.elements.windowSizeInput.value : 1000) || 1000;
+                    var start = centerLine - Math.floor(windowSize / 2);
+                    if (start < 0) start = 0;
+                    var end = start + windowSize;
+                    if (end > this._totalLines) {
+                        end = this._totalLines;
+                        start = Math.max(0, end - windowSize);
+                    }
+                    this._windowStart = start;
+                    this._windowEnd = end;
+
+                    var frag = document.createDocumentFragment();
+                    for (var i = start; i < end; i++) {
+                        var lineEl = lines[i];
+                        var span = document.createElement('span');
+                        span.className = 'minimap-line';
+                        span.textContent = lineEl.textContent;
+                        var color = lineEl.style.color;
+                        if (color) span.style.color = color;
+                        frag.appendChild(span);
+                    }
+                    this.elements.content.innerHTML = '';
+                    this.elements.content.appendChild(frag);
+                    this.updateScaleAndIndicator();
+                },
+
+                updateScaleAndIndicator: function() {
+                    var viewport = this.elements.viewport;
+                    if (!viewport) return;
+                    var container = h.elements.consoleContainer;
+                    if (!container) return;
+
+                    var viewH = container.clientHeight;
+                    viewport.style.bottom = 'auto';
+                    viewport.style.height = viewH + 'px';
+
+                    var contentH = this.elements.content.scrollHeight;
+                    var viewportH = viewport.clientHeight;
+                    if (contentH <= 0 || viewportH <= 0) return;
+
+                    var scale = viewportH / contentH;
+                    scale = Math.min(scale, 0.3);
+                    this.elements.content.style.transform = 'scale(' + scale + ')';
+                    this.updateIndicator();
+                },
+
+                updateIndicator: function() {
+                    var container = h.elements.consoleContainer;
+                    if (!container) return;
+                    var viewport = this.elements.viewport;
+                    if (!viewport) return;
+                    var indicator = this.elements.indicator;
+                    var viewH = viewport.clientHeight;
+                    var lines = container.querySelectorAll('.console-log-line');
+                    if (lines.length === 0 || this._windowEnd <= this._windowStart) {
+                        indicator.style.opacity = '0';
+                        return;
+                    }
+
+                    var scrollTop = container.scrollTop;
+                    var clientH = container.clientHeight;
+                    var firstLine = lines[this._windowStart];
+                    var lastLine = lines[this._windowEnd - 1];
+                    var firstTop = firstLine.offsetTop;
+                    var lastBottom = lastLine.offsetTop + lastLine.offsetHeight;
+                    var totalHeight = lastBottom - firstTop;
+                    if (totalHeight <= 0) {
+                        indicator.style.opacity = '0';
+                        return;
+                    }
+
+                    var visibleTop = (scrollTop - firstTop) / totalHeight;
+                    var visibleHeight = clientH / totalHeight;
+                    visibleTop = Math.max(0, Math.min(visibleTop, 1 - visibleHeight));
+                    visibleHeight = Math.min(visibleHeight, 1);
+                    var pixelTop = visibleTop * viewH;
+                    var pixelHeight = visibleHeight * viewH;
+                    pixelHeight = Math.max(pixelHeight, 8);
+                    var maxPixel = viewH - pixelHeight;
+                    pixelTop = Math.min(Math.max(pixelTop, 0), maxPixel);
+
+                    indicator.style.top = pixelTop + 'px';
+                    indicator.style.height = pixelHeight + 'px';
+                    indicator.style.opacity = '1';
+                }
+            };
+
+            // ============================================================
+            // 界面控制 h
+            // ============================================================
+            var h = {
+                elements: {},
+                ipPanelRenderTimer: null,
+
+                init: function() {
+                    this.elements = {
+                        status: document.getElementById('status'),
+                        autoScroll: document.getElementById('auto-scroll'),
+                        autoWrap: document.getElementById('auto-wrap'),
+                        consoleContainer: document.getElementById('console-log-container'),
+                        chatText: document.getElementById('chat-text'),
+                        joinquitText: document.getElementById('joinquit-text'),
+                        grimText: document.getElementById('grim-text'),
+                        serverText: document.getElementById('server-text'),
+                        ipPanel: document.getElementById('ip-panel'),
+                        ipInput: document.getElementById('ip-input'),
+                        ipResult: document.getElementById('ip-query-result'),
+                        rconCommand: document.getElementById('rcon-command'),
+                        rconResult: document.getElementById('rcon-result'),
+                        immersiveBtn: document.getElementById('immersive-floating-btn'),
+                        rconToggleBtn: document.getElementById('rcon-toggle-btn'),
+                        rconWindow: document.getElementById('rcon-floating'),
+                        collapseAllBtn: document.getElementById('collapse-all-btn'),
+                        batchQueryBtn: document.getElementById('batch-query-ip-btn'),
+                        immersiveConsole: document.getElementById('immersive-console'),
+                        immersiveChat: document.getElementById('immersive-chat'),
+                        immersiveGrim: document.getElementById('immersive-grim'),
+                        immersiveStats: document.getElementById('immersive-stats'),
+                        progressDiv: document.getElementById('log-load-progress'),
+                        minimapPanel: document.getElementById('console-minimap')
+                    };
+
+                    this.bindEvents();
+                    this.initDraggable();
+                    d.init();
+
+                    // 监听滚动更新自动滚动复选框
+                    var self = this;
+                    ['consoleContainer', 'chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(function(
+                    id) {
+                        var el = self.elements[id];
+                        if (el) {
+                            el.addEventListener('scroll', function() {
+                                if (id === 'consoleContainer') d.refresh();
+                                self.updateAutoScrollCheck();
+                            });
+                        }
+                    });
+                },
+
+                bindEvents: function() {
+                    var self = this;
+
+                    this.elements.autoScroll.addEventListener('change', function() { self.onAutoScrollChange(); });
+                    this.elements.autoWrap.addEventListener('change', function() {
+                        self.setAllWrapMode(self.elements.autoWrap.checked);
+                    });
+
+                    document.getElementById('scroll-top-btn').addEventListener('click', function() {
+                        S.smoothScrollToTop(self.elements.consoleContainer, 200);
+                    });
+                    document.getElementById('scroll-bottom-btn').addEventListener('click', function() {
+                        S.smoothScrollToBottomDynamic(self.elements.consoleContainer, 200);
+                    });
+
+                    document.getElementById('copy-console-btn').addEventListener('click', function() {
+                        self.copyConsoleContent();
+                    });
+
+                    document.getElementById('send-command-btn').addEventListener('click', function() {
+                        t.sendCommand();
+                    });
+                    this.elements.rconCommand.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') t.sendCommand();
+                    });
+                    this.elements.rconCommand.addEventListener('keydown', function(e) {
+                        t.onKeydown(e);
+                    });
+
+                    document.getElementById('query-ip-btn').addEventListener('click', function() {
+                        self.queryIP(self.elements.ipInput.value);
+                    });
+                    this.elements.ipInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') self.queryIP(self.elements.ipInput.value);
+                    });
+
+                    if (this.elements.collapseAllBtn) {
+                        this.elements.collapseAllBtn.addEventListener('click', function() { self.collapseAllIps(); });
+                    }
+                    var expandBtn = document.getElementById('expand-all-btn');
+                    if (expandBtn) {
+                        expandBtn.addEventListener('click', function() { self.expandAllGroups(); });
+                    }
+
+                    this.elements.ipPanel.addEventListener('click', function(e) { self.handleIpPanelClick(e); });
+
+                    this.elements.immersiveBtn.addEventListener('click', function() { self.toggleImmersiveMode(); });
+                    this.elements.rconToggleBtn.addEventListener('click', function() { self.toggleRconWindow(); });
+                    if (this.elements.batchQueryBtn) {
+                        this.elements.batchQueryBtn.addEventListener('click', function() { self.batchQueryIpLocation(); });
+                    }
+
+                    document.getElementById('chat-scroll-top') && document.getElementById('chat-scroll-top')
+                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.chatText, 200); });
+                    document.getElementById('chat-scroll-bottom') && document.getElementById('chat-scroll-bottom')
+                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.chatText,
+                            200); });
+
+                    document.getElementById('joinquit-scroll-top') && document.getElementById('joinquit-scroll-top')
+                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.joinquitText,
+                            200); });
+                    document.getElementById('joinquit-scroll-bottom') && document.getElementById('joinquit-scroll-bottom')
+                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements
+                            .joinquitText, 200); });
+
+                    document.getElementById('ip-scroll-top') && document.getElementById('ip-scroll-top')
+                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.ipPanel, 200); });
+                    document.getElementById('ip-scroll-bottom') && document.getElementById('ip-scroll-bottom')
+                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel,
+                            200); });
+                },
+
+                setAllWrapMode: function(enabled) {
+                    var mode = enabled ? 'pre-wrap' : 'pre';
+                    var wordBreak = enabled ? 'break-word' : 'normal';
+
+                    function apply(el) {
+                        if (!el) return;
+                        if (el.tagName === 'TEXTAREA') {
+                            el.style.whiteSpace = mode;
+                            el.style.wordWrap = wordBreak;
+                        } else {
+                            el.style.whiteSpace = mode;
+                            el.style.wordWrap = wordBreak;
+                            Array.from(el.querySelectorAll('.console-log-line')).forEach(function(line) {
+                                line.style.whiteSpace = mode;
+                                line.style.wordWrap = wordBreak;
+                            });
+                        }
+                    }
+
+                    apply(this.elements.chatText);
+                    apply(this.elements.joinquitText);
+                    apply(this.elements.grimText);
+                    apply(this.elements.serverText);
+                    apply(this.elements.consoleContainer);
+                    w.autoWrapEnabled = enabled;
+                    d.refresh();
+                },
+
+                onAutoScrollChange: function() {
+                    w.autoScrollEnabled = this.elements.autoScroll.checked;
+                    if (!w.autoScrollEnabled) return;
+                    var tab = w.currentTab;
+                    if (tab === 'chat') {
+                        S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
+                    } else if (tab === 'joinquit') {
+                        S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
+                    } else if (tab === 'grim') {
+                        S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
+                        S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
+                    } else if (tab === 'playerip') {
+                        S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
+                    } else if (tab === 'console') {
+                        S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                    }
+                },
+
+                updateAutoScrollCheck: function() {
+                    var allAtBottom = true;
+                    var containers = [
+                        this.elements.consoleContainer,
+                        this.elements.chatText,
+                        this.elements.joinquitText,
+                        this.elements.grimText,
+                        this.elements.serverText,
+                        this.elements.ipPanel
+                    ];
+                    for (var i = 0; i < containers.length; i++) {
+                        var el = containers[i];
+                        if (el && !S.isContainerAtBottom(el)) {
+                            allAtBottom = false;
+                            break;
+                        }
+                    }
+                    if (this.elements.autoScroll.checked !== allAtBottom) {
+                        this.elements.autoScroll.checked = allAtBottom;
+                        w.autoScrollEnabled = allAtBottom;
+                    }
+                },
+
+                createLogLineElement: function(text) {
+                    var div = document.createElement('div');
+                    div.className = 'console-log-line';
+                    var color = S.getHighlightColor(text, w.highlightRules);
+                    if (color) div.style.color = color;
+                    div.textContent = text;
+                    if (w.autoWrapEnabled) {
+                        div.style.whiteSpace = 'pre-wrap';
+                        div.style.wordWrap = 'break-word';
+                    } else {
+                        div.style.whiteSpace = 'pre';
+                        div.style.wordWrap = 'normal';
+                    }
+                    return div;
+                },
+
+                appendLogLines: function(lines) {
+                    if (!this.elements.consoleContainer || !lines.length) return;
+                    var frag = document.createDocumentFragment();
+                    for (var i = 0; i < lines.length; i++) {
+                        frag.appendChild(this.createLogLineElement(lines[i]));
+                    }
+                    this.elements.consoleContainer.appendChild(frag);
+                    if (w.autoScrollEnabled) {
+                        S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                    }
+                    this.updateImmersiveDashboard();
+                    d.refresh();
+                },
+
+                renderConsoleLog: function(text) {
+                    if (!this.elements.consoleContainer) return;
+                    var lines = text.split(/\r?\n/);
+                    var frag = document.createDocumentFragment();
+                    for (var i = 0; i < lines.length; i++) {
+                        if (lines[i] !== '') {
+                            frag.appendChild(this.createLogLineElement(lines[i]));
+                        }
+                    }
+                    this.elements.consoleContainer.innerHTML = '';
+                    this.elements.consoleContainer.appendChild(frag);
+                    this.updateImmersiveDashboard();
+                    d.refresh();
+                },
+
+                updateNonConsoleTab: function() {
+                    var tab = w.currentTab;
+                    if (tab === 'console') return;
+                    switch (tab) {
+                        case 'chat':
+                            this.updateTextareaWithSelection(this.elements.chatText, w.chatLines.join('\n'));
+                            break;
+                        case 'joinquit':
+                            var sorted = w.joinQuitLines.slice().sort(function(a, b) {
+                                var t1 = (a.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
+                                var t2 = (b.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
+                                return t1.localeCompare(t2);
+                            });
+                            this.updateTextareaWithSelection(this.elements.joinquitText, sorted.join('\n'));
+                            break;
+                        case 'grim':
+                            this.updateTextareaWithSelection(this.elements.grimText, w.grimLines.join('\n'));
+                            this.updateTextareaWithSelection(this.elements.serverText, w.serverLines.join('\n'));
+                            break;
+                        case 'playerip':
+                            this.renderIpPanel();
+                            return;
+                        default:
+                            break;
+                    }
+                    if (w.autoScrollEnabled) {
+                        if (tab === 'chat') {
+                            S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
+                        } else if (tab === 'joinquit') {
+                            S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
+                        } else if (tab === 'grim') {
+                            S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
+                            S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
+                        }
+                    }
+                    this.updateImmersiveDashboard();
+                },
+
+                updateTextareaWithSelection: function(textarea, value) {
+                    if (!textarea) return;
+                    var selStart = textarea.selectionStart;
+                    var selEnd = textarea.selectionEnd;
+                    textarea.value = value;
+                    if (selStart !== undefined && selEnd !== undefined && value.length >= selEnd) {
+                        textarea.selectionStart = selStart;
+                        textarea.selectionEnd = selEnd;
+                    } else if (selStart !== undefined && value.length >= selStart) {
+                        textarea.selectionStart = selStart;
+                        textarea.selectionEnd = selStart;
+                    }
+                },
+
+                renderIpPanel: function() {
+                    var map = new Map();
+                    for (var i = 0; i < w.ipLoginRecords.length; i++) {
+                        var rec = w.ipLoginRecords[i];
+                        if (!map.has(rec.ip)) {
+                            map.set(rec.ip, { records: [], playersSet: new Set() });
+                        }
+                        var entry = map.get(rec.ip);
+                        entry.records.push({ time: rec.time, player: rec.player });
+                        entry.playersSet.add(rec.player);
+                    }
+
+                    if (map.size === 0) {
+                        this.elements.ipPanel.innerHTML = '<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>';
+                        return;
+                    }
+
+                    var ipList = [];
+                    for (var pair of map.entries()) {
+                        var ip = pair[0];
+                        var data = pair[1];
+                        var province = '未知';
+                        var cached = w.ipLocationCache.get(ip);
+                        if (cached && cached.province) province = cached.province;
+                        var fullLocation = cached ? cached.full : '未知';
+                        ipList.push({
+                            ip: ip,
+                            province: province,
+                            fullLocation: fullLocation,
+                            records: data.records,
+                            totalLogins: data.records.length,
+                            uniquePlayers: data.playersSet.size,
+                            playerNames: Array.from(data.playersSet).sort()
+                        });
+                    }
+
+                    // 按省份分组
+                    var groupMap = new Map();
+                    for (var j = 0; j < ipList.length; j++) {
+                        var item = ipList[j];
+                        var prov = item.province;
+                        if (!groupMap.has(prov)) {
+                            groupMap.set(prov, { province: prov, items: [], totalLogins: 0, uniquePlayersSet: new Set() });
+                        }
+                        var g = groupMap.get(prov);
+                        g.items.push(item);
+                        g.totalLogins += item.totalLogins;
+                        item.playerNames.forEach(function(name) { g.uniquePlayersSet.add(name); });
+                    }
+
+                    var html = '';
+                    var sortedGroups = Array.from(groupMap.entries()).sort(function(a, b) {
+                        return b[1].items.length - a[1].items.length;
+                    });
+
+                    for (var gi = 0; gi < sortedGroups.length; gi++) {
+                        var key = sortedGroups[gi][0];
+                        var group = sortedGroups[gi][1];
+                        var expanded = w.expandedGroups.has(key);
+                        html += '<div class="ip-group" data-group-key="' + key + '">';
+                        html += '<div class="ip-group-header" data-group-key="' + key + '">';
+                        html += '<span class="group-toggle-icon">' + (expanded ? '▼' : '▶') + '</span>';
+                        html += '<span class="group-title">' + key + '</span>';
+                        html += '<span class="group-stats">(' + group.items.length + '个IP, ' + group.totalLogins +
+                            '次登录, ' + group.uniquePlayersSet.size + '个玩家)</span>';
+                        html += '</div>';
+                        html += '<div class="ip-group-content" data-group-key="' + key + '" style="' + (expanded ? '' :
+                            'display:none;') + '">';
+
+                        var items = group.items;
+                        for (var ii = 0; ii < items.length; ii++) {
+                            var it = items[ii];
+                            var cls = it.uniquePlayers > 1 ? 'multi-player' : 'single-player';
+                            var names = it.playerNames.join(' // ');
+                            var ipExpanded = w.expandedIps.has(it.ip);
+                            html += '<div class="ip-card" data-ip="' + it.ip + '">';
+                            html += '<div class="ip-header" data-ip="' + it.ip + '">';
+                            html += '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>';
+                            html += '<span class="ip-address ' + cls + '" data-ip="' + it.ip + '">' + it.ip +
+                            '</span>';
+                            html += '<span class="stats">(' + it.totalLogins + '次登录, ' + it.uniquePlayers +
+                                '个玩家: ' + names + ')</span>';
+                            html += '</div>';
+                            html += '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + it
+                                .ip + '">';
+                            var sortedRecs = it.records.slice().sort(function(a, b) {
+                                return a.time.localeCompare(b.time);
+                            });
+                            for (var ri = 0; ri < sortedRecs.length; ri++) {
+                                var rec2 = sortedRecs[ri];
+                                html += '<div class="login-record-row">';
+                                html += '<span class="login-record-time">' + rec2.time + '</span>';
+                                html += '<span class="login-record-player">' + S.escapeHtml(rec2.player) +
+                                    '</span>';
+                                html += '</div>';
+                            }
+                            html += '</div></div>';
+                        }
+                        html += '</div></div>';
+                    }
+
+                    this.elements.ipPanel.innerHTML = html;
+                    if (w.autoScrollEnabled && w.currentTab === 'playerip') {
+                        S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
+                    }
+                },
+
+                scheduleIpPanelRender: function() {
+                    if (this.ipPanelRenderTimer) clearTimeout(this.ipPanelRenderTimer);
+                    this.ipPanelRenderTimer = setTimeout(function() {
+                        h.ipPanelRenderTimer = null;
+                        h.renderIpPanel();
+                    }, 100);
+                },
+
+                handleIpPanelClick: function(e) {
+                    var target = e.target;
+
+                    // 点击组头
+                    var groupHeader = target.closest('.ip-group-header');
+                    if (groupHeader) {
+                        var key = groupHeader.getAttribute('data-group-key');
+                        if (key) {
+                            var content = this.elements.ipPanel.querySelector('.ip-group-content[data-group-key="' +
+                                key + '"]');
+                            var icon = groupHeader.querySelector('.group-toggle-icon');
+                            if (content) {
+                                if (content.style.display === 'none') {
+                                    content.style.display = 'block';
+                                    if (icon) icon.textContent = '▼';
+                                    w.expandedGroups.add(key);
+                                } else {
+                                    content.style.display = 'none';
+                                    if (icon) icon.textContent = '▶';
+                                    w.expandedGroups.delete(key);
+                                }
+                            }
+                        }
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    // 点击IP地址（快速查询）
+                    var ipAddr = target.closest('.ip-address');
+                    if (ipAddr) {
+                        var ip = ipAddr.getAttribute('data-ip');
+                        if (ip) {
+                            this.elements.ipInput.value = ip;
+                            this.queryIP(ip);
+                        }
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    // 点击IP卡片头部（展开/折叠）
+                    var header = target.closest('.ip-header');
+                    if (header) {
+                        var ip2 = header.getAttribute('data-ip');
+                        if (ip2) {
+                            var details = this.elements.ipPanel.querySelector('.ip-details[data-ip="' + ip2 + '"]');
+                            var icon2 = header.querySelector('.toggle-icon');
+                            if (details) {
+                                if (details.classList.contains('expanded')) {
+                                    details.classList.remove('expanded');
+                                    if (icon2) icon2.textContent = '▶';
+                                    w.expandedIps.delete(ip2);
+                                } else {
+                                    details.classList.add('expanded');
+                                    if (icon2) icon2.textContent = '▼';
+                                    w.expandedIps.add(ip2);
+                                }
+                            }
+                        }
+                    }
+                },
+
+                collapseAllIps: function() {
+                    var contents = this.elements.ipPanel.querySelectorAll('.ip-group-content');
+                    for (var i = 0; i < contents.length; i++) {
+                        contents[i].style.display = 'none';
+                    }
+                    var icons = this.elements.ipPanel.querySelectorAll('.group-toggle-icon');
+                    for (var j = 0; j < icons.length; j++) {
+                        if (icons[j]) icons[j].textContent = '▶';
+                    }
+                    w.expandedGroups.clear();
+                },
+
+                expandAllGroups: function() {
+                    var contents = this.elements.ipPanel.querySelectorAll('.ip-group-content');
+                    for (var i = 0; i < contents.length; i++) {
+                        contents[i].style.display = 'block';
+                    }
+                    var icons = this.elements.ipPanel.querySelectorAll('.group-toggle-icon');
+                    for (var j = 0; j < icons.length; j++) {
+                        if (icons[j]) icons[j].textContent = '▼';
+                    }
+                    var groups = this.elements.ipPanel.querySelectorAll('.ip-group');
+                    for (var k = 0; k < groups.length; k++) {
+                        var key = groups[k].getAttribute('data-group-key');
+                        if (key) w.expandedGroups.add(key);
+                    }
+                },
+
+                batchQueryIpLocation: function() {
+                    var ipSet = new Set();
+                    for (var i = 0; i < w.ipLoginRecords.length; i++) {
+                        ipSet.add(w.ipLoginRecords[i].ip);
+                    }
+                    var ips = Array.from(ipSet);
+                    if (ips.length === 0) {
+                        this.showStatus('没有可查询的IP', 2000);
+                        return;
+                    }
+                    this.showStatus('正在查询 ' + ips.length + ' 个IP的归属地...', 0);
+                    var btn = this.elements.batchQueryBtn;
+                    btn.disabled = true;
+                    btn.textContent = '查询中...';
+                    var self = this;
+
+                    i.batchQuery(ips, function(done, total) {
+                        self.showStatus('查询进度: ' + done + '/' + total, 0);
+                    }).then(function() {
+                        self.showStatus('查询完成，共 ' + ips.length + ' 个IP', 2000);
+                        self.renderIpPanel();
+                    }).catch(function(err) {
+                        console.error(err);
+                        self.showStatus('查询失败，请重试', 2000);
+                    }).finally(function() {
+                        btn.disabled = false;
+                        btn.textContent = '查询IP地址';
+                    });
+                },
+
+                queryIP: function(ip) {
+                    if (!ip.trim()) {
+                        this.elements.ipResult.innerText = '请输入 IP';
+                        return;
+                    }
+                    var resultEl = this.elements.ipResult;
+                    var queries = [{
+                        name: '=========== 结果1 ===========',
+                        fetch: function(ip) {
+                            return fetch('https://api.ip77.net/ip2/v4/', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: 'ip=' + encodeURIComponent(ip)
+                            }).then(function(res) { return res.json(); }).then(function(data) {
+                                if (data.code !== 0 || !data.data) throw new Error(data.error || '查询失败');
+                                var d = data.data;
+                                return {
+                                    location: d.location || '未知',
+                                    lat: d.latitude,
+                                    lng: d.longitude,
+                                    street: d.street_history && d.street_history.length ? d.street_history
+                                        .join('、') : '无街道信息'
+                                };
+                            });
+                        }
+                    }, {
+                        name: '=========== 结果2 ===========',
+                        fetch: function(ip) {
+                            return fetch('http://ip-api.com/json/' + ip +
+                                '?fields=status,country,regionName,city,lat,lon,isp,org'
+                            ).then(function(res) { return res.json(); }).then(function(data) {
+                                if (data.status !== 'success') throw new Error(data.message || '查询失败');
+                                return {
+                                    location: data.country + ' ' + data.regionName + ' ' + data.city,
+                                    lat: data.lat,
+                                    lng: data.lon,
+                                    street: 'ISP: ' + (data.isp || '未知')
+                                };
+                            });
+                        }
+                    }, {
+                        name: '=========== 结果3 ===========',
+                        fetch: function(ip) {
+                            return fetch('https://ipapi.co/' + ip + '/json/').then(function(res) { return res
+                                    .json(); }).then(function(data) {
+                                if (data.error) throw new Error(data.reason || '查询失败');
+                                return {
+                                    location: data.country_name + ' ' + data.region + ' ' + data.city,
+                                    lat: data.latitude,
+                                    lng: data.longitude,
+                                    street: 'ASN: ' + data.asn
+                                };
+                            });
+                        }
+                    }, {
+                        name: '=========== 结果4 ===========',
+                        fetch: function(ip) {
+                            return fetch('https://ipinfo.io/' + ip + '/json').then(function(res) { return res
+                                    .json(); }).then(function(data) {
+                                if (data.bogon || data.error) throw new Error(data.error || '查询失败');
+                                var loc = data.loc ? data.loc.split(',') : [];
+                                return {
+                                    location: data.country + ' ' + data.region + ' ' + data.city,
+                                    lat: loc[0] || null,
+                                    lng: loc[1] || null,
+                                    street: '组织: ' + (data.org || '未知')
+                                };
+                            });
+                        }
+                    }, {
+                        name: '=========== 结果5 ===========',
+                        fetch: function(ip) {
+                            return fetch('https://ipwho.is/' + ip).then(function(res) { return res.json(); })
+                                .then(function(data) {
+                                    if (!data.success) throw new Error(data.message || '查询失败');
+                                    return {
+                                        location: data.country + ' ' + data.region + ' ' + data.city,
+                                        lat: data.latitude,
+                                        lng: data.longitude,
+                                        street: '代理: ' + (data.proxy ? '是' : '否') + ' | ISP: ' + (data
+                                        .isp || '未知')
+                                    };
+                                });
+                        }
+                    }];
+
+                    var html = '';
+                    for (var i = 0; i < queries.length; i++) {
+                        html += '<div id="ip-result-' + i +
+                            '" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【' + queries[i]
+                            .name + '】\n查询中...</div>';
+                    }
+                    resultEl.innerHTML = html;
+
+                    for (var qi = 0; qi < queries.length; qi++) {
+                        (function(index) {
+                            queries[index].fetch(ip).then(function(result) {
+                                var el = document.getElementById('ip-result-' + index);
+                                if (el) {
+                                    el.innerText = '\n\n【' + queries[index].name + '】\n位置: ' + result
+                                        .location + '\n经纬度: ' + result.lng + ',' + result.lat +
+                                        '\n详细: ' + result.street;
+                                }
+                            }).catch(function(err) {
+                                var el = document.getElementById('ip-result-' + index);
+                                if (el) {
+                                    el.innerText = '\n\n【' + queries[index].name + '】\n失败: ' + err.message;
+                                }
+                            });
+                        })(qi);
+                    }
+                },
+
+                copyConsoleContent: function() {
+                    var lines = this.elements.consoleContainer.querySelectorAll('.console-log-line');
+                    if (!lines.length) {
+                        this.showStatus('无内容可复制', 2000);
+                        return;
+                    }
+                    var text = Array.from(lines).map(function(el) { return el.textContent; }).join('\n');
+                    var self = this;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(function() {
+                            self.showStatus('已复制 ' + lines.length + ' 行', 2000);
+                        }).catch(function() {
+                            self.fallbackCopy(text, lines.length);
+                        });
+                    } else {
+                        this.fallbackCopy(text, lines.length);
+                    }
+                },
+
+                fallbackCopy: function(text, count) {
+                    var ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    this.showStatus('已复制 ' + count + ' 行', 2000);
+                },
+
+                showStatus: function(msg, timeout) {
+                    var old = this.elements.status.innerText;
+                    this.elements.status.innerText = msg;
+                    if (timeout > 0) {
+                        var self = this;
+                        setTimeout(function() {
+                            if (self.elements.status.innerText === msg) {
+                                self.elements.status.innerText = old;
+                            }
+                        }, timeout);
+                    }
+                },
+
+                updateImmersiveDashboard: function() {
+                    if (!w.immersiveMode) return;
+
+                    var self = this;
+
+                    // 更新控制台
+                    if (this.elements.immersiveConsole) {
+                        var consoleLines = Array.from(this.elements.consoleContainer ? this.elements.consoleContainer
+                            .children : []).map(function(el) { return el.textContent; });
+                        var slice = consoleLines.slice(-500);
+                        var currentTexts = Array.from(this.elements.immersiveConsole.children).map(function(el) {
+                            return el.textContent;
+                        });
+                        if (JSON.stringify(currentTexts) !== JSON.stringify(slice)) {
+                            this.elements.immersiveConsole.innerHTML = '';
+                            for (var i = 0; i < slice.length; i++) {
+                                var div = document.createElement('div');
+                                div.className = 'console-log-line';
+                                var color = S.getHighlightColor(slice[i], w.highlightRules);
+                                if (color) div.style.color = color;
+                                div.textContent = slice[i];
+                                if (w.autoWrapEnabled) {
+                                    div.style.whiteSpace = 'pre-wrap';
+                                    div.style.wordWrap = 'break-word';
+                                }
+                                this.elements.immersiveConsole.appendChild(div);
+                            }
+                            if (w.autoScrollEnabled) {
+                                setTimeout(function() {
+                                    self.elements.immersiveConsole.scrollTo({
+                                        top: self.elements.immersiveConsole.scrollHeight,
+                                        behavior: 'smooth'
+                                    });
+                                }, 30);
+                            }
+                        } else {
+                            if (w.autoScrollEnabled) {
+                                setTimeout(function() {
+                                    self.elements.immersiveConsole.scrollTo({
+                                        top: self.elements.immersiveConsole.scrollHeight,
+                                        behavior: 'smooth'
+                                    });
+                                }, 30);
+                            }
+                        }
+                    }
+
+                    // 聊天
+                    if (this.elements.immersiveChat) {
+                        var chatText = w.chatLines.slice(-500).join('\n');
+                        if (this.elements.immersiveChat.innerText !== chatText) {
+                            this.elements.immersiveChat.innerText = chatText;
+                        }
+                        if (w.autoScrollEnabled) {
+                            setTimeout(function() {
+                                self.elements.immersiveChat.scrollTo({
+                                    top: self.elements.immersiveChat.scrollHeight,
+                                    behavior: 'smooth'
+                                });
+                            }, 30);
+                        }
+                    }
+
+                    // 反作弊
+                    if (this.elements.immersiveGrim) {
+                        var grimText = w.grimLines.slice(-500).join('\n');
+                        if (this.elements.immersiveGrim.innerText !== grimText) {
+                            this.elements.immersiveGrim.innerText = grimText;
+                        }
+                        if (w.autoScrollEnabled) {
+                            setTimeout(function() {
+                                self.elements.immersiveGrim.scrollTo({
+                                    top: self.elements.immersiveGrim.scrollHeight,
+                                    behavior: 'smooth'
+                                });
+                            }, 30);
+                        }
+                    }
+                },
+
+                toggleImmersiveMode: function() {
+                    w.immersiveMode = !w.immersiveMode;
+                    if (w.immersiveMode) {
+                        document.body.classList.add('immersive-mode');
+                        this.elements.immersiveBtn.textContent = '[-]';
+                        if (this.elements.rconWindow) {
+                            this.elements.rconWindow.style.display = 'none';
+                        }
+                        if (!w.autoScrollEnabled) {
+                            w.autoScrollEnabled = true;
+                            this.elements.autoScroll.checked = true;
+                        }
+                        if (!w.autoWrapEnabled) {
+                            w.autoWrapEnabled = true;
+                            this.elements.autoWrap.checked = true;
+                            this.setAllWrapMode(true);
+                        }
+                        if (w.currentTab !== 'console') {
+                            l('console');
+                        }
+                        var self = this;
+                        setTimeout(function() {
+                            if (!w.immersiveChart && self.elements.immersiveStats) {
+                                w.immersiveChart = echarts.init(self.elements.immersiveStats);
+                                w.immersiveChart.setOption({
+                                    tooltip: { trigger: 'axis' },
+                                    xAxis: { type: 'category', data: [] },
+                                    yAxis: { type: 'value', name: '在线人数' },
+                                    series: [{ type: 'line', data: [], smooth: false,
+                                        lineStyle: { color: '#00ffcc' } }],
+                                    grid: { containLabel: true, left: 40, right: 20, top: 30,
+                                    bottom: 30 }
+                                });
+                            }
+                            o.loadOnlineStats(w.currentStatsRange, true);
+                        }, 100);
+
+                        if (w.immersiveStatsTimer) clearInterval(w.immersiveStatsTimer);
+                        w.immersiveStatsTimer = setInterval(function() {
+                            if (w.immersiveMode) o.loadOnlineStats(w.currentStatsRange, true);
+                        }, 30000);
+
+                        this.updateImmersiveDashboard();
+                    } else {
+                        document.body.classList.remove('immersive-mode');
+                        this.elements.immersiveBtn.textContent = '[+]';
+                        if (w.apiPassword && this.elements.rconWindow) {
+                            this.elements.rconWindow.style.display = 'flex';
+                        }
+                        w.autoScrollEnabled = this.elements.autoScroll.checked;
+                        w.autoWrapEnabled = this.elements.autoWrap.checked;
+                        this.setAllWrapMode(w.autoWrapEnabled);
+                        if (w.autoScrollEnabled) {
+                            S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                        }
+                        if (w.immersiveStatsTimer) {
+                            clearInterval(w.immersiveStatsTimer);
+                            w.immersiveStatsTimer = null;
+                        }
+                        setTimeout(function() {
+                            if (w.onlineChart) w.onlineChart.resize();
+                            o.resizeAllCharts();
+                        }, 50);
+                        d.refresh();
+                    }
+                },
+
+                toggleRconWindow: function() {
+                    var win = this.elements.rconWindow;
+                    if (!win) return;
+                    if (win.style.display === 'none') {
+                        win.style.display = 'flex';
+                        var left = (window.innerWidth - win.offsetWidth) / 2;
+                        var top = (window.innerHeight - win.offsetHeight) / 2;
+                        win.style.left = left + 'px';
+                        win.style.top = top + 'px';
+                        win.style.bottom = '';
+                        win.style.right = '';
+                    } else {
+                        win.style.display = 'none';
+                    }
+                },
+
+                initDraggable: function() {
+                    var header = document.getElementById('rcon-header');
+                    var windowEl = document.getElementById('rcon-floating');
+                    if (!header || !windowEl) return;
+
+                    var isDragging = false;
+                    var offsetX = 0,
+                        offsetY = 0;
+                    var startX = 0,
+                        startY = 0;
+
+                    function getPos(e) {
+                        var ev = e.touches ? e.touches[0] : e;
+                        return { clientX: ev.clientX, clientY: ev.clientY };
+                    }
+
+                    function onMove(e) {
+                        if (!isDragging) return;
+                        e.preventDefault();
+                        var pos = getPos(e);
+                        var dx = pos.clientX - offsetX;
+                        var dy = pos.clientY - offsetY;
+                        var maxX = window.innerWidth - windowEl.offsetWidth;
+                        var maxY = window.innerHeight - windowEl.offsetHeight;
+                        dx = Math.min(Math.max(dx, 0), maxX);
+                        dy = Math.min(Math.max(dy, 0), maxY);
+                        windowEl.style.left = dx + 'px';
+                        windowEl.style.top = dy + 'px';
+                        windowEl.style.bottom = '';
+                        windowEl.style.right = '';
+                    }
+
+                    function onUp() {
+                        isDragging = false;
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        document.removeEventListener('touchmove', onMove);
+                        document.removeEventListener('touchend', onUp);
+                    }
+
+                    function onDown(e) {
+                        if (e.button !== undefined && e.button !== 0) return;
+                        e.preventDefault();
+                        var rect = windowEl.getBoundingClientRect();
+                        var pos = getPos(e);
+                        offsetX = pos.clientX - rect.left;
+                        offsetY = pos.clientY - rect.top;
+                        isDragging = true;
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                        document.addEventListener('touchmove', onMove, { passive: false });
+                        document.addEventListener('touchend', onUp);
+                    }
+
+                    header.addEventListener('mousedown', onDown);
+                    header.addEventListener('touchstart', onDown, { passive: false });
+                }
+            };
+
+            // ============================================================
+            // WebSocket 连接 a
+            // ============================================================
+            var a = {
+                socket: null,
+
+                init: function() {
+                    if (!w.apiPassword) {
+                        console.warn('WebSocket 未认证，跳过连接');
+                        return;
+                    }
+                    this.socket = io({
+                        query: { token: w.apiPassword },
+                        reconnection: true,
+                        reconnectionAttempts: 10,
+                        reconnectionDelay: 1000,
+                        transports: ['websocket']
+                    });
+
+                    var self = this;
+                    this.socket.on('connect', function() {
+                        console.log('WebSocket 已连接');
+                        h.showStatus('WebSocket 已连接', 2000);
+                        if (!window._historyLoadStarted) {
+                            window._historyLoadStarted = true;
+                            s.start();
+                        }
+                        if (!window._autoListSent) {
+                            window._autoListSent = true;
+                            setTimeout(function() {
+                                t.sendCommand('/list', false);
+                            }, 500);
+                        }
+                    });
+
+                    this.socket.on('disconnect', function() {
+                        location.reload();
+                    });
+
+                    this.socket.on('connect_error', function(err) {
+                        console.error('WebSocket 认证失败:', err);
+                        h.showStatus('WebSocket 认证失败，请刷新页面重新登录', 5000);
+                    });
+
+                    this.socket.on('new_log_batch', function(lines) {
+                        h.appendLogLines(lines);
+                        r.processBatch(lines);
+                        if (w.currentTab !== 'console') h.updateNonConsoleTab();
+                    });
+
+                    this.socket.on('new_log', function(line) {
+                        h.appendLogLines([line]);
+                        r.processLine(line);
+                        if (w.currentTab !== 'console') h.updateNonConsoleTab();
+                    });
+
+                    this.socket.on('connected', function(data) {
+                        console.log('服务器确认:', data);
+                    });
+
+                    this.socket.on('performance_update', function(data) {
+                        w.performanceData.cpu.push(data.cpu);
+                        w.performanceData.mem.push(data.memory);
+                        w.performanceData.upload.push(data.upload);
+                        w.performanceData.download.push(data.download);
+
+                        if (data.cpu_per_core && data.cpu_per_core.length) {
+                            if (w.cpuCharts.length === 0) {
+                                var container = document.getElementById('cpu-charts-container');
+                                if (container) {
+                                    container.innerHTML = '';
+                                    var coreCount = data.cpu_per_core.length;
+                                    for (var i = 0; i < coreCount; i++) {
+                                        var div = document.createElement('div');
+                                        div.id = 'cpu-core-' + i;
+                                        div.style.width = '200px';
+                                        div.style.height = '150px';
+                                        div.style.flex = '0 0 auto';
+                                        container.appendChild(div);
+                                        var chart = echarts.init(div);
+                                        chart.setOption({
+                                            title: { text: '核心' + i, left: 'center', top: 0,
+                                                textStyle: { fontSize: 10, color: '#aaa' } },
+                                            tooltip: { trigger: 'axis' },
+                                            grid: { top: 28, bottom: 15, left: 30, right: 10,
+                                                containLabel: true },
+                                            xAxis: { type: 'category', data: [], show: true,
+                                                axisLabel: { fontSize: 8, interval: 5 } },
+                                            yAxis: { type: 'value', min: 0, max: 100, show: true,
+                                                axisLabel: { fontSize: 8 } },
+                                            series: [{ type: 'line', data: [], smooth: false,
+                                                color: '#ff5722',
+                                                lineStyle: { color: '#ff5722' },
+                                                areaStyle: { opacity: 0.2, color: '#ff5722' }
+                                            }]
+                                        });
+                                        w.cpuCharts.push(chart);
+                                    }
+                                }
+                            }
+                            if (!w.performanceData.cpuPerCore || w.performanceData.cpuPerCore.length === 0) {
+                                w.performanceData.cpuPerCore = data.cpu_per_core.map(function() { return []; });
+                            }
+                            for (var ci = 0; ci < data.cpu_per_core.length; ci++) {
+                                w.performanceData.cpuPerCore[ci].push(data.cpu_per_core[ci]);
+                            }
+                        }
+
+                        // 限制数据长度
+                        if (w.performanceData.cpu.length > 60) {
+                            w.performanceData.cpu.shift();
+                            w.performanceData.mem.shift();
+                            w.performanceData.upload.shift();
+                            w.performanceData.download.shift();
+                            if (w.performanceData.cpuPerCore) {
+                                for (var j = 0; j < w.performanceData.cpuPerCore.length; j++) {
+                                    w.performanceData.cpuPerCore[j].shift();
+                                }
+                            }
+                        }
+
+                        var xData = w.performanceData.cpu.map(function(_, idx) { return idx.toString(); });
+                        if (w.currentTab === 'stats') {
+                            if (w.cpuCharts.length && w.performanceData.cpuPerCore) {
+                                for (var k = 0; k < w.cpuCharts.length; k++) {
+                                    var coreData = w.performanceData.cpuPerCore[k] || [];
+                                    w.cpuCharts[k].setOption({
+                                        xAxis: { data: xData },
+                                        series: [{ data: coreData.slice() }]
+                                    });
+                                }
+                            }
+                            if (w.memChart) {
+                                w.memChart.setOption({
+                                    xAxis: { data: xData },
+                                    series: [{ data: w.performanceData.mem.slice() }]
+                                });
+                            }
+                            if (w.netChart) {
+                                w.netChart.setOption({
+                                    xAxis: { data: xData },
+                                    series: [
+                                        { data: w.performanceData.upload.slice() },
+                                        { data: w.performanceData.download.slice() }
+                                    ]
+                                });
+                            }
+                        }
+                    });
+                }
+            };
+
+            // ============================================================
+            // RCON 命令 t
+            // ============================================================
+            var t = {
+                sendCommand: async function(cmd, recordHistory, clearInput) {
+                    if (recordHistory === undefined) recordHistory = true;
+                    if (clearInput === undefined) clearInput = true;
+                    if (!w.apiPassword) {
+                        h.elements.rconResult.innerText = '离线模式，RCON不可用';
+                        return false;
+                    }
+                    var input = cmd || h.elements.rconCommand.value.trim();
+                    if (!input) {
+                        h.elements.rconResult.innerText = '请输入命令';
+                        return false;
+                    }
+                    h.elements.rconResult.innerText = '发送中...';
+                    try {
+                        var response = await fetch('/api/rcon', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + w.apiPassword
+                            },
+                            body: JSON.stringify({ command: input })
+                        });
+                        var data = await response.json();
+                        if (data.success) {
+                            h.elements.rconResult.innerText = data.output || '(无输出)';
+                            if (recordHistory) {
+                                w.cmdHistory.push(input);
+                                w.historyIdx = w.cmdHistory.length;
+                            }
+                            if (clearInput) {
+                                h.elements.rconCommand.value = '';
+                            }
+                            return true;
+                        } else {
+                            h.elements.rconResult.innerText = '错误：' + data.output;
+                            return false;
+                        }
+                    } catch (err) {
+                        h.elements.rconResult.innerText = '网络错误：' + err.message;
+                        return false;
+                    }
+                },
+
+                onKeydown: function(e) {
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (w.cmdHistory.length && w.historyIdx > 0) {
+                            w.historyIdx--;
+                            h.elements.rconCommand.value = w.cmdHistory[w.historyIdx];
+                        } else if (w.historyIdx === w.cmdHistory.length && w.cmdHistory.length) {
+                            w.historyIdx = w.cmdHistory.length - 1;
+                            h.elements.rconCommand.value = w.cmdHistory[w.historyIdx];
+                        }
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (w.cmdHistory.length && w.historyIdx < w.cmdHistory.length - 1) {
+                            w.historyIdx++;
+                            h.elements.rconCommand.value = w.cmdHistory[w.historyIdx];
+                        } else if (w.cmdHistory.length && w.historyIdx === w.cmdHistory.length - 1) {
+                            w.historyIdx = w.cmdHistory.length;
+                            h.elements.rconCommand.value = '';
+                        }
+                    }
+                }
+            };
+
+
+            // ============================================================
+            // 统计图表 o (修改部分)
+            // ============================================================
+            var o = {
+                // 加载在线人数统计（始终请求全部数据，用 dataZoom 控制窗口）
+                loadOnlineStats: async function(range, immersive) {
+                    immersive = immersive || false;
+                    try {
+                        var resp = await fetch('/api/stats/online?range=all', {
+                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                        });
+                        var data = await resp.json();
+                        if (!data.success) return;
+
+                        var times = data.data.times;
+                        var counts = data.data.counts;
+                        var missingRanges = data.data.missingRanges;
+
+                        // 缓存全量数据（以备后续扩展）
+                        w.fullTimes = times;
+                        w.fullCounts = counts;
+                        w.fullMissingRanges = missingRanges;
+
+                        var totalPoints = times.length;
+                        var hasZoom = false;
+                        var startVal = 0;
+                        var endVal = 100;
+                        var effectiveRange = range; // 可能回退为 'all'
+                        var targetWidth = 0;         // 预设窗口宽度（百分比），用于事件锁定
+
+                        // 只有非“全部”且数据点大于1才计算窗口
+                        if (range !== 'all' && totalPoints > 1) {
+                            var startTime = new Date(times[0]).getTime();
+                            var endTime = new Date(times[totalPoints - 1]).getTime();
+                            var totalDays = (endTime - startTime) / (1000 * 60 * 60 * 24);
+
+                            var windowDays = 1;
+                            if (range === '3d') windowDays = 3;
+                            else if (range === '7d') windowDays = 7;
+                            else if (range === '1d') windowDays = 1;
+
+                            // 方案A：总跨度 <= 窗口天数，回退为全部
+                            if (totalDays <= windowDays) {
+                                hasZoom = false;
+                                effectiveRange = 'all';
+                            } else {
+                                hasZoom = true;
+                                var windowPercent = (windowDays / totalDays) * 100;
+                                // 锚定右侧（最新数据），start 向左延伸
+                                var zoomEnd = 100;
+                                var zoomStart = Math.max(0, 100 - windowPercent);
+                                startVal = zoomStart;
+                                endVal = zoomEnd;
+                                targetWidth = windowPercent; // 保存目标宽度
+                            }
+                        }
+
+                        // 基础图表配置
+                        var option = {
+                            tooltip: { trigger: 'axis' },
+                            xAxis: {
+                                type: 'category',
+                                data: times,
+                                axisLabel: { rotate: 45, interval: 'auto' }
+                            },
+                            yAxis: {
+                                type: 'value',
+                                name: '在线人数',
+                                minInterval: 1,
+                                axisLabel: {
+                                    formatter: function(value) {
+                                        return Number.isInteger(value) ? value : '';
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'line',
+                                data: counts.map(function(v) {
+                                    return v === null ? undefined : v;
+                                }),
+                                smooth: false,
+                                lineStyle: { color: '#00ffcc' },
+                                areaStyle: { opacity: 0.2, color: '#00ffcc' },
+                                itemStyle: { color: '#00ffcc' },
+                                connectNulls: false,
+                                markArea: {
+                                    silent: true,
+                                    itemStyle: { color: 'rgba(255,30,30,0.5)' },
+                                    data: missingRanges.map(function(r) {
+                                        return [
+                                            { xAxis: r.startIdx, yAxis: 'min' },
+                                            { xAxis: r.endIdx, yAxis: 'max' }
+                                        ];
+                                    })
+                                }
+                            }],
+                            grid: { top: 28, bottom: 45, left: '9%', right: '15%', containLabel: true }
+                        };
+
+                        // 如果需要滑块，则添加 dataZoom（允许拖动手柄，但我们用事件强制宽度）
+                        if (hasZoom) {
+                            option.dataZoom = [{
+                                type: 'slider',
+                                start: startVal,
+                                end: endVal,
+                                zoomLock: true,
+                                showDetail: true,
+                                bottom: 10,
+                                height: 20,
+                                borderColor: '#2c2c2c',
+                                fillerColor: 'rgba(0,255,204,0.2)',
+                                handleStyle: { color: '#00ffcc' },
+                                textStyle: { color: '#ccc' }
+                            }];
+                        }
+
+                        // 渲染图表
+                        var chart;
+                        if (immersive) {
+                            chart = w.immersiveChart;
+                            if (!chart) {
+                                chart = echarts.init(h.elements.immersiveStats);
+                            }
+                            chart.setOption(option, true);
+                            setTimeout(function() { chart.resize(); }, 50);
+                            w.immersiveChart = chart;
+                        } else {
+                            if (!w.onlineChart) {
+                                w.onlineChart = echarts.init(document.getElementById('online-chart'));
+                                if (!w.resizeHandlerAttached) {
+                                    window.addEventListener('resize', function() {
+                                        if (w.onlineChart) w.onlineChart.resize();
+                                        o.resizeAllCharts();
+                                    });
+                                    w.resizeHandlerAttached = true;
+                                }
+                            }
+                            chart = w.onlineChart;
+                            chart.setOption(option, true);
+                            chart.resize();
+                        }
+
+                        // 绑定 datazoom 事件：当用户拖拽手柄改变宽度时，强制恢复为预设宽度（仅限非 'all' 且有缩放）
+                        if (hasZoom && effectiveRange !== 'all') {
+                            var targetWidthCopy = targetWidth; // 闭包捕获
+                            chart.off('datazoom'); // 移除旧监听，避免重复绑定
+                            chart.on('datazoom', function(params) {
+                                var currentStart = params.start;
+                                var currentEnd = params.end;
+                                var currentWidth = currentEnd - currentStart;
+                                // 如果当前宽度与目标宽度差异超过 0.5%，则修正
+                                if (Math.abs(currentWidth - targetWidthCopy) > 0.5) {
+                                    // 保持右侧锚定（end=100），重新计算 start
+                                    var newStart = 100 - targetWidthCopy;
+                                    newStart = Math.max(0, Math.min(100 - targetWidthCopy, newStart));
+                                    chart.setOption({
+                                        dataZoom: [{
+                                            start: newStart,
+                                            end: 100
+                                        }]
+                                    });
+                                }
+                            });
+                        }
+
+                        // 统一高亮按钮（如果回退到 'all'，则高亮“全部”按钮）
+                        document.querySelectorAll('#range-selector .range-btn').forEach(function(btn) {
+                            btn.classList.remove('active');
+                        });
+                        var activeBtn = document.querySelector('#range-selector .range-btn[data-range="' + effectiveRange + '"]');
+                        if (activeBtn) activeBtn.classList.add('active');
+                        w.currentStatsRange = effectiveRange;
+
+                    } catch (err) {
+                        console.error('加载统计数据失败:', err);
+                    }
+                },
+
+                // 加载各服务器实时在线人数明细与总人数
+                loadOnlineDetail: async function() {
+                    var el = document.getElementById('live-online-summary');
+                    if (!el) return;
+                    try {
+                        var resp = await fetch('/api/online/detail', {
+                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                        });
+                        var data = await resp.json();
+                        if (!data.success || !data.data) {
+                            el.textContent = '';
+                            return;
+                        }
+                        var d = data.data;
+                        var parts = [];
+                        if (d.servers && d.servers.length) {
+                            for (var i = 0; i < d.servers.length; i++) {
+                                var sv = d.servers[i];
+                                parts.push(sv.address + ': ' + (sv.online === null ? '--' : sv.online));
+                            }
+                        }
+                        var totalText = (d.total === null || d.total === undefined) ? '--' : d.total;
+                        el.textContent = '当前总在线: ' + totalText + (parts.length ? '（' + parts.join(' | ') + '）' : '');
+                    } catch (err) {
+                        el.textContent = '';
+                    }
+                },
+
+                // 调整所有图表尺寸（窗口resize时调用）
+                resizeAllCharts: function() {
+                    if (w.cpuCharts) {
+                        for (var i = 0; i < w.cpuCharts.length; i++) {
+                            w.cpuCharts[i].resize();
+                        }
+                    }
+                    if (w.memChart) w.memChart.resize();
+                    if (w.netChart) w.netChart.resize();
+                    if (w.onlineChart) w.onlineChart.resize();
+                    if (w.immersiveChart) w.immersiveChart.resize();
+                },
+
+                // 初始化性能监控图表（内存、网络、CPU核心）
+                initPerformanceCharts: function() {
+                    var self = this;
+                    var checkMem = function() {
+                        var el = document.getElementById('mem-chart');
+                        if (el && el.offsetHeight > 0 && !w.memChart) {
+                            w.memChart = echarts.init(el);
+                            w.memChart.setOption({
+                                tooltip: { trigger: 'axis' },
+                                grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
+                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30,
+                                        fontSize: 9, margin: 8 } },
+                                yAxis: { type: 'value', name: '%', min: 0, max: 100 },
+                                series: [{ type: 'line', data: [], smooth: false, color: '#2196f3',
+                                    lineStyle: { color: '#2196f3' }, areaStyle: { opacity: 0.2,
+                                        color: '#2196f3' } }]
+                            });
+                        }
+                    };
+                    var checkNet = function() {
+                        var el = document.getElementById('net-chart');
+                        if (el && el.offsetHeight > 0 && !w.netChart) {
+                            w.netChart = echarts.init(el);
+                            w.netChart.setOption({
+                                tooltip: { trigger: 'axis' },
+                                grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
+                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30,
+                                        fontSize: 9, margin: 8 } },
+                                yAxis: { type: 'value', name: 'Mbps' },
+                                series: [
+                                    { name: '上传', type: 'line', data: [], color: '#ff9800',
+                                        lineStyle: { color: '#ff9800' }, areaStyle: { opacity: 0.2,
+                                            color: '#ff9800' } },
+                                    { name: '下载', type: 'line', data: [], color: '#4caf50',
+                                        lineStyle: { color: '#4caf50' }, areaStyle: { opacity: 0.2,
+                                            color: '#4caf50' } }
+                                ]
+                            });
+                        }
+                    };
+                    checkMem();
+                    checkNet();
+                    // 如果元素还没渲染，延迟重试
+                    if (!w.memChart || !w.netChart) {
+                        setTimeout(function() { self.initPerformanceCharts(); }, 100);
+                    }
+                    this.resizeAllCharts();
+                },
+
+                // 启动定时刷新（每30秒）
+                startAutoRefresh: function() {
+                    if (w.statsRefreshTimer) clearInterval(w.statsRefreshTimer);
+                    var self = this;
+                    w.statsRefreshTimer = setInterval(function() {
+                        if (w.currentTab === 'stats') {
+                            self.loadOnlineStats(w.currentStatsRange);
+                            self.loadOnlineDetail();
+                        }
+                    },30000);
+                },
+
+                // 停止定时刷新
+                stopAutoRefresh: function() {
+                    if (w.statsRefreshTimer) {
+                        clearInterval(w.statsRefreshTimer);
+                        w.statsRefreshTimer = null;
+                    }
+                }
+            };
+            // ============================================================
+            // 日志加载器 s（分段加载）
+            // ============================================================
+            var s = {
+                enabled: false,
+                initialized: false,
+                totalLines: 0,
+                loadedUpTo: 0,
+                loading: false,
+                chunkSize: 1000,
+                stopFlag: false,
+                progressDiv: null,
+
+                start: async function() {
+                    if (this.initialized || this.enabled) return;
+                    this.enabled = true;
+                    this.stopFlag = false;
+                    this.progressDiv = h.elements.progressDiv;
+                    await this.resetAndClear();
+                    if (!this.stopFlag && this.loadedUpTo < this.totalLines) {
+                        this.loadNextChunk();
+                    }
+                },
+
+                resetAndClear: async function() {
+                    this.loadedUpTo = 0;
+                    if (h.elements.consoleContainer) {
+                        h.elements.consoleContainer.innerHTML = '';
+                    }
+                    this.updateProgress(0, 0);
+                    try {
+                        var resp = await fetch('/api/log/total_lines', {
+                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                        });
+                        var data = await resp.json();
+                        this.totalLines = data.total;
+                        this.updateProgress(0, this.totalLines);
+                    } catch (err) {
+                        console.error('获取总行数失败', err);
+                        this.totalLines = 0;
+                        this.enabled = false;
+                        if (this.progressDiv) this.progressDiv.textContent = ' 加载失败';
+                    }
+                },
+
+                loadNextChunk: function() {
+                    if (this.stopFlag || !this.enabled || this.loading) return;
+                    if (this.loadedUpTo >= this.totalLines) {
+                        this.updateProgress(this.totalLines, this.totalLines);
+                        this.enabled = false;
+                        d.refresh();
+                        return;
+                    }
+                    this.loading = true;
+                    var start = this.loadedUpTo;
+                    var count = Math.min(this.chunkSize, this.totalLines - start);
+                    var self = this;
+
+                    fetch('/api/log/range?start=' + start + '&count=' + count, {
+                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                    }).then(function(resp) { return resp.json(); }).then(function(data) {
+                        if (data.lines && data.lines.length) {
+                            var container = h.elements.consoleContainer;
+                            if (container) {
+                                var frag = document.createDocumentFragment();
+                                for (var i = 0; i < data.lines.length; i++) {
+                                    frag.appendChild(h.createLogLineElement(data.lines[i]));
+                                }
+                                var oldHeight = container.scrollHeight;
+                                var oldScroll = container.scrollTop;
+                                var wasAtBottom = S.isContainerAtBottom(container);
+                                container.appendChild(frag);
+                                if (wasAtBottom && w.autoScrollEnabled) {
+                                    S.smoothScrollToBottomDynamic(container, 100);
+                                } else if (oldScroll > 0 && !wasAtBottom) {
+                                    var delta = container.scrollHeight - oldHeight;
+                                    container.scrollTop = oldScroll + delta;
+                                }
+                                d.refresh();
+                            }
+                            self.loadedUpTo += data.lines.length;
+                            self.updateProgress(self.loadedUpTo, self.totalLines);
+                        }
+                        self.loading = false;
+                        if (!self.stopFlag && self.loadedUpTo < self.totalLines) {
+                            setTimeout(function() { self.loadNextChunk(); }, 50);
+                        } else {
+                            self.updateProgress(self.totalLines, self.totalLines);
+                            self.enabled = false;
+                            d.refresh();
+                        }
+                    }).catch(function(err) {
+                        console.error('加载日志块失败', err);
+                        self.enabled = false;
+                        if (self.progressDiv) self.progressDiv.textContent = ' ⚠ 加载失败';
+                        self.loading = false;
+                    });
+                },
+
+                updateProgress: function(loaded, total) {
+                    if (!this.progressDiv) return;
+                    if (total === 0) {
+                        this.progressDiv.textContent = ' 计算行数...';
+                        this.progressDiv.style.display = '';
+                        return;
+                    }
+                    if (loaded >= total) {
+                        this.progressDiv.style.display = 'none';
+                    } else {
+                        this.progressDiv.style.display = '';
+                        var pct = ((loaded / total) * 100).toFixed(1);
+                        this.progressDiv.textContent = ' 📄 加载日志 ' + loaded + '/' + total + ' (' + pct + '%)';
+                    }
+                },
+
+                stop: function() {
+                    this.stopFlag = true;
+                    this.enabled = false;
+                    if (this.progressDiv) this.progressDiv.textContent = '';
+                }
+            };
+
+            // ============================================================
+            // 标签切换 l
+            // ============================================================
+            async function l(tab) {
+                w.currentTab = tab;
+                document.querySelectorAll('.tab-button').forEach(function(btn) {
+                    btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+                });
+                document.querySelectorAll('.tab-content').forEach(function(el) {
+                    el.classList.remove('active');
+                });
+                document.getElementById('tab-' + tab).classList.add('active');
+
+                if (tab === 'console') {
+                    d.refresh();
+                    setTimeout(function() { d.updateScaleAndIndicator(); }, 100);
+                    o.stopAutoRefresh();
+                } else if (tab === 'stats') {
+                    s.stop();
+                    var activeBtn = document.querySelector('#range-selector .range-btn.active');
+                    var range = activeBtn ? activeBtn.getAttribute('data-range') : '7d';
+                    w.currentStatsRange = range;
+                    await o.loadOnlineStats(range);
+                    o.loadOnlineDetail();
+                    o.initPerformanceCharts();
+                    if (w.onlineChart) {
+                        setTimeout(function() { w.onlineChart.resize(); }, 100);
+                    }
+                    o.startAutoRefresh();
+                } else {
+                    s.stop();
+                    h.updateNonConsoleTab();
+                    o.stopAutoRefresh();
+                }
+            }
+
+            // ============================================================
+            // 登录流程 c
+            // ============================================================
+            async function c() {
+                var password = await new Promise(function(resolve) {
+                    var modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.innerHTML =
+                        `
+                    <div class="modal-card">
+                        <h3>请输入访问密码</h3>
+                        <input type="password" id="pwd-input" placeholder="密码">
+                        <button id="pwd-submit">确认</button>
+                    </div>
+                `;
+                    document.body.appendChild(modal);
+                    var input = modal.querySelector('#pwd-input');
+                    var btn = modal.querySelector('#pwd-submit');
+                    var submit = function() {
+                        var val = input.value;
+                        if (val) {
+                            modal.remove();
+                            resolve(val);
+                        } else {
+                            alert('密码不能为空');
+                        }
+                    };
+                    btn.onclick = submit;
+                    input.onkeypress = function(e) {
+                        if (e.key === 'Enter') submit();
+                    };
+                    input.focus();
+                });
+
+                try {
+                    var testResp = await fetch('/api/log/total_lines', {
+                        headers: { 'Authorization': 'Bearer ' + password }
+                    });
+                    if (testResp.status === 401) {
+                        alert('密码错误');
+                        return c();
+                    }
+                    w.apiPassword = password;
+                    h.showStatus('验证成功，加载数据...', 2000);
+                    h.elements.immersiveBtn.style.display = 'flex';
+                    h.elements.rconToggleBtn.style.display = 'flex';
+
+                    // 加载原始日志（用于初始化各记录）
+                    var rawResp = await fetch('/api/latest_raw', {
+                        headers: { 'Authorization': 'Bearer ' + password }
+                    });
+                    var rawText = await rawResp.text();
+                    r.refreshAllDataFromRaw(rawText);
+
+                    // 启动WebSocket
+                    a.init();
+
+                    // 切换到控制台
+                    await l('console');
+                    h.showStatus('就绪', 2000);
+
+                    // 显示RCON窗口
+                    if (h.elements.rconWindow) {
+                        var win = h.elements.rconWindow;
+                        win.style.display = 'flex';
+                        var left = (window.innerWidth - win.offsetWidth) / 2;
+                        var top = (window.innerHeight - win.offsetHeight) / 2;
+                        win.style.left = left + 'px';
+                        win.style.top = top + 'px';
+                        win.style.bottom = '';
+                        win.style.right = '';
+                    }
+
+                    d.refresh();
+
+                } catch (err) {
+                    alert('网络错误，请检查后端');
+                    return c();
+                }
+            }
+
+            // ============================================================
+            // Grim 分割条拖动
+            // ============================================================
+            (function() {
+                var divider = document.getElementById('grim-divider');
+                var leftPanel = document.getElementById('grim-left-panel');
+                var parent = divider ? divider.parentElement : null;
+                if (!divider || !leftPanel || !parent) return;
+
+                var isDragging = false;
+                var startX = 0;
+                var startWidth = 0;
+
+                function setWidth(percent) {
+                    percent = Math.min(90, Math.max(10, percent));
+                    leftPanel.style.width = percent + '%';
+                    return percent;
+                }
+
+                function onStart(e) {
+                    e.preventDefault();
+                    var ev = e.touches ? e.touches[0] : e;
+                    isDragging = true;
+                    divider.classList.add('dragging');
+                    startX = ev.clientX;
+                    startWidth = leftPanel.getBoundingClientRect().width;
+                    document.body.style.userSelect = 'none';
+                    document.body.style.webkitUserSelect = 'none';
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onEnd);
+                    document.addEventListener('touchmove', onMove, { passive: false });
+                    document.addEventListener('touchend', onEnd);
+                    document.addEventListener('touchcancel', onEnd);
+                }
+
+                function onMove(e) {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    var ev = e.touches ? e.touches[0] : e;
+                    var dx = ev.clientX - startX;
+                    var containerWidth = parent.getBoundingClientRect().width;
+                    if (containerWidth <= 0) return;
+                    var dividerWidth = divider.offsetWidth || 6;
+                    var usableWidth = containerWidth - dividerWidth;
+                    var percent = ((startWidth + dx) / usableWidth) * 100;
+                    setWidth(percent);
+                }
+
+                function onEnd() {
+                    if (isDragging) {
+                        isDragging = false;
+                        divider.classList.remove('dragging');
+                        document.body.style.userSelect = '';
+                        document.body.style.webkitUserSelect = '';
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onEnd);
+                        document.removeEventListener('touchmove', onMove);
+                        document.removeEventListener('touchend', onEnd);
+                        document.removeEventListener('touchcancel', onEnd);
+                    }
+                }
+
+                divider.addEventListener('mousedown', onStart);
+                divider.addEventListener('touchstart', onStart, { passive: false });
+
+                divider.addEventListener('dblclick', function() {
+                    setWidth(50);
+                });
+            })();
+
+            // ============================================================
+            // 主启动流程
+            // ============================================================
+            (async function() {
+                // 加载高亮规则
+                try {
+                    var hr = await fetch('/api/highlight_rules');
+                    var hrData = await hr.json();
+                    w.highlightRules = Array.isArray(hrData) ? hrData : [];
+                } catch (e) {
+                    w.highlightRules = [];
+                }
+
+                // 加载反作弊关键词
+                try {
+                    var ak = await fetch('/api/anticheat_keywords');
+                    var akData = await ak.json();
+                    w.anticheatKeywords = Array.isArray(akData) ? akData : [];
+                } catch (e) {
+                    w.anticheatKeywords = [];
+                }
+
+                // 初始化界面
+                h.init();
+
+                // 标签切换事件
+                document.querySelectorAll('.tab-button').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        l(btn.getAttribute('data-tab'));
+                    });
+                });
+
+                // 统计范围选择事件（修改：直接调用 o.loadOnlineStats，高亮由内部统一）
+                document.getElementById('range-selector').addEventListener('click', function(e) {
+                    var btn = e.target.closest('.range-btn');
+                    if (btn) {
+                        var range = btn.getAttribute('data-range');
+                        o.loadOnlineStats(range);
+                    }
+                });
+
+                // 启动登录
+                await c();
+            })();
+
+        })();
+    </script>
+</body>
+</html>
