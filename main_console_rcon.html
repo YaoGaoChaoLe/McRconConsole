@@ -1571,12 +1571,6 @@
                     h.updateImmersiveDashboard();
                 },
 
-                processBatch: function(lines) {
-                    for (var i = 0; i < lines.length; i++) {
-                        this.processLine(lines[i]);
-                    }
-                },
-
                 refreshAllDataFromRaw: function(rawText) {
                     w.chatLines = [];
                     w.joinQuitLines = [];
@@ -2856,12 +2850,6 @@
                     this.socket.on('connect_error', function(err) {
                         console.error('WebSocket 认证失败:', err);
                         h.showStatus('WebSocket 认证失败，请刷新页面重新登录', 5000);
-                    });
-
-                    this.socket.on('new_log_batch', function(lines) {
-                        h.appendLogLines(lines);
-                        r.processBatch(lines);
-                        if (w.currentTab !== 'console') h.updateNonConsoleTab();
                     });
 
                     this.socket.on('new_log', function(line) {

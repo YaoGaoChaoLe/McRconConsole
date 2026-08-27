@@ -14,6 +14,9 @@ class Config:
         self.LATEST_LOG = os.path.join(self.LOG_DIR, 'latest.log')
         self.SERVER_PROPERTIES_PATH = cfg['server_properties_path']
 
+        # API 访问密码：与 server.properties 中的 rcon.password 一致（由 main.py 设置）
+        self.API_PASSWORD = None
+
         self.SAMPLE_INTERVAL_SECONDS = cfg['sample_interval_seconds']
 
         self.FILTER_KEYWORDS = cfg.get('filter_keywords', [])

@@ -95,7 +95,7 @@ class MailNotifier:
                 print(f"[RECOVERY] 启动命令失败: {cmd} -> {e}")
 
     def try_send(self, line):
-        # 排除聊天线程相关日志（仍然保留）
+        # 聊天线程相关日志不触发告警
         if "[Not Secure]" in line or "[Async Chat Thread]" in line:
             return
         if not self.contains_keyword(line):
