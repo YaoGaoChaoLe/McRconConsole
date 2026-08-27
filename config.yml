@@ -111,5 +111,5 @@ anticheat_keywords:
 
 
 # ==================== 一般不用管这个 ====================
-db_path: "stats.db"   # (不用管这个)  数据库文件路径（留空则自动使用当前目录下的 stats.db）
+db_path: "数据库.db"   # (不用管这个)  数据库文件路径（留空则自动使用当前目录下的 stats.db）
 crash_confirm_delay_seconds: 10   # 崩溃确认延迟（秒） 当日志行出现"crash"时，间隔 {crash_confirm_delay_seconds}(默认10) 秒检查是否出现crash日志，判断是否真崩溃了。
