@@ -91,7 +91,7 @@ def create_app(config, rcon_client, db, mail_notifier, socketio_instance):
     @require_auth
     def stats_online():
         range_param = request.args.get('range', '7d')
-        days_map = {'1d': 1, '3d': 3, '7d': 7, 'all': None}
+        days_map = {'1d': 1, '3d': 3, '7d': 7, '15d': 15, '30d': 30, 'all': None}
         days = days_map.get(range_param, 7)
         rows = db.get_hourly_stats(days)
         if not rows:

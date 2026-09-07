@@ -1256,6 +1256,8 @@
                             <button class="range-btn active" data-range="1d">1天</button>
                             <button class="range-btn" data-range="3d">3天</button>
                             <button class="range-btn" data-range="7d">7天</button>
+                            <button class="range-btn" data-range="15d">15天</button>
+                            <button class="range-btn" data-range="30d">30天</button>
                             <button class="range-btn" data-range="all">全部</button>
                         </div>
                     </div>
@@ -3066,6 +3068,8 @@
                             var windowDays = 1;
                             if (range === '3d') windowDays = 3;
                             else if (range === '7d') windowDays = 7;
+                            else if (range === '15d') windowDays = 15;
+                            else if (range === '30d') windowDays = 30;
                             else if (range === '1d') windowDays = 1;
 
                             // 方案A：总跨度 <= 窗口天数，回退为全部

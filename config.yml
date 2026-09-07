@@ -4,8 +4,8 @@
 # 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。或用内网穿透(TCP)穿透 127.0.0.1:5000。
 host: "127.0.0.1"          # 本地 IP地址
 port: 5000                 # 本地 端口号
-log_dir: 'C:\.MC_server\MSL\Server1\logs'  # 服务器日志目录（包含 latest.log）   (用'单引号'，而不是"双引号")
-server_properties_path: 'C:\.MC_server\MSL\Server1\server.properties'  # 服务器 server.properties 文件绝对路径   (用'单引号'，而不是"双引号")
+log_dir: 'D:\.MC_server\MSL\Server1\logs'  # 服务器日志目录（包含 latest.log）   (用'单引号'，而不是"双引号")
+server_properties_path: 'D:\.MC_server\MSL\Server1\server.properties'  # 服务器 server.properties 文件绝对路径   (用'单引号'，而不是"双引号")
 
 sample_interval_seconds: 300  # 人数采样间隔（秒）  多少秒采集一次人数，并绘制成曲线图。 建议一次性设置好 不要随便改
 
@@ -14,7 +14,8 @@ sample_interval_seconds: 300  # 人数采样间隔（秒）  多少秒采集一�
 public_server_addresses:
   - "7891.ovvo.space"
   - "1145.ovvo.space"
-
+  - "cn-gz-2.qwq.fan:24803"
+  
 filter_keywords: # 日志过滤关键词（包含这些词 的日志行 不会显示在前端）
   - "failed to"
   - "voicechat"
@@ -31,7 +32,7 @@ email:
 
 
   user: ""     # 发件人的用户名
-  from: ""    # 发件人邮箱号
+  from: "m"    # 发件人邮箱号
   to: ""   # 收件人邮箱
 
 
@@ -58,7 +59,7 @@ crash_recovery_commands:
   - "taskkill /F /T /IM java.exe"
   - "taskkill /F /T /IM frpc_custom.exe"
   - "taskkill /F /T /IM MSL.exe"
-  - 'C:\.MC_server\MSL.exe'     # [注意反斜杠] 如果要运行 C:/.MC_server/MSL.exe，应该写成 C:\.MC_server\MSL.exe。
+  - 'D:\.MC_server\MSL.exe'     # [注意反斜杠] 如果要运行 C:/.MC_server/MSL.exe，应该写成 C:\.MC_server\MSL.exe。
 
 alert_cooldown_seconds: 20  # 邮件告警冷却时间（秒）    触发邮件报警后，n秒之内不会再次发送邮件
 # ==============================================================================================

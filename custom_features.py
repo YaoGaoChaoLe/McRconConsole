@@ -5,7 +5,7 @@ import __main__
 
 def 扩展_自定义功能(line):
     """ 当有玩家发送违规词语[Meteor on Crack] 那么就直接/ban-ip """
-    if "Meteor on Crack" in line:
+    if "Meteor on Crack123" in line:
         rcon = getattr(__main__, 'rcon_client', None)
         if rcon is None:return
         player = None
@@ -22,4 +22,4 @@ def 扩展_自定义功能(line):
         
 
         print(f"[CHEAT] 封禁作弊玩家: {player}")
-        rcon.send_command(f"ban-ip {player} 因使用作弊客户端被封禁")
+        rcon.send_command(f"ban-ip {player} 因为发送了某些消息，被封禁")

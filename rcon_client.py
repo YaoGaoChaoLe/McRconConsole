@@ -66,7 +66,7 @@ class RCONClient:
         """使用 mcstatus 查询单个服务器的在线人数，尝试两次，总超时3秒"""
         for attempt in range(2):
             try:
-                with Timeout(3):   # 控制整个查询在3秒内完成
+                with Timeout(10):   # 控制整个查询在10秒内完成
                     server = JavaServer.lookup(address)
                     status = server.status()
                     return status.players.online
