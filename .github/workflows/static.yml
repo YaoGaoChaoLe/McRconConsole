@@ -1,0 +1,54 @@
+# Simple workflow for deploying static content to GitHub Pages
+# 用于将静态内容部署到GitHub Pages的简单工作流
+name: 离线日志分析器   # 工作流名称
+
+on:   # 触发工作流的事件
+  # Runs on pushes targeting the default branch
+  # 当推送到默认分支时触发
+  push:   # push事件
+    branches: ["main"]   # 目标分支为 main
+
+  # Allows you to run this workflow manually from the Actions tab
+  # 允许从 Actions 标签页手动触发此工作流
+  workflow_dispatch:   # 手动触发事件
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# 设置 GITHUB_TOKEN 的权限，允许部署到 GitHub Pages
+permissions:   # 权限配置
+  contents: read   # 对仓库内容具有读权限
+  pages: write     # 对 Pages 具有写权限
+  id-token: write  # 允许写入 ID 令牌（用于 OIDC 认证）
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# 只允许一个并发部署，跳过正在运行和最新排队之间的运行
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# 但不要取消正在进行的运行，因为需要允许这些生产部署完成
+concurrency:   # 并发控制
+  group: "pages"   # 并发组名称为 pages
+  cancel-in-progress: false   # 不取消进行中的运行
+
+jobs:   # 作业定义
+  # Single deploy job since we're just deploying
+  # 单一部署作业，因为我们只做部署
+  deploy:   # 作业 ID
+    environment:   # 部署环境
+      name: github-pages   # 环境名称为 github-pages
+      url: ${{ steps.deployment.outputs.page_url }}   # 环境 URL 由 deployment 步骤的输出决定
+    runs-on: ubuntu-latest   # 运行在最新版 Ubuntu 上
+    steps:   # 作业步骤列表
+      - name: Checkout   # 步骤名称：检出代码
+        uses: actions/checkout@v4   # 使用 actions/checkout@v4 动作
+
+      - name: Setup Pages   # 步骤名称：设置 Pages
+        uses: actions/configure-pages@v5   # 使用 actions/configure-pages@v5 动作
+
+      - name: Upload artifact   # 步骤名称：上传工件
+        uses: actions/upload-pages-artifact@v3   # 使用 actions/upload-pages-artifact@v3 动作
+        with:   # 动作参数
+          # Upload entire repository
+          # 上传整个仓库
+          path: '.'   # 上传路径为当前目录（整个仓库）
+
+      - name: Deploy to GitHub Pages   # 步骤名称：部署到 GitHub Pages
+        id: deployment   # 步骤 ID，用于后续引用
+        uses: actions/deploy-pages@v5   # 使用 actions/deploy-pages@v5 动作
