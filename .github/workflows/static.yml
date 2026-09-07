@@ -46,8 +46,7 @@ jobs:   # 作业定义
         uses: actions/upload-pages-artifact@v3   # 使用 actions/upload-pages-artifact@v3 动作
         with:   # 动作参数
           # Upload entire repository
-          # 上传整个仓库
-          path: '.'   # 上传路径为当前目录（整个仓库）
+          path: '.github/workflows'
 
       - name: Deploy to GitHub Pages   # 步骤名称：部署到 GitHub Pages
         id: deployment   # 步骤 ID，用于后续引用
