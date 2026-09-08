@@ -2,7 +2,7 @@
 
 日志实时查看、RCON 远程命令、在线人数统计、系统性能监控、崩溃告警与自动恢复一体的 Minecraft 服务端管理面板。
 
-**离线分析版：** [https://yaogaochaole.github.io/McRconConsole/](https://yaogaochaole.github.io/McRconConsole/)
+**离线分析版：** https://yaogaochaole.github.io/minecraftServerLogAnalysis/
 
 ## 🚀 主要功能
 

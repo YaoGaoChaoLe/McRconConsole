@@ -1,7 +1,16 @@
 # main.py
+import builtins
+import time
 from gevent import monkey
 monkey.patch_all()
 import os
+
+# ===== 全局 print 添加时间戳 =====
+_original_print = builtins.print
+def _timestamp_print(*args, **kwargs):
+    timestamp = time.strftime('[%Y-%m-%d %H:%M:%S]')
+    _original_print(timestamp, *args, **kwargs)
+builtins.print = _timestamp_print
 
 from config import Config
 from rcon_client import RCONClient

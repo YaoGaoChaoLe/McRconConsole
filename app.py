@@ -42,6 +42,53 @@ def create_app(config, rcon_client, db, mail_notifier, socketio_instance):
     def get_anticheat_keywords():
         return jsonify(config.ANTICHEAT_KEYWORDS)
 
+    @app.route('/api/screen', methods=['GET'])
+    @require_auth
+    def screen_capture():
+        """截取服务器屏幕，返回Base64图片"""
+        import subprocess
+        import base64
+        import tempfile
+        import os as _os
+
+        # 创建临时文件路径
+        tmp_dir = tempfile.gettempdir()
+        img_path = _os.path.join(tmp_dir, 'mcscreen_capture.png')
+        ps_script = f"""
+Add-Type -AssemblyName System.Windows.Forms,System.Drawing
+$bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$bmp = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+# 使用JPEG编码器并设置压缩质量
+$jpegCodec = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object {{ $_.MimeType -eq 'image/jpeg' }}
+$encoderParams = New-Object System.Drawing.Imaging.EncoderParameters(1)
+$encoderParams.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter([System.Drawing.Imaging.Encoder]::Quality, 50)  # 质量设为50，可调整
+$bmp.Save("{img_path}", $jpegCodec, $encoderParams)
+$g.Dispose()
+$bmp.Dispose()
+"""
+        try:
+            # 执行PowerShell命令
+            result = subprocess.run(
+                ['powershell', '-Command', ps_script],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                check=True
+            )
+            # 读取图片并编码
+            with open(img_path, 'rb') as f:
+                img_data = base64.b64encode(f.read()).decode('utf-8')
+            # 删除临时文件
+            _os.remove(img_path)
+            print(f"获取屏幕")
+            return jsonify({'success': True, 'image_base64': f'data:image/jpeg;base64,{img_data}'})
+        except subprocess.TimeoutExpired:
+            return jsonify({'success': False, 'error': '截图超时'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'error': f'截图失败: {str(e)}'}), 500
+
     @app.route('/api/latest_raw')
     @require_auth
     def get_latest_raw():

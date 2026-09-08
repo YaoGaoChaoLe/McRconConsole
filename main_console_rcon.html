@@ -1136,6 +1136,7 @@
         <button class="tab-button" data-tab="grim">反作弊日志</button>
         <button class="tab-button" data-tab="playerip">登录查询</button>
         <button class="tab-button" data-tab="stats">统计</button>
+        <button class="tab-button" data-tab="screen">屏幕</button>
         <button class="tab-button" data-tab="joinquit">退出</button>
     </div>
 
@@ -1290,6 +1291,20 @@
             </div>
         </div>
 
+        <!-- 屏幕 -->
+        <div class="tab-content" id="tab-screen">
+            <div class="console-log-area">
+                <div class="sub-header">
+                    <span>屏幕查看</span>
+                </div>
+                <div style="padding:10px; flex:1; min-height:0; display:flex; flex-direction:column;">
+                    <div id="screen-image-container" style="flex:1; min-height:0; display:flex; align-items:center; justify-content:center;">
+                        <img id="screen-image" style="width:100%; height:100%; object-fit:contain; border:1px solid #333; display:none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div><!-- /panel-container -->
 
     <!-- ===== 沉浸式仪表盘 ===== -->
@@ -1359,6 +1374,7 @@
                 immersiveMode: false,
                 autoScrollEnabled: true,
                 autoWrapEnabled: false,
+                screenCaptureTimer: null,
                 onlineChart: null,
                 cpuCharts: [],
                 memChart: null,
@@ -2548,6 +2564,45 @@
                     }
                 },
 
+                startScreenCapture: function() {
+                    if (w.screenCaptureTimer) return;
+                    this.screenCaptureLoop();
+                },
+
+                stopScreenCapture: function() {
+                    if (w.screenCaptureTimer) {
+                        clearTimeout(w.screenCaptureTimer);
+                        w.screenCaptureTimer = null;
+                    }
+                },
+
+                screenCaptureLoop: function() {
+                    var self = this;
+                    if (w.currentTab !== 'screen') return; // 不在屏幕页则停止
+                    fetch('/api/screen', {
+                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                    }).then(function(resp) { return resp.json(); }).then(function(data) {
+                        if (data.success) {
+                            var img = document.getElementById('screen-image');
+                            if (img) {
+                                img.src = data.image_base64;
+                                img.style.display = 'block';
+                            }
+                        }
+                        // 无论成功失败都继续循环
+                    }).catch(function(err) {
+                        console.error('屏幕获取失败:', err);
+                    }).finally(function() {
+                        if (w.currentTab === 'screen') {
+                            w.screenCaptureTimer = setTimeout(function() {
+                                self.screenCaptureLoop();
+                            }, 500); // 500ms 后获取下一张，可调整
+                        } else {
+                            w.screenCaptureTimer = null;
+                        }
+                    });
+                },
+
                 copyConsoleContent: function() {
                     var lines = this.elements.consoleContainer.querySelectorAll('.console-log-line');
                     if (!lines.length) {
@@ -3471,8 +3526,13 @@
                         setTimeout(function() { w.onlineChart.resize(); }, 100);
                     }
                     o.startAutoRefresh();
+                } else if (tab === 'screen') {
+                    s.stop();
+                    o.stopAutoRefresh();
+                    h.startScreenCapture();
                 } else {
                     s.stop();
+                    h.stopScreenCapture(); // 离开屏幕页时停止截图
                     h.updateNonConsoleTab();
                     o.stopAutoRefresh();
                 }
