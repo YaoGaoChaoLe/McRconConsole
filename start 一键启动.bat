@@ -1,5 +1,5 @@
 @echo off
-title Minecraft Server Log - MiniGames
+title McRconConsole
 call myenv\Scripts\activate.bat
 
 python main.py

@@ -10,9 +10,9 @@ class Config:
 
         self.HOST = cfg.get('host', '127.0.0.1')
         self.PORT = cfg.get('port', 5000)
-        self.LOG_DIR = cfg['log_dir']
-        self.LATEST_LOG = os.path.join(self.LOG_DIR, 'latest.log')
         self.SERVER_PROPERTIES_PATH = cfg['server_properties_path']
+        self.LOG_DIR = os.path.join(os.path.dirname(self.SERVER_PROPERTIES_PATH), 'logs')
+        self.LATEST_LOG = os.path.join(self.LOG_DIR, 'latest.log')
 
         # API 访问密码：与 server.properties 中的 rcon.password 一致（由 main.py 设置）
         self.API_PASSWORD = None
