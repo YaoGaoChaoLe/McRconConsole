@@ -125,165 +125,6 @@
         }
 
         /* ===========================
-           控制台日志区域（含缩略图）
-           =========================== */
-        .console-log-container {
-            flex: 1;
-            background: #1a1a1a;
-            font-family: Consolas, monospace;
-            font-size: 12px;
-            line-height: 1.5;
-            padding: 1px;
-            overflow: auto;
-        }
-        .console-log-line {
-            font-family: inherit;
-            font-size: inherit;
-            line-height: inherit;
-        }
-
-        /* 过滤启用时隐藏被过滤的行 */
-        .console-log-container.filter-enabled .filtered-line {
-            display: none;
-        }
-
-        /* 日志行与缩略图横向布局 */
-        .console-log-row {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-        }
-        .console-minimap {
-            width: 10%;
-            min-width: 80px;
-            max-width: 200px;
-            flex-shrink: 0;
-            background: #1a1a1a;
-            border-left: 1px solid #2c2c2c;
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            box-shadow: inset 2px 0 8px rgba(0,0,0,0.4);
-        }
-        .console-minimap:hover {
-            filter: brightness(1.05);
-        }
-        .console-minimap .minimap-viewport {
-            position: absolute;
-            top: 8px;
-            left: 6px;
-            right: 6px;
-            bottom: 8px;
-            overflow: hidden;
-        }
-        .console-minimap .minimap-content {
-            transform-origin: top left;
-            pointer-events: none;
-            font-size: 15px;
-            line-height: 1.5;
-            white-space: pre;
-        }
-        .console-minimap .minimap-content .minimap-line {
-            display: block;
-            line-height: inherit;
-            white-space: pre;
-        }
-        .console-minimap .minimap-indicator {
-            position: absolute;
-            left: 4px;
-            right: 4px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 2px;
-            pointer-events: none;
-            z-index: 5;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-        .console-minimap:hover .minimap-indicator {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
-        }
-        /* 响应式隐藏缩略图 */
-        @media (max-width: 500px) {
-            .console-minimap {
-                display: none;
-            }
-            .minimap-window-label {
-                display: none;
-            }
-        }
-
-        /* ===========================
-           日志控制区域（子标题）
-           =========================== */
-        .sub-header {
-            padding: 5px 10px;
-            background: #252525;
-            font-weight: 600;
-            border-bottom: 1px solid #3a3a3a;
-            flex-shrink: 0;
-            color: #0fc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .line-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .line-control button,
-        .scroll-btn {
-            padding: 4px 12px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .line-control button:hover,
-        .scroll-btn:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-        .scroll-buttons {
-            display: flex;
-            gap: 4px;
-            margin-left: auto;
-        }
-        .minimap-window-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: #aaa;
-            white-space: nowrap;
-        }
-        .minimap-window-input {
-            width: 60px;
-            padding: 2px 4px;
-            background: #0f0f0f;
-            color: #0fc;
-            border: 1px solid #2c2c2c;
-            border-radius: 3px;
-            font-size: 11px;
-            font-family: monospace;
-            text-align: center;
-            opacity: 0.8;
-            transition: opacity 0.2s, border-color 0.2s;
-        }
-        .minimap-window-input:hover,
-        .minimap-window-input:focus {
-            opacity: 1;
-            border-color: #0fc;
-            outline: none;
-        }
-
-        /* ===========================
            其他标签页的文本域样式
            =========================== */
         .log-textarea {
@@ -319,6 +160,24 @@
             min-height: 0;
             border: 1px solid #2c2c2c;
         }
+
+        /* ===========================
+           Monaco Editor 控制台区域
+           =========================== */
+        #monaco-container {
+            width: 100%;
+            height: 100%;
+            border-left: 1px solid #2c2c2c;
+            background: #1a1a1a;
+        }
+
+        /* Monaco 文本高亮类（动态匹配原 highlight_rules 颜色） */
+        .color-ff0000 { color: #ff0000 !important; }
+        .color-fbff00 { color: #fbff00 !important; }
+        .color-00ffea { color: #00ffea !important; }
+        .color-666666 { color: #666666 !important; }
+        .color-3bf010 { color: #3bf010 !important; }
+        .color-ffffff { color: #ffffff !important; }
 
         /* 配置面板 */
         .config-panel {
@@ -712,9 +571,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #ffffffd4;
         }
-        #console-log-container::-webkit-scrollbar {
-            width: 12px;
-        }
 
         /* ===========================
            响应式其他
@@ -802,7 +658,57 @@
                 display: none;
             }
         }
+
+        /* 日志控制区域（子标题） */
+        .sub-header {
+            padding: 5px 10px;
+            background: #252525;
+            font-weight: 600;
+            border-bottom: 1px solid #3a3a3a;
+            flex-shrink: 0;
+            color: #0fc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .line-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .line-control button,
+        .scroll-btn {
+            padding: 4px 12px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .line-control button:hover,
+        .scroll-btn:hover {
+            background: #3a3a3a;
+            color: #fff;
+            border-color: #0fc;
+        }
+        .scroll-buttons {
+            display: flex;
+            gap: 4px;
+            margin-left: auto;
+        }
     </style>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- 引入 Monaco Editor 官方 CDN (使用 fastly 加速节点) -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css" />
+    <script>
+        var require = { paths: { vs: 'https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } };
+    </script>
+    <script src="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 </head>
 <body>
 
@@ -857,22 +763,10 @@
                             <button id="scroll-bottom-btn" class="scroll-btn" title="底部">↓</button>
                         </div>
                         <div id="log-load-progress" style="font-size:12px;color:#aaa;white-space:nowrap;"></div>
-                        <label class="minimap-window-label">
-                            <span>缩略图行数:</span>
-                            <input type="number" id="minimap-window-size" class="minimap-window-input" value="1000" min="200" max="100000" step="200">
-                        </label>
                         <label class="filter-errors-check"><input type="checkbox" id="filter-errors" checked> 屏蔽报错</label>
                     </div>
                 </div>
-                <div class="console-log-row">
-                    <div id="console-log-container" class="console-log-container filter-enabled"></div>
-                    <div id="console-minimap" class="console-minimap">
-                        <div class="minimap-viewport">
-                            <div class="minimap-content" id="minimap-content"></div>
-                        </div>
-                        <div class="minimap-indicator" id="minimap-indicator"></div>
-                    </div>
-                </div>
+                <div id="monaco-container" style="width: 100%; height: 100%; position: relative;"></div>
             </div>
         </div>
 
@@ -974,6 +868,7 @@
                 "java.util",
                 "Caused by",
                 "Failed to decode value",
+                "generated an exception while executing",
             ];
             const HIGHLIGHT_RULES = [
                 { keyword: "Server empty for", color: "#ff0000" },
@@ -1022,12 +917,11 @@
                 ipLocationCache: new Map(),
                 highlightRules: HIGHLIGHT_RULES,
                 anticheatConfig: { ...DEFAULT_ANTICHEAT_CONFIG },
-                minimapWindowSize: 1000,
-                minimapDragging: false,
-                minimapStartY: 0,
-                minimapHasMoved: false,
                 totalLines: 0,
                 processing: false,
+                monacoEditor: null,
+                monacoModel: null,
+                monacoDecorations: null,
             };
 
             // ============================================================
@@ -1314,13 +1208,13 @@
             // ============================================================
             const UIManager = {
                 elements: {},
+                _scrollCheckTimer: null,
                 init() {
                     this.elements = {
                         status: document.getElementById('status'),
                         autoScroll: document.getElementById('auto-scroll'),
                         autoWrap: document.getElementById('auto-wrap'),
                         filterErrors: document.getElementById('filter-errors'),
-                        consoleContainer: document.getElementById('console-log-container'),
                         chatText: document.getElementById('chat-text'),
                         joinquitText: document.getElementById('joinquit-text'),
                         grimText: document.getElementById('grim-text'),
@@ -1329,10 +1223,6 @@
                         ipInput: document.getElementById('ip-input'),
                         ipResult: document.getElementById('ip-query-result'),
                         progressDiv: document.getElementById('log-load-progress'),
-                        minimapPanel: document.getElementById('console-minimap'),
-                        minimapContent: document.getElementById('minimap-content'),
-                        minimapIndicator: document.getElementById('minimap-indicator'),
-                        minimapSizeInput: document.getElementById('minimap-window-size'),
                         grimLeftInput: document.getElementById('grim-left-keywords'),
                         grimRightInput: document.getElementById('grim-right-keywords'),
                         grimConfigPanel: document.getElementById('grim-config-panel'),
@@ -1341,6 +1231,7 @@
                     this.bindEvents();
                     this.setAllWrapMode(AppState.autoWrapEnabled);
                     this.loadAnticheatConfig();
+                    this.initMonaco();
                 },
                 loadAnticheatConfig() {
                     try {
@@ -1358,94 +1249,124 @@
                 saveAnticheatConfig(config) {
                     localStorage.setItem('anticheatConfig', JSON.stringify(config));
                 },
+                // 新增：初始化 Monaco Editor
+                initMonaco() {
+                    const self = this;
+                    require(['vs/editor/editor.main'], function() {
+                        const container = document.getElementById('monaco-container');
+                        if (!container) return;
+
+                        // 动态生成颜色 CSS 类（完美保留原高亮规则）
+                        const style = document.createElement('style');
+                        let css = '';
+                        AppState.highlightRules.forEach(rule => {
+                            const color = rule.color.replace('#', '');
+                            css += `.color-${color} { color: ${rule.color} !important; }`;
+                        });
+                        style.innerHTML = css;
+                        document.head.appendChild(style);
+
+                        AppState.monacoModel = monaco.editor.createModel('', 'plaintext');
+                        AppState.monacoEditor = monaco.editor.create(container, {
+                            model: AppState.monacoModel,
+                            theme: 'vs-dark',
+                            minimap: {
+                                enabled: true, 
+                                renderCharacters: false
+                            },
+                            wordWrap: AppState.autoWrapEnabled ? 'on' : 'off',
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            fontSize: 13,
+                            lineHeight: 20
+                        });
+
+                        // 监听滚动更新自动滚动复选框（防抖）
+                        AppState.monacoEditor.onDidScrollChange(function() {
+                            self.updateAutoScrollCheck();
+                        });
+                    });
+                },
+                // 新增：应用颜色高亮
+                updateDecorations() {
+                    if (!AppState.monacoEditor) return;
+                    const model = AppState.monacoEditor.getModel();
+                    const rules = AppState.highlightRules;
+                    const newDecorations = [];
+                    for (let i = 0; i < rules.length; i++) {
+                        const rule = rules[i];
+                        const regexStr = rule.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(regexStr, "i");
+                        const matches = model.findMatches(regex.source, false, true, true, null, true);
+                        for (let j = 0; j < matches.length; j++) {
+                            newDecorations.push({
+                                range: matches[j].range,
+                                options: { 
+                                    isWholeLine: true, 
+                                    inlineClassName: 'color-' + rule.color.replace('#', '') 
+                                }
+                            });
+                        }
+                    }
+                    if (AppState.monacoDecorations) {
+                        AppState.monacoDecorations.clear();
+                    }
+                    AppState.monacoDecorations = AppState.monacoEditor.createDecorationsCollection(newDecorations);
+                },
                 bindEvents() {
                     this.elements.autoScroll.addEventListener('change', () => {
                         AppState.autoScrollEnabled = this.elements.autoScroll.checked;
                         if (AppState.autoScrollEnabled) {
                             const tab = AppState.currentTab;
-                            if (tab === 'console') Utils.smoothScrollToBottomDynamic(this.elements
-                                .consoleContainer, 200);
-                            else if (tab === 'chat') Utils.smoothScrollToBottomDynamic(this.elements.chatText,
-                                200);
-                            else if (tab === 'joinquit') Utils.smoothScrollToBottomDynamic(this.elements
-                                .joinquitText, 200);
-                            else if (tab === 'grim') { Utils.smoothScrollToBottomDynamic(this.elements.grimText,
-                                    200);
-                                Utils.smoothScrollToBottomDynamic(this.elements.serverText, 200); } else if (
-                                tab === 'playerip') Utils.smoothScrollToBottomDynamic(this.elements.ipPanel,
-                                200);
+                            if (tab === 'console' && AppState.monacoEditor) {
+                                AppState.monacoEditor.revealLineInCenter(AppState.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                            }
+                            else if (tab === 'chat') Utils.smoothScrollToBottomDynamic(this.elements.chatText, 200);
+                            else if (tab === 'joinquit') Utils.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
+                            else if (tab === 'grim') { Utils.smoothScrollToBottomDynamic(this.elements.grimText, 200);
+                                Utils.smoothScrollToBottomDynamic(this.elements.serverText, 200); }
+                            else if (tab === 'playerip') Utils.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
                         }
                     });
                     this.elements.autoWrap.addEventListener('change', () => {
                         this.setAllWrapMode(this.elements.autoWrap.checked);
                     });
 
+                    // 过滤切换：重新加载 Monaco
                     this.elements.filterErrors.addEventListener('change', () => {
                         AppState.filterEnabled = this.elements.filterErrors.checked;
-                        const container = this.elements.consoleContainer;
-                        if (AppState.filterEnabled) {
-                            container.classList.add('filter-enabled');
-                        } else {
-                            container.classList.remove('filter-enabled');
-                        }
-                        MinimapManager.refresh();
-                        if (AppState.autoScrollEnabled && AppState.currentTab === 'console') {
-                            Utils.smoothScrollToBottomDynamic(container, 200);
-                        }
-                        const visibleCount = AppState.filterEnabled ?
-                            container.querySelectorAll('.console-log-line:not(.filtered-line)').length :
-                            container.querySelectorAll('.console-log-line').length;
-                        this.showStatus(
-                            `屏蔽报错: ${AppState.filterEnabled ? '开启' : '关闭'} | 可见行数: ${visibleCount}`,
-                            2000);
+                        this.reloadConsoleLog();
+                        this.showStatus(`屏蔽报错: ${AppState.filterEnabled ? '开启' : '关闭'}`, 2000);
                     });
 
-                    document.getElementById('scroll-top-btn').addEventListener('click', () => Utils
-                        .smoothScrollToTop(this.elements.consoleContainer, 200));
-                    document.getElementById('scroll-bottom-btn').addEventListener('click', () => Utils
-                        .smoothScrollToBottomDynamic(this.elements.consoleContainer, 200));
-                    document.getElementById('copy-console-btn').addEventListener('click', () => this
-                        .copyConsoleContent());
+                    // 控制台按钮操作 Monaco
+                    document.getElementById('scroll-top-btn').addEventListener('click', () => {
+                        if (AppState.monacoEditor) AppState.monacoEditor.revealLine(1);
+                    });
+                    document.getElementById('scroll-bottom-btn').addEventListener('click', () => {
+                        if (AppState.monacoEditor) AppState.monacoEditor.revealLineInCenter(AppState.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                    });
+                    document.getElementById('copy-console-btn').addEventListener('click', () => this.copyConsoleContent());
 
-                    document.getElementById('chat-scroll-top')?.addEventListener('click', () => Utils
-                        .smoothScrollToTop(this.elements.chatText, 200));
-                    document.getElementById('chat-scroll-bottom')?.addEventListener('click', () => Utils
-                        .smoothScrollToBottomDynamic(this.elements.chatText, 200));
-                    document.getElementById('joinquit-scroll-top')?.addEventListener('click', () => Utils
-                        .smoothScrollToTop(this.elements.joinquitText, 200));
-                    document.getElementById('joinquit-scroll-bottom')?.addEventListener('click', () => Utils
-                        .smoothScrollToBottomDynamic(this.elements.joinquitText, 200));
-                    document.getElementById('ip-scroll-top')?.addEventListener('click', () => Utils.smoothScrollToTop(
-                        this.elements.ipPanel, 200));
-                    document.getElementById('ip-scroll-bottom')?.addEventListener('click', () => Utils
-                        .smoothScrollToBottomDynamic(this.elements.ipPanel, 200));
+                    document.getElementById('chat-scroll-top')?.addEventListener('click', () => Utils.smoothScrollToTop(this.elements.chatText, 200));
+                    document.getElementById('chat-scroll-bottom')?.addEventListener('click', () => Utils.smoothScrollToBottomDynamic(this.elements.chatText, 200));
+                    document.getElementById('joinquit-scroll-top')?.addEventListener('click', () => Utils.smoothScrollToTop(this.elements.joinquitText, 200));
+                    document.getElementById('joinquit-scroll-bottom')?.addEventListener('click', () => Utils.smoothScrollToBottomDynamic(this.elements.joinquitText, 200));
+                    document.getElementById('ip-scroll-top')?.addEventListener('click', () => Utils.smoothScrollToTop(this.elements.ipPanel, 200));
+                    document.getElementById('ip-scroll-bottom')?.addEventListener('click', () => Utils.smoothScrollToBottomDynamic(this.elements.ipPanel, 200));
 
-                    document.getElementById('query-ip-btn').addEventListener('click', () => this.queryIP(this.elements
-                        .ipInput.value));
-                    this.elements.ipInput.addEventListener('keypress', e => { if (e.key === 'Enter') this.queryIP(this
-                            .elements.ipInput.value); });
+                    document.getElementById('query-ip-btn').addEventListener('click', () => this.queryIP(this.elements.ipInput.value));
+                    this.elements.ipInput.addEventListener('keypress', e => { if (e.key === 'Enter') this.queryIP(this.elements.ipInput.value); });
 
                     document.getElementById('collapse-all-btn').addEventListener('click', () => this.collapseAllIps());
                     document.getElementById('expand-all-btn').addEventListener('click', () => this.expandAllGroups());
-                    document.getElementById('batch-query-ip-btn').addEventListener('click', () => this
-                        .batchQueryIpLocation());
+                    document.getElementById('batch-query-ip-btn').addEventListener('click', () => this.batchQueryIpLocation());
 
                     this.elements.ipPanel.addEventListener('click', e => this.handleIpPanelClick(e));
 
-                    this.elements.minimapSizeInput.addEventListener('input', () => {
-                        AppState.minimapWindowSize = parseInt(this.elements.minimapSizeInput.value) || 1000;
-                        MinimapManager.refresh();
-                    });
-
-                    this.elements.consoleContainer.addEventListener('scroll', () => {
-                        MinimapManager.refresh();
-                        const atBottom = Utils.isContainerAtBottom(this.elements.consoleContainer);
-                        if (this.elements.autoScroll.checked !== atBottom) {
-                            this.elements.autoScroll.checked = atBottom;
-                            AppState.autoScrollEnabled = atBottom;
-                        }
-                    });
-
+                    // 其他容器的滚动监听
                     ['chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(key => {
                         const el = this.elements[key];
                         if (el) {
@@ -1467,10 +1388,8 @@
                         const panel = this.elements.grimConfigPanel;
                         panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
                     });
-                    document.getElementById('grim-apply-config').addEventListener('click', () => this
-                        .applyAnticheatConfig());
-                    document.getElementById('grim-reset-config').addEventListener('click', () => this
-                        .resetAnticheatConfig());
+                    document.getElementById('grim-apply-config').addEventListener('click', () => this.applyAnticheatConfig());
+                    document.getElementById('grim-reset-config').addEventListener('click', () => this.resetAnticheatConfig());
                     document.getElementById('grim-cancel-config').addEventListener('click', () => {
                         this.elements.grimConfigPanel.style.display = 'none';
                         this.elements.grimLeftInput.value = AppState.anticheatConfig.leftKeywords.join(',');
@@ -1547,40 +1466,55 @@
                     const wordWrap = enabled ? "break-word" : "normal";
                     const set = (el) => {
                         if (!el) return;
-                        if (el.tagName === "TEXTAREA") { el.style.whiteSpace = style;
-                            el.style.wordWrap = wordWrap; } else { el.style.whiteSpace = style;
-                            el.style.wordWrap = wordWrap; }
+                        if (el.tagName === "TEXTAREA") { el.style.whiteSpace = style; el.style.wordWrap = wordWrap; } else { el.style.whiteSpace = style; el.style.wordWrap = wordWrap; }
                     };
                     set(this.elements.chatText);
                     set(this.elements.joinquitText);
                     set(this.elements.grimText);
                     set(this.elements.serverText);
-                    set(this.elements.consoleContainer);
+                    // Monaco 自动换行
+                    if (AppState.monacoEditor) {
+                        AppState.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
+                    }
                     AppState.autoWrapEnabled = enabled;
-                    MinimapManager.refresh();
                 },
+                // 重构后的 appendConsoleLines：加入 Monaco
                 appendConsoleLines(lineObjects) {
                     if (!lineObjects || lineObjects.length === 0) return;
-                    const container = this.elements.consoleContainer;
-                    const fragment = document.createDocumentFragment();
-                    for (const obj of lineObjects) {
-                        const div = document.createElement('div');
-                        div.className = 'console-log-line';
-                        if (obj.filtered) {
-                            div.classList.add('filtered-line');
-                        }
-                        const color = Utils.getHighlightColor(obj.text, AppState.highlightRules);
-                        if (color) div.style.color = color;
-                        div.textContent = obj.text;
-                        if (AppState.autoWrapEnabled) {
-                            div.style.whiteSpace = "pre-wrap";
-                            div.style.wordWrap = "break-word";
-                        }
-                        fragment.appendChild(div);
+                    let validLines = lineObjects;
+                    if (AppState.filterEnabled) {
+                        validLines = lineObjects.filter(obj => !obj.filtered);
                     }
-                    container.appendChild(fragment);
+                    if (validLines.length === 0 || !AppState.monacoEditor) return;
+                    const model = AppState.monacoEditor.getModel();
+                    const lastLine = model.getLineCount();
+                    const text = validLines.map(obj => obj.text).join('\n');
+                    model.pushEditOperations([], [{
+                        range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
+                        text: '\n' + text,
+                        forceMoveMarkers: true
+                    }]);
                     if (AppState.autoScrollEnabled) {
-                        Utils.smoothScrollToBottomDynamic(container, 100);
+                        AppState.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
+                    }
+                    this.updateDecorations();
+                },
+                // 切换过滤时的重新加载
+                reloadConsoleLog() {
+                    if (!AppState.monacoEditor || !AppState.rawDisplayLines) return;
+                    const model = AppState.monacoEditor.getModel();
+                    model.setValue('');
+                    const text = AppState.rawDisplayLines
+                        .filter(line => {
+                            if (!AppState.filterEnabled) return true;
+                            const result = DataProcessor.processLineData(line);
+                            return !result.filtered;
+                        })
+                        .join('\n');
+                    model.setValue(text);
+                    this.updateDecorations();
+                    if (AppState.autoScrollEnabled) {
+                        AppState.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
                     }
                 },
                 updateNonConsoleTab() {
@@ -1849,19 +1783,11 @@
                     });
                 },
                 async copyConsoleContent() {
-                    const allLines = this.elements.consoleContainer.querySelectorAll(".console-log-line");
-                    if (!allLines.length) return this.showStatus("无内容可复制", 2000);
-                    let lines;
-                    if (AppState.filterEnabled) {
-                        lines = Array.from(allLines).filter(l => !l.classList.contains('filtered-line'));
-                    } else {
-                        lines = Array.from(allLines);
-                    }
-                    if (!lines.length) return this.showStatus("无可见内容可复制", 2000);
-                    const text = lines.map(l => l.textContent).join("\n");
+                    if (!AppState.monacoEditor) return this.showStatus("无内容可复制", 2000);
+                    const text = AppState.monacoEditor.getValue();
                     try {
                         await navigator.clipboard.writeText(text);
-                        this.showStatus(`已复制 ${lines.length} 行`, 2000);
+                        this.showStatus("已复制内容", 2000);
                     } catch {
                         const ta = document.createElement("textarea");
                         ta.value = text;
@@ -1869,7 +1795,7 @@
                         ta.select();
                         document.execCommand("copy");
                         document.body.removeChild(ta);
-                        this.showStatus(`已复制 ${lines.length} 行`, 2000);
+                        this.showStatus("已复制内容", 2000);
                     }
                 },
                 showStatus(msg, timeout) {
@@ -1887,7 +1813,7 @@
                     document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
                     document.getElementById(`tab-${tabId}`).classList.add("active");
                     if (tabId === 'console') {
-                        MinimapManager.refresh();
+                        if (AppState.monacoEditor) AppState.monacoEditor.layout();
                     } else if (tabId === 'playerip') {
                         this.renderIpPanel();
                     } else if (tabId === 'grim') {
@@ -1897,8 +1823,10 @@
                         this.updateNonConsoleTab();
                     }
                     if (AppState.autoScrollEnabled) {
-                        const map = { console: 'consoleContainer', chat: 'chatText', joinquit: 'joinquitText',
-                            grim: 'grimText', playerip: 'ipPanel' };
+                        if (tabId === 'console' && AppState.monacoEditor) {
+                            AppState.monacoEditor.revealLineInCenter(AppState.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                        }
+                        const map = { chat: 'chatText', joinquit: 'joinquitText', grim: 'grimText', playerip: 'ipPanel' };
                         const key = map[tabId];
                         if (key) {
                             const el = this.elements[key];
@@ -1908,222 +1836,45 @@
                             Utils.smoothScrollToBottomDynamic(this.elements.serverText, 200);
                         }
                     }
-                }
-            };
-
-            // ============================================================
-            // 7. 缩略图管理
-            // ============================================================
-            const MinimapManager = {
-                elements: {},
-                windowStart: 0,
-                windowEnd: 0,
-                totalLines: 0,
-                _rafId: null,
-                init() {
-                    this.elements = {
-                        panel: document.getElementById('console-minimap'),
-                        viewport: document.querySelector('#console-minimap .minimap-viewport'),
-                        content: document.getElementById('minimap-content'),
-                        indicator: document.getElementById('minimap-indicator'),
-                        sizeInput: document.getElementById('minimap-window-size'),
-                    };
-                    this.bindEvents();
-                    const container = UIManager.elements.consoleContainer;
-                    if (container) {
-                        container.addEventListener('scroll', () => this.refresh());
-                        if (window.ResizeObserver) {
-                            const ro = new ResizeObserver(() => this.refresh());
-                            ro.observe(container);
-                        } else {
-                            window.addEventListener('resize', () => {
-                                clearTimeout(this._resizeTimer);
-                                this._resizeTimer = setTimeout(() => this.refresh(), 150);
-                            });
+                },
+                // 修复后的防抖判断
+                updateAutoScrollCheck: function() {
+                    const self = this;
+                    if (this._scrollCheckTimer) clearTimeout(this._scrollCheckTimer);
+                    this._scrollCheckTimer = setTimeout(function() {
+                        let allAtBottom = true;
+                        if (AppState.monacoEditor) {
+                            const scrollTop = AppState.monacoEditor.getScrollTop();
+                            const scrollHeight = AppState.monacoEditor.getScrollHeight();
+                            const clientHeight = AppState.monacoEditor.getLayoutInfo().height;
+                            if (scrollHeight - scrollTop - clientHeight > 5) {
+                                allAtBottom = false;
+                            }
                         }
-                    }
+                        const containers = [
+                            self.elements.chatText,
+                            self.elements.joinquitText,
+                            self.elements.grimText,
+                            self.elements.serverText,
+                            self.elements.ipPanel
+                        ];
+                        for (let i = 0; i < containers.length; i++) {
+                            const el = containers[i];
+                            if (el && !Utils.isContainerAtBottom(el)) {
+                                allAtBottom = false;
+                                break;
+                            }
+                        }
+                        if (self.elements.autoScroll.checked !== allAtBottom) {
+                            self.elements.autoScroll.checked = allAtBottom;
+                            AppState.autoScrollEnabled = allAtBottom;
+                        }
+                    }, 100);
                 },
-                bindEvents() {
-                    const panel = this.elements.panel;
-                    if (!panel) return;
-                    panel.addEventListener('mousedown', (e) => {
-                        e.preventDefault();
-                        AppState.minimapDragging = true;
-                        AppState.minimapHasMoved = false;
-                        const rect = this.elements.viewport.getBoundingClientRect();
-                        AppState.minimapStartY = e.clientY - rect.top;
-                        document.addEventListener('mousemove', this.onMouseMove);
-                        document.addEventListener('mouseup', this.onMouseUp);
-                    });
-                },
-                onMouseMove(e) {
-                    if (!AppState.minimapDragging) return;
-                    e.preventDefault();
-                    const rect = MinimapManager.elements.viewport.getBoundingClientRect();
-                    const currentY = e.clientY - rect.top;
-                    const delta = Math.abs(currentY - AppState.minimapStartY);
-                    if (delta > 3) AppState.minimapHasMoved = true;
-                    if (AppState.minimapHasMoved) MinimapManager.scrollToMouseY(currentY);
-                },
-                onMouseUp(e) {
-                    if (!AppState.minimapDragging) return;
-                    AppState.minimapDragging = false;
-                    document.removeEventListener('mousemove', MinimapManager.onMouseMove);
-                    document.removeEventListener('mouseup', MinimapManager.onMouseUp);
-                    const rect = MinimapManager.elements.viewport.getBoundingClientRect();
-                    const endY = e.clientY - rect.top;
-                    MinimapManager.scrollToMouseY(endY, true);
-                },
-                _findFirstVisibleLine(lines, scrollTop) {
-                    let low = 0,
-                        high = lines.length - 1;
-                    while (low < high) {
-                        const mid = Math.floor((low + high) / 2);
-                        if (lines[mid].offsetTop >= scrollTop) high = mid;
-                        else low = mid + 1;
-                    }
-                    return Math.min(low, lines.length - 1);
-                },
-                _getVisibleLines(logContainer) {
-                    let allLines = Array.from(logContainer.querySelectorAll('.console-log-line'));
-                    if (AppState.filterEnabled) {
-                        return allLines.filter(l => !l.classList.contains('filtered-line'));
-                    }
-                    return allLines;
-                },
-                scrollToMouseY(mouseY, smooth = false) {
-                    const viewport = this.elements.viewport;
-                    if (!viewport) return;
-                    const logContainer = UIManager.elements.consoleContainer;
-                    if (!logContainer) return;
-                    const lines = this._getVisibleLines(logContainer);
-                    if (lines.length === 0 || this.windowEnd <= this.windowStart) return;
-                    const viewportHeight = viewport.clientHeight;
-                    const ratio = Math.max(0, Math.min(1, mouseY / viewportHeight));
-                    const windowLines = this.windowEnd - this.windowStart;
-                    let targetLine = this.windowStart + Math.floor(ratio * windowLines);
-                    targetLine = Math.max(0, Math.min(targetLine, lines.length - 1));
-                    const targetTop = lines[targetLine].offsetTop;
-                    const scrollTarget = targetTop - logContainer.clientHeight * 0.3;
-                    const maxScroll = logContainer.scrollHeight - logContainer.clientHeight;
-                    const finalTop = Math.max(0, Math.min(scrollTarget, maxScroll));
-                    if (smooth) {
-                        logContainer.scrollTo({ top: finalTop, behavior: 'smooth' });
-                    } else {
-                        logContainer.scrollTop = finalTop;
-                    }
-                },
-                refresh() {
-                    if (this._rafId) return;
-                    this._rafId = requestAnimationFrame(() => {
-                        this._rafId = null;
-                        this._doRefresh();
-                    });
-                },
-                _doRefresh() {
-                    const logContainer = UIManager.elements.consoleContainer;
-                    if (!logContainer) return;
-                    const visibleLines = this._getVisibleLines(logContainer);
-                    this.totalLines = visibleLines.length;
-                    if (this.totalLines === 0) {
-                        this.elements.content.innerHTML = '';
-                        this.updateIndicator();
-                        return;
-                    }
-                    const scrollTop = logContainer.scrollTop;
-                    const clientHeight = logContainer.clientHeight;
-                    const totalHeight = logContainer.scrollHeight;
-                    const firstVisibleIdx = this._findFirstVisibleLine(visibleLines, scrollTop);
-                    const avgLineHeight = totalHeight / this.totalLines;
-                    const visibleCount = Math.ceil(clientHeight / avgLineHeight);
-                    const centerIdx = firstVisibleIdx + Math.floor(visibleCount / 2);
-                    const winSize = parseInt(AppState.minimapWindowSize) || 1000;
-                    const half = Math.floor(winSize / 2);
-                    let start = centerIdx - half;
-                    if (start < 0) start = 0;
-                    let end = start + winSize;
-                    if (end > this.totalLines) {
-                        end = this.totalLines;
-                        start = Math.max(0, end - winSize);
-                    }
-                    this.windowStart = start;
-                    this.windowEnd = end;
-
-                    const fragment = document.createDocumentFragment();
-                    for (let i = start; i < end; i++) {
-                        const lineEl = visibleLines[i];
-                        const span = document.createElement('span');
-                        span.className = 'minimap-line';
-                        span.textContent = lineEl.textContent;
-                        const color = lineEl.style.color;
-                        if (color) span.style.color = color;
-                        fragment.appendChild(span);
-                    }
-                    this.elements.content.innerHTML = '';
-                    this.elements.content.appendChild(fragment);
-
-                    this.updateScaleAndIndicator();
-                },
-                updateScaleAndIndicator() {
-                    const viewport = this.elements.viewport;
-                    const logContainer = UIManager.elements.consoleContainer;
-                    if (!viewport || !logContainer) return;
-                    const logHeight = logContainer.clientHeight;
-                    viewport.style.bottom = '8px';
-                    viewport.style.top = '8px';
-                    viewport.style.height = (logHeight - 16) + 'px';
-
-                    const viewportHeight = viewport.clientHeight;
-                    const contentHeight = this.elements.content.scrollHeight;
-                    if (contentHeight <= 0 || viewportHeight <= 0) return;
-                    let scale = viewportHeight / contentHeight;
-                    scale = Math.min(scale, 0.3);
-                    this.elements.content.style.transform = `scale(${scale})`;
-
-                    this.updateIndicator();
-                },
-                updateIndicator() {
-                    const logContainer = UIManager.elements.consoleContainer;
-                    if (!logContainer) return;
-                    const viewport = this.elements.viewport;
-                    if (!viewport) return;
-                    const viewportHeight = viewport.clientHeight;
-                    const visibleLines = this._getVisibleLines(logContainer);
-                    if (visibleLines.length === 0 || this.windowEnd <= this.windowStart) {
-                        this.elements.indicator.style.opacity = '0';
-                        return;
-                    }
-                    const scrollTop = logContainer.scrollTop;
-                    const clientHeight = logContainer.clientHeight;
-                    const startLine = visibleLines[this.windowStart];
-                    const endLine = visibleLines[this.windowEnd - 1];
-                    const windowPixelStart = startLine.offsetTop;
-                    const windowPixelEnd = endLine.offsetTop + endLine.offsetHeight;
-                    const windowPixelHeight = windowPixelEnd - windowPixelStart;
-                    if (windowPixelHeight <= 0) {
-                        this.elements.indicator.style.opacity = '0';
-                        return;
-                    }
-                    const visiblePixelStart = scrollTop;
-                    const visiblePixelHeight = clientHeight;
-                    let relStart = (visiblePixelStart - windowPixelStart) / windowPixelHeight;
-                    let relHeight = visiblePixelHeight / windowPixelHeight;
-                    relStart = Math.max(0, Math.min(relStart, 1 - relHeight));
-                    relHeight = Math.min(relHeight, 1);
-                    const indicatorTop = relStart * viewportHeight;
-                    let indicatorHeight = relHeight * viewportHeight;
-                    const minH = 8;
-                    indicatorHeight = Math.max(indicatorHeight, minH);
-                    const maxTop = viewportHeight - indicatorHeight;
-                    const finalTop = Math.min(Math.max(indicatorTop, 0), maxTop);
-                    this.elements.indicator.style.top = finalTop + 'px';
-                    this.elements.indicator.style.height = indicatorHeight + 'px';
-                    this.elements.indicator.style.opacity = '1';
-                }
             };
 
             // ============================================================
-            // 8. 异步分批加载函数
+            // 7. 异步分批加载函数
             // ============================================================
             const BATCH_SIZE = 10000;
 
@@ -2141,8 +1892,11 @@
                 AppState.ipLoginRecords = [];
                 AppState.totalLines = 0;
 
-                const container = UIManager.elements.consoleContainer;
-                container.innerHTML = '';
+                // 清空 Monaco
+                if (AppState.monacoEditor) {
+                    AppState.monacoEditor.setValue('');
+                    if (AppState.monacoDecorations) AppState.monacoDecorations.clear();
+                }
 
                 const lines = text.split(/\r?\n/);
                 const total = lines.length;
@@ -2179,16 +1933,21 @@
                     } else {
                         progressEl.style.display = 'none';
                         const visibleCount = AppState.filterEnabled ?
-                            container.querySelectorAll('.console-log-line:not(.filtered-line)').length :
-                            container.querySelectorAll('.console-log-line').length;
+                            AppState.rawDisplayLines.filter(line => {
+                                const res = DataProcessor.processLineData(line);
+                                return !res.filtered;
+                            }).length :
+                            AppState.rawDisplayLines.length;
                         statusEl.innerText =
                             `一共 ${total} 行日志，屏蔽部分后有 ${visibleCount} 行可见`;
                         AppState.processing = false;
 
                         UIManager.updateNonConsoleTab();
-                        MinimapManager.refresh();
+                        UIManager.updateDecorations();
 
-                        Utils.smoothScrollToBottomDynamic(container, 200);
+                        if (AppState.autoScrollEnabled && AppState.monacoEditor) {
+                            AppState.monacoEditor.revealLineInCenter(AppState.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                        }
                     }
                 }
 
@@ -2196,7 +1955,7 @@
             }
 
             // ============================================================
-            // 9. 反作弊标签页分隔条拖拽（离线版）
+            // 8. 反作弊标签页分隔条拖拽（离线版）
             // ============================================================
             (function initGrimDivider() {
                 const divider = document.getElementById('grim-divider');
@@ -2271,11 +2030,10 @@
             })();
 
             // ============================================================
-            // 10. 初始化
+            // 9. 初始化
             // ============================================================
             document.addEventListener('DOMContentLoaded', function() {
                 UIManager.init();
-                MinimapManager.init();
 
                 const fileInput = document.getElementById('file-input');
                 const textInput = document.getElementById('text-input');
