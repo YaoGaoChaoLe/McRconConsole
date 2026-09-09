@@ -1052,6 +1052,39 @@
             color: #aaa;
             margin-left: 98px;
         }
+
+
+        /* ===== 全局加载遮罩 ===== */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #0fc;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: '微软雅黑', sans-serif;
+        }
+        #loading-overlay .loader {
+            border: 4px solid #2c2c2c;
+            border-top: 4px solid #0fc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -1065,6 +1098,11 @@
 </head>
 
 <body>
+    <!-- 加载遮罩 -->
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <div>正在加载控制台引擎 (CDN)，请稍候...</div>
+    </div>
     <!-- ===== 顶部状态栏 ===== -->
     <div class="top-bar">
         <div class="status-text" id="status"></div>
@@ -1699,9 +1737,12 @@
                     });
                 },
 
-                // 新增：初始化 Monaco Editor
                 initMonaco: function() {
                     var self = this;
+                    // 必须先显示遮罩，确保 CDN 加载期间禁止用户操作
+                    var overlay = document.getElementById('loading-overlay');
+                    if (overlay) overlay.style.display = 'flex';
+
                     require(['vs/editor/editor.main'], function() {
                         var container = document.getElementById('monaco-container');
                         if (!container) return;
@@ -1742,9 +1783,18 @@
                         if (self.monacoModel.getValueLength() > 0) {
                             self.updateDecorations();
                         }
+
+                        // ===== 新增：加载成功，解除禁止 =====
+                        if (overlay) overlay.style.display = 'none';
+
+                    }, function(err) {
+                        // ===== 新增：加载失败提示 =====
+                        console.error('Monaco CDN 加载失败:', err);
+                        if (overlay) {
+                            overlay.innerHTML = '<div style="color: #ff4343; text-align: center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
+                        }
                     });
                 },
-
                 // 新增：应用颜色高亮（基于原 w.highlightRules）
                 updateDecorations: function() {
                     if (!this.monacoEditor) return;
