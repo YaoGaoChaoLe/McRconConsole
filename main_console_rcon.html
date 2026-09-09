@@ -155,25 +155,6 @@
             min-height: 0;
         }
 
-        .split-panel {
-            display: flex;
-            gap: 10px;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        .split-half {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1a;
-            border-radius: 4px;
-            overflow: hidden;
-            min-height: 0;
-            border: 1px solid #2c2c2c;
-        }
-
         /* ===== 通用子标题 ===== */
         .console-log-area .sub-header,
         .ip-query-area .sub-header,
@@ -458,8 +439,8 @@
             border: 1px solid #2c2c2c;
             padding: 12px;
             min-height: 300px;
-            overflow: hidden;   /* 防止子元素溢出 */
-            position: relative; /* 确保内部定位生效 */
+            overflow: hidden;
+            position: relative;
         }
 
         .stats-chart-header {
@@ -852,102 +833,21 @@
             background: #0f0f0f;
         }
 
-        /* ===== 控制台缩略图 ===== */
-        .minimap-window-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 12px;
-        }
-
-        .minimap-window-input {
-            width: 60px;
-            padding: 2px 4px;
-            background: #0f0f0f;
-            color: #0fc;
-            border: 1px solid #2c2c2c;
-            border-radius: 3px;
-            font-size: 11px;
-            font-family: monospace;
-            text-align: center;
-            opacity: .8;
-            transition: opacity .2s, border-color .2s;
-        }
-
-        .minimap-window-input:focus,
-        .minimap-window-input:hover {
-            opacity: 1;
-            border-color: #0fc;
-            outline: 0;
-        }
-
-        .minimap-window-input::-webkit-inner-spin-button {
-            opacity: .6;
-            height: 16px;
-        }
-
-        .console-log-row {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .console-minimap {
-            width: 10%;
-            min-width: 80px;
-            max-width: 200px;
-            flex-shrink: 0;
-            background: #1a1a1a;
+        /* ===== Monaco Editor 控制台区域 ===== */
+        #monaco-container {
+            width: 100%;
+            height: 100%;
             border-left: 1px solid #2c2c2c;
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            box-shadow: inset 2px 0 8px rgba(0, 0, 0, .4);
+            background: #1a1a1a;
         }
 
-        .console-minimap:hover {
-            filter: brightness(1.05);
-        }
-
-        .console-minimap .minimap-viewport {
-            position: absolute;
-            top: 8px;
-            left: 6px;
-            right: 6px;
-            bottom: auto;
-            overflow: hidden;
-        }
-
-        .console-minimap .minimap-content {
-            transform-origin: top left;
-            pointer-events: none;
-            font-size: 15px;
-            line-height: 1.5;
-            white-space: pre;
-        }
-
-        .console-minimap .minimap-content .minimap-line {
-            display: block;
-            line-height: inherit;
-            white-space: pre;
-        }
-
-        .console-minimap .minimap-indicator {
-            position: absolute;
-            left: 4px;
-            right: 4px;
-            background: rgba(255, 255, 255, .1);
-            border: 1px solid rgba(255, 255, 255, .3);
-            border-radius: 2px;
-            pointer-events: none;
-            z-index: 5;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
-        }
-
-        .console-minimap:hover .minimap-indicator {
-            background: rgba(255, 255, 255, .2);
-            border-color: rgba(255, 255, 255, .5);
-        }
+        /* Monaco 文本高亮类（动态匹配原 highlight_rules 颜色） */
+        .color-ff0000 { color: #ff0000 !important; }
+        .color-fbff00 { color: #fbff00 !important; }
+        .color-00ffea { color: #00ffea !important; }
+        .color-666666 { color: #666666 !important; }
+        .color-3bf010 { color: #3bf010 !important; }
+        .color-ffffff { color: #ffffff !important; }
 
         /* ===== 滚动条 ===== */
         ::-webkit-scrollbar {
@@ -987,16 +887,6 @@
         }
 
         /* ===== 响应式 ===== */
-        @media (max-width: 768px) {
-            .console-minimap {
-                width: 60px;
-            }
-            .minimap-window-input {
-                width: 50px;
-                font-size: 10px;
-            }
-        }
-
         @media (max-width: 600px) {
             .tab-button {
                 padding: 6px 12px;
@@ -1008,15 +898,6 @@
             .split-panel {
                 flex-direction: column;
                 gap: 8px;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .console-minimap {
-                display: none;
-            }
-            .minimap-window-label {
-                display: none;
             }
         }
 
@@ -1032,7 +913,7 @@
             }
         }
 
-        /* ===== Grim 面板分割 ===== */
+        /* ===== Grim 面板分割（可配置关键词） ===== */
         .grim-split-container {
             display: flex;
             flex: 1;
@@ -1109,12 +990,78 @@
                 display: none;
             }
         }
+
+        /* 配置面板 */
+        .config-panel {
+            background: #1a1a1a;
+            border-bottom: 1px solid #2c2c2c;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .config-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .config-row label {
+            min-width: 90px;
+            color: #ccc;
+        }
+        .config-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 6px 8px;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .config-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .config-actions button {
+            padding: 6px 14px;
+            background: #2c2c2c;
+            color: #0fc;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .config-actions button:hover {
+            background: #3a3a3a;
+            color: #fff;
+        }
+        .config-toggle {
+            cursor: pointer;
+            color: #FFD700;
+            text-decoration: underline;
+            font-size: 13px;
+        }
+        .config-toggle:hover {
+            color: #FFA500;
+        }
+        .config-hint {
+            font-size: 12px;
+            color: #aaa;
+            margin-left: 98px;
+        }
     </style>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- 引入 Monaco Editor 官方 CDN (使用 fastly 加速节点) -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css" />
+    <script>
+        var require = { paths: { vs: 'https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js">
-    </script>
+    <script src="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
 </head>
 
 <body>
@@ -1156,21 +1103,9 @@
                                 <button class="scroll-btn" id="scroll-bottom-btn" title="滚动到底部">↓</button>
                             </div>
                             <div id="log-load-progress" style="font-size:12px;margin-left:auto;color:#aaa;white-space:nowrap;"></div>
-                            <label class="minimap-window-label">
-                                <span style="font-size:12px;color:#aaa;white-space:nowrap;">缩略图行数:</span>
-                                <input id="minimap-window-size" type="number" class="minimap-window-input" max="100000" min="50" step="50" title="缩略图显示行数" value="1000">
-                            </label>
                         </div>
                     </div>
-                    <div class="console-log-row">
-                        <div class="console-log-container" id="console-log-container"></div>
-                        <div class="console-minimap" id="console-minimap">
-                            <div class="minimap-viewport">
-                                <div class="minimap-content" id="minimap-content"></div>
-                            </div>
-                            <div class="minimap-indicator" id="minimap-indicator"></div>
-                        </div>
-                    </div>
+                    <div id="monaco-container" style="width: 100%; height: 100%; position: relative;"></div>
                 </div>
             </div>
         </div>
@@ -1203,16 +1138,36 @@
             </div>
         </div>
 
-        <!-- 反作弊 + Server -->
+        <!-- 仅看关键词（反作弊 + Server） - 可配置版 -->
         <div class="tab-content" id="tab-grim">
+            <div class="sub-header">
+                <span>仅看关键词</span>
+                <span class="config-toggle" id="grim-config-toggle">⚙ 配置关键词</span>
+            </div>
+            <div id="grim-config-panel" class="config-panel" style="display:none;">
+                <div class="config-row">
+                    <label>关键词1：</label>
+                    <input type="text" id="grim-left-keywords" placeholder="多个关键词用半角逗号分隔，如: 触发了, [Server]">
+                </div>
+                <div class="config-row">
+                    <label>关键词2：</label>
+                    <input type="text" id="grim-right-keywords" placeholder="多个关键词用半角逗号分隔，如: [Server], moved too quickly">
+                </div>
+                <div class="config-hint">💡 多个关键词用 半角逗号(英文输入法下的逗号) 分隔。但不要以逗号结尾</div>
+                <div class="config-actions">
+                    <button id="grim-apply-config">应用</button>
+                    <button id="grim-reset-config">重置默认</button>
+                    <button id="grim-cancel-config">取消</button>
+                </div>
+            </div>
             <div class="grim-split-container">
                 <div class="grim-panel grim-left" id="grim-left-panel">
-                    <div class="sub-header">反作弊日志</div>
+                    <div class="sub-header" style="border-radius:0;border-bottom:1px solid #3a3a3a;">包含 关键词1 的日志</div>
                     <textarea class="log-textarea" id="grim-text" readonly wrap="off"></textarea>
                 </div>
                 <div class="grim-divider" id="grim-divider" title="拖动调整左右宽度"></div>
                 <div class="grim-panel grim-right">
-                    <div class="sub-header">[Server]</div>
+                    <div class="sub-header" style="border-radius:0;border-bottom:1px solid #3a3a3a;">包含 关键词2 的日志</div>
                     <textarea class="log-textarea" id="server-text" readonly wrap="off"></textarea>
                 </div>
             </div>
@@ -1266,7 +1221,6 @@
                         <div id="online-chart" style="width:100%;height:320px;overflow:hidden;"></div>
                         <div id="live-online-summary" style="position:absolute;top:28px;right:0;width:15%;box-sizing:border-box;padding:0 8px;text-align:left;color:#0fc;font-size:12px;line-height:1.7;z-index:5;pointer-events:none;overflow-wrap:anywhere;"></div>
                     </div>
-                    <!-- <div id="online-chart" style="width:100%;height:290px;"></div> -->
                 </div>
 
                 <div class="performance-charts-row">
@@ -1393,11 +1347,15 @@
                 immersiveChart: null,
                 immersiveStatsTimer: null,
                 anticheatKeywords: [],
+                grimConfig: {
+                    leftKeywords: ["触发了", "[Server]"],
+                    rightKeywords: ["[Server]", "moved too quickly"]
+                },
+                rawLogLines: [], // 用于保存原始日志，以便重新过滤
                 minimapRefreshTimer: null,
                 minimapDragging: false,
                 minimapStartY: 0,
                 minimapHasMoved: false,
-                // 新增：缓存的完整数据（用于滑块）
                 fullTimes: [],
                 fullCounts: [],
                 fullMissingRanges: []
@@ -1559,8 +1517,9 @@
                         raw.includes('[Rcon]') || raw.includes('[TEAM_ONLY]') || raw.includes('[SHOUT]') ||
                         /<[a-zA-Z0-9_]+>/.test(raw);
                     var isJoinQuit = raw.includes('lost connection');
-                    var isGrim = w.anticheatKeywords.some(function(kw) { return raw.includes(kw); });
-                    var isServer = raw.includes('[Server]');
+                    // 修改：基于可配置的 grimConfig
+                    var isGrim = w.grimConfig.leftKeywords.some(function(kw) { return raw.includes(kw); });
+                    var isServer = w.grimConfig.rightKeywords.some(function(kw) { return raw.includes(kw); });
                     var isLogin = raw.includes('logged in');
 
                     // 清理前缀
@@ -1598,6 +1557,7 @@
                     w.serverLines = [];
                     w.ipLoginRecords = [];
                     var lines = rawText.split(/\r?\n/);
+                    w.rawLogLines = lines; // 保存原始行
                     for (var i = 0; i < lines.length; i++) {
                         this.processLine(lines[i]);
                     }
@@ -1690,244 +1650,7 @@
             };
 
             // ============================================================
-            // 控制台缩略图 d
-            // ============================================================
-            var d = {
-                elements: {
-                    panel: document.getElementById('console-minimap'),
-                    viewport: null,
-                    content: document.getElementById('minimap-content'),
-                    indicator: document.getElementById('minimap-indicator')
-                },
-                _windowStart: 0,
-                _windowEnd: 0,
-                _totalLines: 0,
-                _resizeTimer: null,
-                _rafId: null,
-                resizeObserver: null,
-
-                init: function() {
-                    var panel = this.elements.panel;
-                    if (!panel || !this.elements.content || !this.elements.indicator) return;
-                    this.elements.viewport = panel.querySelector('.minimap-viewport');
-                    this.elements.windowSizeInput = document.getElementById('minimap-window-size');
-                    this.bindEvents();
-
-                    if (window.ResizeObserver) {
-                        this.resizeObserver = new ResizeObserver(function() {
-                            d.refresh();
-                        });
-                        this.resizeObserver.observe(h.elements.consoleContainer);
-                    } else {
-                        window.addEventListener('resize', function() {
-                            clearTimeout(d._resizeTimer);
-                            d._resizeTimer = setTimeout(function() { d.refresh(); }, 150);
-                        });
-                    }
-
-                    var input = this.elements.windowSizeInput;
-                    if (input) {
-                        input.addEventListener('input', function() { d.refresh(); });
-                    }
-                },
-
-                bindEvents: function() {
-                    var panel = this.elements.panel;
-                    var that = this;
-                    panel.addEventListener('mousedown', function(e) {
-                        e.preventDefault();
-                        w.minimapDragging = true;
-                        w.minimapHasMoved = false;
-                        var rect = that.elements.viewport.getBoundingClientRect();
-                        w.minimapStartY = e.clientY - rect.top;
-                        document.addEventListener('mousemove', that.onMouseMove);
-                        document.addEventListener('mouseup', that.onMouseUp);
-                    });
-                },
-
-                onMouseMove: function(e) {
-                    if (!w.minimapDragging) return;
-                    e.preventDefault();
-                    var rect = d.elements.viewport.getBoundingClientRect();
-                    var y = e.clientY - rect.top;
-                    if (Math.abs(y - w.minimapStartY) > 3) {
-                        w.minimapHasMoved = true;
-                    }
-                    if (w.minimapHasMoved) {
-                        d.scrollToMouseY(y);
-                    }
-                },
-
-                onMouseUp: function(e) {
-                    if (w.minimapDragging) {
-                        w.minimapDragging = false;
-                        document.removeEventListener('mousemove', d.onMouseMove);
-                        document.removeEventListener('mouseup', d.onMouseUp);
-                        var rect = d.elements.viewport.getBoundingClientRect();
-                        var y = e.clientY - rect.top;
-                        d.scrollToMouseY(y, true);
-                    }
-                },
-
-                _findFirstVisibleLine: function(lines, scrollTop) {
-                    var lo = 0,
-                        hi = lines.length - 1;
-                    while (lo < hi) {
-                        var mid = Math.floor((lo + hi) / 2);
-                        if (lines[mid].offsetTop >= scrollTop) {
-                            hi = mid;
-                        } else {
-                            lo = mid + 1;
-                        }
-                    }
-                    return Math.min(lo, lines.length - 1);
-                },
-
-                scrollToMouseY: function(y, smooth) {
-                    var viewport = this.elements.viewport;
-                    if (!viewport) return;
-                    var viewportHeight = viewport.clientHeight;
-                    var container = h.elements.consoleContainer;
-                    if (!container) return;
-                    var lines = container.querySelectorAll('.console-log-line');
-                    if (lines.length === 0 || this._windowEnd <= this._windowStart) return;
-
-                    var ratio = Math.max(0, Math.min(1, y / viewportHeight));
-                    var visibleRange = this._windowEnd - this._windowStart;
-                    var targetLineIdx = this._windowStart + Math.floor(ratio * visibleRange);
-                    targetLineIdx = Math.max(0, Math.min(targetLineIdx, lines.length - 1));
-                    var targetTop = lines[targetLineIdx].offsetTop - 0.3 * container.clientHeight;
-                    var maxTop = container.scrollHeight - container.clientHeight;
-                    targetTop = Math.max(0, Math.min(targetTop, maxTop));
-
-                    if (smooth) {
-                        container.scrollTo({ top: targetTop, behavior: 'smooth' });
-                    } else {
-                        container.scrollTop = targetTop;
-                    }
-                },
-
-                refresh: function() {
-                    if (!this.elements.panel || !this.elements.content || !this.elements.indicator) return;
-                    if (!h.elements.consoleContainer) return;
-                    if (this._rafId) return;
-                    this._rafId = requestAnimationFrame(function() {
-                        d._rafId = null;
-                        d._doRefresh();
-                    });
-                },
-
-                _doRefresh: function() {
-                    var container = h.elements.consoleContainer;
-                    if (!container) return;
-                    var lines = container.querySelectorAll('.console-log-line');
-                    this._totalLines = lines.length;
-                    if (this._totalLines === 0) {
-                        this.elements.content.innerHTML = '';
-                        this.updateScaleAndIndicator();
-                        return;
-                    }
-
-                    var scrollTop = container.scrollTop;
-                    var clientH = container.clientHeight;
-                    var scrollH = container.scrollHeight;
-
-                    // 找到第一个可见行
-                    var firstVisible = this._findFirstVisibleLine(lines, scrollTop);
-                    // 估算可见行数
-                    var avgLineH = scrollH / this._totalLines;
-                    var visibleLines = Math.ceil(clientH / avgLineH);
-                    var centerLine = firstVisible + Math.floor(visibleLines / 2);
-
-                    var windowSize = parseInt(this.elements.windowSizeInput ? this.elements.windowSizeInput.value : 1000) || 1000;
-                    var start = centerLine - Math.floor(windowSize / 2);
-                    if (start < 0) start = 0;
-                    var end = start + windowSize;
-                    if (end > this._totalLines) {
-                        end = this._totalLines;
-                        start = Math.max(0, end - windowSize);
-                    }
-                    this._windowStart = start;
-                    this._windowEnd = end;
-
-                    var frag = document.createDocumentFragment();
-                    for (var i = start; i < end; i++) {
-                        var lineEl = lines[i];
-                        var span = document.createElement('span');
-                        span.className = 'minimap-line';
-                        span.textContent = lineEl.textContent;
-                        var color = lineEl.style.color;
-                        if (color) span.style.color = color;
-                        frag.appendChild(span);
-                    }
-                    this.elements.content.innerHTML = '';
-                    this.elements.content.appendChild(frag);
-                    this.updateScaleAndIndicator();
-                },
-
-                updateScaleAndIndicator: function() {
-                    var viewport = this.elements.viewport;
-                    if (!viewport) return;
-                    var container = h.elements.consoleContainer;
-                    if (!container) return;
-
-                    var viewH = container.clientHeight;
-                    viewport.style.bottom = 'auto';
-                    viewport.style.height = viewH + 'px';
-
-                    var contentH = this.elements.content.scrollHeight;
-                    var viewportH = viewport.clientHeight;
-                    if (contentH <= 0 || viewportH <= 0) return;
-
-                    var scale = viewportH / contentH;
-                    scale = Math.min(scale, 0.3);
-                    this.elements.content.style.transform = 'scale(' + scale + ')';
-                    this.updateIndicator();
-                },
-
-                updateIndicator: function() {
-                    var container = h.elements.consoleContainer;
-                    if (!container) return;
-                    var viewport = this.elements.viewport;
-                    if (!viewport) return;
-                    var indicator = this.elements.indicator;
-                    var viewH = viewport.clientHeight;
-                    var lines = container.querySelectorAll('.console-log-line');
-                    if (lines.length === 0 || this._windowEnd <= this._windowStart) {
-                        indicator.style.opacity = '0';
-                        return;
-                    }
-
-                    var scrollTop = container.scrollTop;
-                    var clientH = container.clientHeight;
-                    var firstLine = lines[this._windowStart];
-                    var lastLine = lines[this._windowEnd - 1];
-                    var firstTop = firstLine.offsetTop;
-                    var lastBottom = lastLine.offsetTop + lastLine.offsetHeight;
-                    var totalHeight = lastBottom - firstTop;
-                    if (totalHeight <= 0) {
-                        indicator.style.opacity = '0';
-                        return;
-                    }
-
-                    var visibleTop = (scrollTop - firstTop) / totalHeight;
-                    var visibleHeight = clientH / totalHeight;
-                    visibleTop = Math.max(0, Math.min(visibleTop, 1 - visibleHeight));
-                    visibleHeight = Math.min(visibleHeight, 1);
-                    var pixelTop = visibleTop * viewH;
-                    var pixelHeight = visibleHeight * viewH;
-                    pixelHeight = Math.max(pixelHeight, 8);
-                    var maxPixel = viewH - pixelHeight;
-                    pixelTop = Math.min(Math.max(pixelTop, 0), maxPixel);
-
-                    indicator.style.top = pixelTop + 'px';
-                    indicator.style.height = pixelHeight + 'px';
-                    indicator.style.opacity = '1';
-                }
-            };
-
-            // ============================================================
-            // 界面控制 h
+            // 界面控制 h（已完全移除旧缩略图 d 对象）
             // ============================================================
             var h = {
                 elements: {},
@@ -1938,7 +1661,6 @@
                         status: document.getElementById('status'),
                         autoScroll: document.getElementById('auto-scroll'),
                         autoWrap: document.getElementById('auto-wrap'),
-                        consoleContainer: document.getElementById('console-log-container'),
                         chatText: document.getElementById('chat-text'),
                         joinquitText: document.getElementById('joinquit-text'),
                         grimText: document.getElementById('grim-text'),
@@ -1958,25 +1680,102 @@
                         immersiveGrim: document.getElementById('immersive-grim'),
                         immersiveStats: document.getElementById('immersive-stats'),
                         progressDiv: document.getElementById('log-load-progress'),
-                        minimapPanel: document.getElementById('console-minimap')
+                        grimConfigToggle: document.getElementById('grim-config-toggle')
                     };
 
                     this.bindEvents();
                     this.initDraggable();
-                    d.init();
+                    this.initMonaco();
 
-                    // 监听滚动更新自动滚动复选框
+                    // 监听滚动更新自动滚动复选框 (移除了 consoleContainer)
                     var self = this;
-                    ['consoleContainer', 'chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(function(
-                    id) {
+                    ['chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(function(id) {
                         var el = self.elements[id];
                         if (el) {
                             el.addEventListener('scroll', function() {
-                                if (id === 'consoleContainer') d.refresh();
                                 self.updateAutoScrollCheck();
                             });
                         }
                     });
+                },
+
+                // 新增：初始化 Monaco Editor
+                initMonaco: function() {
+                    var self = this;
+                    require(['vs/editor/editor.main'], function() {
+                        var container = document.getElementById('monaco-container');
+                        if (!container) return;
+
+                        // 动态生成颜色 CSS 类（完美保留原高亮规则）
+                        var style = document.createElement('style');
+                        var css = '';
+                        w.highlightRules.forEach(function(rule) {
+                            var color = rule.color.replace('#', '');
+                            css += '.color-' + color + ' { color: ' + rule.color + ' !important; }';
+                        });
+                        style.innerHTML = css;
+                        document.head.appendChild(style);
+
+                        self.monacoModel = monaco.editor.createModel('', 'plaintext');
+                        self.monacoEditor = monaco.editor.create(container, {
+                            model: self.monacoModel,
+                            theme: 'vs-dark',
+                            minimap: {
+                                enabled: true, 
+                                renderCharacters: false // 几百万行优化
+                            },
+                            wordWrap: w.autoWrapEnabled ? 'on' : 'off',
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                            readOnly: true,
+                            lineNumbers: true,
+                            fontSize: 14,
+                            lineHeight: 20
+                        });
+
+                        // 监听滚动更新自动滚动复选框
+                        self.monacoEditor.onDidScrollChange(function() {
+                            self.updateAutoScrollCheck();
+                        });
+
+                        // 如果已有数据，重新渲染并加高亮
+                        if (self.monacoModel.getValueLength() > 0) {
+                            self.updateDecorations();
+                        }
+                    });
+                },
+
+                // 新增：应用颜色高亮（基于原 w.highlightRules）
+                updateDecorations: function() {
+                    if (!this.monacoEditor) return;
+                    var model = this.monacoEditor.getModel();
+                    var rules = w.highlightRules;
+                    var newDecorations = [];
+
+                    for (var i = 0; i < rules.length; i++) {
+                        var rule = rules[i];
+                        var keyword = rule.keyword;
+                        // 转义正则特殊字符
+                        var regexStr = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        var regex = new RegExp(regexStr, "i");
+
+                        var matches = model.findMatches(regex.source, false, true, true, null, true);
+                        for (var j = 0; j < matches.length; j++) {
+                            newDecorations.push({
+                                range: matches[j].range,
+                                options: { 
+                                    isWholeLine: true, 
+                                    inlineClassName: 'color-' + rule.color.replace('#', '') 
+                                }
+                            });
+                        }
+                    }
+
+                    // 应用新装饰并清空旧的
+                    if (this.monacoDecorations) {
+                        this.monacoDecorations.clear();
+                    }
+                    this.monacoDecorations = this.monacoEditor.createDecorationsCollection(newDecorations);
                 },
 
                 bindEvents: function() {
@@ -1987,11 +1786,16 @@
                         self.setAllWrapMode(self.elements.autoWrap.checked);
                     });
 
+                    // 修改滚动按钮事件，操作 Monaco API
                     document.getElementById('scroll-top-btn').addEventListener('click', function() {
-                        S.smoothScrollToTop(self.elements.consoleContainer, 200);
+                        if (self.monacoEditor) {
+                            self.monacoEditor.revealLine(1);
+                        }
                     });
                     document.getElementById('scroll-bottom-btn').addEventListener('click', function() {
-                        S.smoothScrollToBottomDynamic(self.elements.consoleContainer, 200);
+                        if (self.monacoEditor) {
+                            self.monacoEditor.revealLineInCenter(self.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                        }
                     });
 
                     document.getElementById('copy-console-btn').addEventListener('click', function() {
@@ -2049,6 +1853,94 @@
                     document.getElementById('ip-scroll-bottom') && document.getElementById('ip-scroll-bottom')
                         .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel,
                             200); });
+
+                    // ===== 新增：Grim 关键词配置 =====
+                    this.elements.grimConfigToggle.addEventListener('click', function() {
+                        var panel = document.getElementById('grim-config-panel');
+                        panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+                    });
+                    document.getElementById('grim-apply-config').addEventListener('click', function() { self.applyAnticheatConfig(); });
+                    document.getElementById('grim-reset-config').addEventListener('click', function() { self.resetAnticheatConfig(); });
+                    document.getElementById('grim-cancel-config').addEventListener('click', function() {
+                        document.getElementById('grim-config-panel').style.display = 'none';
+                        document.getElementById('grim-left-keywords').value = w.grimConfig.leftKeywords.join(',');
+                        document.getElementById('grim-right-keywords').value = w.grimConfig.rightKeywords.join(',');
+                    });
+                },
+
+                // 新增：更新反作弊关键词配置
+                applyAnticheatConfig: function() {
+                    var leftRaw = document.getElementById('grim-left-keywords').value.trim();
+                    var rightRaw = document.getElementById('grim-right-keywords').value.trim();
+                    var leftKeywords = leftRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
+                    var rightKeywords = rightRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
+
+                    w.grimConfig.leftKeywords = leftKeywords;
+                    w.grimConfig.rightKeywords = rightKeywords;
+
+                    // 重新过滤所有日志
+                    this.reclassifyAnticheatLines();
+                    document.getElementById('grim-config-panel').style.display = 'none';
+                    this.showStatus('反作弊关键词已更新', 2000);
+                },
+
+                // 新增：重置关键词为默认
+                resetAnticheatConfig: function() {
+                    w.grimConfig = {
+                        leftKeywords: ["触发了", "[Server]"],
+                        rightKeywords: ["[Server]", "moved too quickly"]
+                    };
+                    document.getElementById('grim-left-keywords').value = w.grimConfig.leftKeywords.join(',');
+                    document.getElementById('grim-right-keywords').value = w.grimConfig.rightKeywords.join(',');
+                    this.reclassifyAnticheatLines();
+                    this.showStatus('已重置为默认关键词', 2000);
+                },
+
+                // 新增：当关键词改变时，重新分类日志（支持在线和离线）
+                reclassifyAnticheatLines: function() {
+                    var leftKeys = w.grimConfig.leftKeywords;
+                    var rightKeys = w.grimConfig.rightKeywords;
+                    var newGrim = [];
+                    var newServer = [];
+
+                    var rawLines = w.rawLogLines || [];
+                    var BATCH = 5000;
+                    var index = 0;
+                    var self = this;
+                    var statusEl = this.elements.status;
+                    var progressEl = document.getElementById('log-load-progress');
+                    progressEl.style.display = 'block';
+                    var total = rawLines.length;
+
+                    function processBatch() {
+                        var end = Math.min(index + BATCH, total);
+                        for (var i = index; i < end; i++) {
+                            var line = rawLines[i];
+                            var cleaned = line.replace('[Server thread/INFO]: [Not Secure] ', '')
+                                .replace('[Server thread/INFO]: ', '');
+                            if (leftKeys.some(kw => line.includes(kw))) newGrim.push(cleaned);
+                            if (rightKeys.some(kw => line.includes(kw))) newServer.push(cleaned);
+                        }
+                        index = end;
+                        var pct = Math.round((index / total) * 100);
+                        statusEl.innerText = '正在重新分类反作弊日志... ' + index + '/' + total + ' (' + pct + '%)';
+                        progressEl.innerText = ' 🔄 重新过滤 ' + index + '/' + total + ' (' + pct + '%)';
+
+                        if (index < total) {
+                            requestAnimationFrame(processBatch);
+                        } else {
+                            w.grimLines = newGrim;
+                            w.serverLines = newServer;
+                            self.updateNonConsoleTab();
+                            progressEl.style.display = 'none';
+                            statusEl.innerText = w.totalLines + ' 行日志已加载';
+                            if (w.currentTab === 'grim' && w.autoScrollEnabled) {
+                                S.smoothScrollToBottomDynamic(self.elements.grimText, 200);
+                                S.smoothScrollToBottomDynamic(self.elements.serverText, 200);
+                            }
+                        }
+                    }
+                    requestAnimationFrame(processBatch);
                 },
 
                 setAllWrapMode: function(enabled) {
@@ -2074,9 +1966,12 @@
                     apply(this.elements.joinquitText);
                     apply(this.elements.grimText);
                     apply(this.elements.serverText);
-                    apply(this.elements.consoleContainer);
+                    
+                    // 原 consoleContainer 和 d.refresh() 已移除，改用 Monaco API
+                    if (this.monacoEditor) {
+                        this.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
+                    }
                     w.autoWrapEnabled = enabled;
-                    d.refresh();
                 },
 
                 onAutoScrollChange: function() {
@@ -2093,76 +1988,72 @@
                     } else if (tab === 'playerip') {
                         S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
                     } else if (tab === 'console') {
-                        S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                        if (this.monacoEditor) {
+                            this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                        }
                     }
                 },
 
                 updateAutoScrollCheck: function() {
-                    var allAtBottom = true;
-                    var containers = [
-                        this.elements.consoleContainer,
-                        this.elements.chatText,
-                        this.elements.joinquitText,
-                        this.elements.grimText,
-                        this.elements.serverText,
-                        this.elements.ipPanel
-                    ];
-                    for (var i = 0; i < containers.length; i++) {
-                        var el = containers[i];
-                        if (el && !S.isContainerAtBottom(el)) {
-                            allAtBottom = false;
-                            break;
+                    var self = this;
+                    // 使用定时器延迟判断，防止 Monaco 平滑滚动过程中导致误判取消自动滚动
+                    if (this._scrollCheckTimer) clearTimeout(this._scrollCheckTimer);
+                    this._scrollCheckTimer = setTimeout(function() {
+                        var allAtBottom = true;
+                        // 监控 Monaco 的滚动状态
+                        if (self.monacoEditor) {
+                            var scrollTop = self.monacoEditor.getScrollTop();
+                            var scrollHeight = self.monacoEditor.getScrollHeight();
+                            var clientHeight = self.monacoEditor.getLayoutInfo().height;
+                            if (scrollHeight - scrollTop - clientHeight > 5) {
+                                allAtBottom = false;
+                            }
                         }
-                    }
-                    if (this.elements.autoScroll.checked !== allAtBottom) {
-                        this.elements.autoScroll.checked = allAtBottom;
-                        w.autoScrollEnabled = allAtBottom;
-                    }
-                },
-
-                createLogLineElement: function(text) {
-                    var div = document.createElement('div');
-                    div.className = 'console-log-line';
-                    var color = S.getHighlightColor(text, w.highlightRules);
-                    if (color) div.style.color = color;
-                    div.textContent = text;
-                    if (w.autoWrapEnabled) {
-                        div.style.whiteSpace = 'pre-wrap';
-                        div.style.wordWrap = 'break-word';
-                    } else {
-                        div.style.whiteSpace = 'pre';
-                        div.style.wordWrap = 'normal';
-                    }
-                    return div;
+                        var containers = [
+                            self.elements.chatText,
+                            self.elements.joinquitText,
+                            self.elements.grimText,
+                            self.elements.serverText,
+                            self.elements.ipPanel
+                        ];
+                        for (var i = 0; i < containers.length; i++) {
+                            var el = containers[i];
+                            if (el && !S.isContainerAtBottom(el)) {
+                                allAtBottom = false;
+                                break;
+                            }
+                        }
+                        if (self.elements.autoScroll.checked !== allAtBottom) {
+                            self.elements.autoScroll.checked = allAtBottom;
+                            w.autoScrollEnabled = allAtBottom;
+                        }
+                    }, 100); // 100毫秒延迟，等待滚动动画和布局稳定
                 },
 
                 appendLogLines: function(lines) {
-                    if (!this.elements.consoleContainer || !lines.length) return;
-                    var frag = document.createDocumentFragment();
-                    for (var i = 0; i < lines.length; i++) {
-                        frag.appendChild(this.createLogLineElement(lines[i]));
-                    }
-                    this.elements.consoleContainer.appendChild(frag);
+                    if (!this.monacoEditor || !lines.length) return;
+                    var model = this.monacoEditor.getModel();
+                    var lastLine = model.getLineCount();
+                    // 追加日志到 Model 末尾（保持原自动滚动逻辑）
+                    var text = lines.join('\n');
+                    model.pushEditOperations([], [{
+                        range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
+                        text: '\n' + text,
+                        forceMoveMarkers: true
+                    }]);
                     if (w.autoScrollEnabled) {
-                        S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                        this.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
                     }
                     this.updateImmersiveDashboard();
-                    d.refresh();
+                    this.updateDecorations();
                 },
 
                 renderConsoleLog: function(text) {
-                    if (!this.elements.consoleContainer) return;
-                    var lines = text.split(/\r?\n/);
-                    var frag = document.createDocumentFragment();
-                    for (var i = 0; i < lines.length; i++) {
-                        if (lines[i] !== '') {
-                            frag.appendChild(this.createLogLineElement(lines[i]));
-                        }
-                    }
-                    this.elements.consoleContainer.innerHTML = '';
-                    this.elements.consoleContainer.appendChild(frag);
+                    if (!this.monacoEditor) return;
+                    var model = this.monacoEditor.getModel();
+                    model.setValue(text);
                     this.updateImmersiveDashboard();
-                    d.refresh();
+                    this.updateDecorations();
                 },
 
                 updateNonConsoleTab: function() {
@@ -2604,21 +2495,20 @@
                 },
 
                 copyConsoleContent: function() {
-                    var lines = this.elements.consoleContainer.querySelectorAll('.console-log-line');
-                    if (!lines.length) {
+                    if (!this.monacoEditor) {
                         this.showStatus('无内容可复制', 2000);
                         return;
                     }
-                    var text = Array.from(lines).map(function(el) { return el.textContent; }).join('\n');
+                    var text = this.monacoEditor.getValue();
                     var self = this;
                     if (navigator.clipboard && navigator.clipboard.writeText) {
                         navigator.clipboard.writeText(text).then(function() {
-                            self.showStatus('已复制 ' + lines.length + ' 行', 2000);
+                            self.showStatus('已复制内容', 2000);
                         }).catch(function() {
-                            self.fallbackCopy(text, lines.length);
+                            self.fallbackCopy(text, 0);
                         });
                     } else {
-                        this.fallbackCopy(text, lines.length);
+                        this.fallbackCopy(text, 0);
                     }
                 },
 
@@ -2647,13 +2537,19 @@
 
                 updateImmersiveDashboard: function() {
                     if (!w.immersiveMode) return;
-
                     var self = this;
 
-                    // 更新控制台
+                    // 更新控制台 (从 Monaco Model 获取)
                     if (this.elements.immersiveConsole) {
-                        var consoleLines = Array.from(this.elements.consoleContainer ? this.elements.consoleContainer
-                            .children : []).map(function(el) { return el.textContent; });
+                        var consoleLines = [];
+                        if (this.monacoEditor) {
+                            var model = this.monacoEditor.getModel();
+                            var lastLine = model.getLineCount();
+                            var startLine = Math.max(1, lastLine - 500);
+                            for (var lineNum = startLine; lineNum <= lastLine; lineNum++) {
+                                consoleLines.push(model.getLineContent(lineNum));
+                            }
+                        }
                         var slice = consoleLines.slice(-500);
                         var currentTexts = Array.from(this.elements.immersiveConsole.children).map(function(el) {
                             return el.textContent;
@@ -2777,8 +2673,8 @@
                         w.autoScrollEnabled = this.elements.autoScroll.checked;
                         w.autoWrapEnabled = this.elements.autoWrap.checked;
                         this.setAllWrapMode(w.autoWrapEnabled);
-                        if (w.autoScrollEnabled) {
-                            S.smoothScrollToBottomDynamic(this.elements.consoleContainer, 200);
+                        if (w.autoScrollEnabled && this.monacoEditor) {
+                            this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
                         }
                         if (w.immersiveStatsTimer) {
                             clearInterval(w.immersiveStatsTimer);
@@ -2787,8 +2683,8 @@
                         setTimeout(function() {
                             if (w.onlineChart) w.onlineChart.resize();
                             o.resizeAllCharts();
+                            if (h.monacoEditor) h.monacoEditor.layout();
                         }, 50);
-                        d.refresh();
                     }
                 },
 
@@ -3083,12 +2979,10 @@
                 }
             };
 
-
             // ============================================================
-            // 统计图表 o (修改部分)
+            // 统计图表 o
             // ============================================================
             var o = {
-                // 加载在线人数统计（始终请求全部数据，用 dataZoom 控制窗口）
                 loadOnlineStats: async function(range, immersive) {
                     immersive = immersive || false;
                     try {
@@ -3102,7 +2996,6 @@
                         var counts = data.data.counts;
                         var missingRanges = data.data.missingRanges;
 
-                        // 缓存全量数据（以备后续扩展）
                         w.fullTimes = times;
                         w.fullCounts = counts;
                         w.fullMissingRanges = missingRanges;
@@ -3111,10 +3004,9 @@
                         var hasZoom = false;
                         var startVal = 0;
                         var endVal = 100;
-                        var effectiveRange = range; // 可能回退为 'all'
-                        var targetWidth = 0;         // 预设窗口宽度（百分比），用于事件锁定
+                        var effectiveRange = range;
+                        var targetWidth = 0;
 
-                        // 只有非“全部”且数据点大于1才计算窗口
                         if (range !== 'all' && totalPoints > 1) {
                             var startTime = new Date(times[0]).getTime();
                             var endTime = new Date(times[totalPoints - 1]).getTime();
@@ -3127,23 +3019,20 @@
                             else if (range === '30d') windowDays = 30;
                             else if (range === '1d') windowDays = 1;
 
-                            // 方案A：总跨度 <= 窗口天数，回退为全部
                             if (totalDays <= windowDays) {
                                 hasZoom = false;
                                 effectiveRange = 'all';
                             } else {
                                 hasZoom = true;
                                 var windowPercent = (windowDays / totalDays) * 100;
-                                // 锚定右侧（最新数据），start 向左延伸
                                 var zoomEnd = 100;
                                 var zoomStart = Math.max(0, 100 - windowPercent);
                                 startVal = zoomStart;
                                 endVal = zoomEnd;
-                                targetWidth = windowPercent; // 保存目标宽度
+                                targetWidth = windowPercent;
                             }
                         }
 
-                        // 基础图表配置
                         var option = {
                             tooltip: { trigger: 'axis' },
                             xAxis: {
@@ -3185,7 +3074,6 @@
                             grid: { top: 28, left: '9%', right: '15%', containLabel: true }
                         };
 
-                        // 如果需要滑块，则添加 dataZoom（允许拖动手柄，但我们用事件强制宽度）
                         if (hasZoom) {
                             option.dataZoom = [{
                                 type: 'slider',
@@ -3202,7 +3090,6 @@
                             }];
                         }
 
-                        // 渲染图表
                         var chart;
                         if (immersive) {
                             chart = w.immersiveChart;
@@ -3228,17 +3115,14 @@
                             chart.resize();
                         }
 
-                        // 绑定 datazoom 事件：当用户拖拽手柄改变宽度时，强制恢复为预设宽度（仅限非 'all' 且有缩放）
                         if (hasZoom && effectiveRange !== 'all') {
-                            var targetWidthCopy = targetWidth; // 闭包捕获
-                            chart.off('datazoom'); // 移除旧监听，避免重复绑定
+                            var targetWidthCopy = targetWidth;
+                            chart.off('datazoom');
                             chart.on('datazoom', function(params) {
                                 var currentStart = params.start;
                                 var currentEnd = params.end;
                                 var currentWidth = currentEnd - currentStart;
-                                // 如果当前宽度与目标宽度差异超过 0.5%，则修正
                                 if (Math.abs(currentWidth - targetWidthCopy) > 0.5) {
-                                    // 保持右侧锚定（end=100），重新计算 start
                                     var newStart = 100 - targetWidthCopy;
                                     newStart = Math.max(0, Math.min(100 - targetWidthCopy, newStart));
                                     chart.setOption({
@@ -3251,7 +3135,6 @@
                             });
                         }
 
-                        // 统一高亮按钮（如果回退到 'all'，则高亮“全部”按钮）
                         document.querySelectorAll('#range-selector .range-btn').forEach(function(btn) {
                             btn.classList.remove('active');
                         });
@@ -3264,7 +3147,6 @@
                     }
                 },
 
-                // 加载各服务器实时在线人数明细与总人数
                 loadOnlineDetail: async function() {
                     var el = document.getElementById('live-online-summary');
                     if (!el) return;
@@ -3293,7 +3175,6 @@
                     }
                 },
 
-                // 调整所有图表尺寸（窗口resize时调用）
                 resizeAllCharts: function() {
                     if (w.cpuCharts) {
                         for (var i = 0; i < w.cpuCharts.length; i++) {
@@ -3306,7 +3187,6 @@
                     if (w.immersiveChart) w.immersiveChart.resize();
                 },
 
-                // 初始化性能监控图表（内存、网络、CPU核心）
                 initPerformanceCharts: function() {
                     var self = this;
                     var checkMem = function() {
@@ -3348,14 +3228,12 @@
                     };
                     checkMem();
                     checkNet();
-                    // 如果元素还没渲染，延迟重试
                     if (!w.memChart || !w.netChart) {
                         setTimeout(function() { self.initPerformanceCharts(); }, 100);
                     }
                     this.resizeAllCharts();
                 },
 
-                // 启动定时刷新（每30秒）
                 startAutoRefresh: function() {
                     if (w.statsRefreshTimer) clearInterval(w.statsRefreshTimer);
                     var self = this;
@@ -3367,7 +3245,6 @@
                     },30000);
                 },
 
-                // 停止定时刷新
                 stopAutoRefresh: function() {
                     if (w.statsRefreshTimer) {
                         clearInterval(w.statsRefreshTimer);
@@ -3376,7 +3253,7 @@
                 }
             };
             // ============================================================
-            // 日志加载器 s（分段加载）
+            // 日志加载器 s（分段加载，基于 Monaco）
             // ============================================================
             var s = {
                 enabled: false,
@@ -3401,8 +3278,9 @@
 
                 resetAndClear: async function() {
                     this.loadedUpTo = 0;
-                    if (h.elements.consoleContainer) {
-                        h.elements.consoleContainer.innerHTML = '';
+                    if (h.monacoEditor) {
+                        h.monacoEditor.setValue('');
+                        if (h.monacoDecorations) h.monacoDecorations.clear();
                     }
                     this.updateProgress(0, 0);
                     try {
@@ -3425,7 +3303,6 @@
                     if (this.loadedUpTo >= this.totalLines) {
                         this.updateProgress(this.totalLines, this.totalLines);
                         this.enabled = false;
-                        d.refresh();
                         return;
                     }
                     this.loading = true;
@@ -3437,23 +3314,20 @@
                         headers: { 'Authorization': 'Bearer ' + w.apiPassword }
                     }).then(function(resp) { return resp.json(); }).then(function(data) {
                         if (data.lines && data.lines.length) {
-                            var container = h.elements.consoleContainer;
-                            if (container) {
-                                var frag = document.createDocumentFragment();
-                                for (var i = 0; i < data.lines.length; i++) {
-                                    frag.appendChild(h.createLogLineElement(data.lines[i]));
+                            // 追加到 Monaco Editor
+                            if (h.monacoEditor) {
+                                var model = h.monacoEditor.getModel();
+                                var lastLine = model.getLineCount();
+                                var text = data.lines.join('\n');
+                                model.pushEditOperations([], [{
+                                    range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
+                                    text: '\n' + text,
+                                    forceMoveMarkers: true
+                                }]);
+                                if (w.autoScrollEnabled) {
+                                    h.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
                                 }
-                                var oldHeight = container.scrollHeight;
-                                var oldScroll = container.scrollTop;
-                                var wasAtBottom = S.isContainerAtBottom(container);
-                                container.appendChild(frag);
-                                if (wasAtBottom && w.autoScrollEnabled) {
-                                    S.smoothScrollToBottomDynamic(container, 100);
-                                } else if (oldScroll > 0 && !wasAtBottom) {
-                                    var delta = container.scrollHeight - oldHeight;
-                                    container.scrollTop = oldScroll + delta;
-                                }
-                                d.refresh();
+                                h.updateDecorations();
                             }
                             self.loadedUpTo += data.lines.length;
                             self.updateProgress(self.loadedUpTo, self.totalLines);
@@ -3464,7 +3338,6 @@
                         } else {
                             self.updateProgress(self.totalLines, self.totalLines);
                             self.enabled = false;
-                            d.refresh();
                         }
                     }).catch(function(err) {
                         console.error('加载日志块失败', err);
@@ -3511,8 +3384,7 @@
                 document.getElementById('tab-' + tab).classList.add('active');
 
                 if (tab === 'console') {
-                    d.refresh();
-                    setTimeout(function() { d.updateScaleAndIndicator(); }, 100);
+                    if (h.monacoEditor) h.monacoEditor.layout();
                     o.stopAutoRefresh();
                 } else if (tab === 'stats') {
                     s.stop();
@@ -3532,7 +3404,7 @@
                     h.startScreenCapture();
                 } else {
                     s.stop();
-                    h.stopScreenCapture(); // 离开屏幕页时停止截图
+                    h.stopScreenCapture();
                     h.updateNonConsoleTab();
                     o.stopAutoRefresh();
                 }
@@ -3611,8 +3483,6 @@
                         win.style.right = '';
                     }
 
-                    d.refresh();
-
                 } catch (err) {
                     alert('网络错误，请检查后端');
                     return c();
@@ -3620,72 +3490,77 @@
             }
 
             // ============================================================
-            // Grim 分割条拖动
+            // Grim 分割条拖动（适配新配置结构）
             // ============================================================
             (function() {
                 var divider = document.getElementById('grim-divider');
                 var leftPanel = document.getElementById('grim-left-panel');
-                var parent = divider ? divider.parentElement : null;
-                if (!divider || !leftPanel || !parent) return;
+                var container = divider ? divider.parentElement : null;
+                if (!divider || !leftPanel || !container) return;
 
                 var isDragging = false;
                 var startX = 0;
-                var startWidth = 0;
+                var startLeftWidth = 0;
 
-                function setWidth(percent) {
-                    percent = Math.min(90, Math.max(10, percent));
-                    leftPanel.style.width = percent + '%';
-                    return percent;
+                function getContainerWidth() {
+                    return container.getBoundingClientRect().width;
                 }
 
-                function onStart(e) {
+                function setLeftWidth(percent) {
+                    var clamped = Math.min(90, Math.max(10, percent));
+                    leftPanel.style.width = clamped + '%';
+                    return clamped;
+                }
+
+                function startDrag(e) {
                     e.preventDefault();
-                    var ev = e.touches ? e.touches[0] : e;
+                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
                     isDragging = true;
                     divider.classList.add('dragging');
-                    startX = ev.clientX;
-                    startWidth = leftPanel.getBoundingClientRect().width;
+                    startX = clientX;
+                    startLeftWidth = leftPanel.getBoundingClientRect().width;
                     document.body.style.userSelect = 'none';
                     document.body.style.webkitUserSelect = 'none';
-                    document.addEventListener('mousemove', onMove);
-                    document.addEventListener('mouseup', onEnd);
-                    document.addEventListener('touchmove', onMove, { passive: false });
-                    document.addEventListener('touchend', onEnd);
-                    document.addEventListener('touchcancel', onEnd);
+
+                    document.addEventListener('mousemove', onDragMove);
+                    document.addEventListener('mouseup', onDragEnd);
+                    document.addEventListener('touchmove', onDragMove, { passive: false });
+                    document.addEventListener('touchend', onDragEnd);
+                    document.addEventListener('touchcancel', onDragEnd);
                 }
 
-                function onMove(e) {
+                function onDragMove(e) {
                     if (!isDragging) return;
                     e.preventDefault();
-                    var ev = e.touches ? e.touches[0] : e;
-                    var dx = ev.clientX - startX;
-                    var containerWidth = parent.getBoundingClientRect().width;
+                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    var deltaX = clientX - startX;
+                    var containerWidth = getContainerWidth();
                     if (containerWidth <= 0) return;
                     var dividerWidth = divider.offsetWidth || 6;
-                    var usableWidth = containerWidth - dividerWidth;
-                    var percent = ((startWidth + dx) / usableWidth) * 100;
-                    setWidth(percent);
+                    var available = containerWidth - dividerWidth;
+                    var newWidth = startLeftWidth + deltaX;
+                    var percent = (newWidth / available) * 100;
+                    setLeftWidth(percent);
                 }
 
-                function onEnd() {
-                    if (isDragging) {
-                        isDragging = false;
-                        divider.classList.remove('dragging');
-                        document.body.style.userSelect = '';
-                        document.body.style.webkitUserSelect = '';
-                        document.removeEventListener('mousemove', onMove);
-                        document.removeEventListener('mouseup', onEnd);
-                        document.removeEventListener('touchmove', onMove);
-                        document.removeEventListener('touchend', onEnd);
-                        document.removeEventListener('touchcancel', onEnd);
-                    }
+                function onDragEnd() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    divider.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    document.body.style.webkitUserSelect = '';
+                    document.removeEventListener('mousemove', onDragMove);
+                    document.removeEventListener('mouseup', onDragEnd);
+                    document.removeEventListener('touchmove', onDragMove);
+                    document.removeEventListener('touchend', onDragEnd);
+                    document.removeEventListener('touchcancel', onDragEnd);
                 }
 
-                divider.addEventListener('mousedown', onStart);
-                divider.addEventListener('touchstart', onStart, { passive: false });
+                divider.addEventListener('mousedown', startDrag);
+                divider.addEventListener('touchstart', startDrag, { passive: false });
 
                 divider.addEventListener('dblclick', function() {
-                    setWidth(50);
+                    setLeftWidth(50);
                 });
             })();
 
@@ -3702,15 +3577,6 @@
                     w.highlightRules = [];
                 }
 
-                // 加载反作弊关键词
-                try {
-                    var ak = await fetch('/api/anticheat_keywords');
-                    var akData = await ak.json();
-                    w.anticheatKeywords = Array.isArray(akData) ? akData : [];
-                } catch (e) {
-                    w.anticheatKeywords = [];
-                }
-
                 // 初始化界面
                 h.init();
 
@@ -3721,7 +3587,7 @@
                     });
                 });
 
-                // 统计范围选择事件（修改：直接调用 o.loadOnlineStats，高亮由内部统一）
+                // 统计范围选择事件
                 document.getElementById('range-selector').addEventListener('click', function(e) {
                     var btn = e.target.closest('.range-btn');
                     if (btn) {
