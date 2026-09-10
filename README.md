@@ -14,36 +14,31 @@
 
 ## 通过源码部署
 
-### 1. 支持环境
+### 1. 环境要求
 - Python 3.8+
+- 互联网连接
 - Windows / Linux / macOS
+  (本项目基于 window10专业版 开发，其它系统可能会出现小问题。)
 
-### 2. 创建虚拟环境（可选）（推荐）
+### 2. 创建、进入 虚拟环境（可选）（推荐）
 ```bash
-# 使用系统 Python 创建虚拟环境
+# Windows：
 python -m venv myenv
-
-# 激活虚拟环境（Windows):
 myenv\Scripts\activate
 
-# 激活虚拟环境（Linux / macOS）；
+# Linux / macOS；
+python -m venv myenv
 source myenv/bin/activate
 ```
 
 ### 3. 安装依赖
 ```bash
-# 升级打包工具
-python -m pip install --upgrade pip setuptools wheel
+# 安装依赖：
+pip install -r requirements.txt --only-binary=gevent
 
-# 安装核心依赖（国内可用清华镜像加速）
-pip install flask flask-socketio flask-compress mcrcon pyyaml psutil -i https://pypi.tuna.tsinghua.edu.cn/simple/
-
-# 安装 gevent
-pip install setuptools==58.0.0
-pip install gevent --only-binary gevent -i https://pypi.tuna.tsinghua.edu.cn/simple/
+# 如果中国大陆网络安装很慢，那就用这个：
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
 ```
-
-> **注意**：为了避免不必要的麻烦，请务必按照 顺序、逐个 安装。
 
 
 ### 4.写好配置文件 & 运行
@@ -51,7 +46,6 @@ pip install gevent --only-binary gevent -i https://pypi.tuna.tsinghua.edu.cn/sim
 2. 确保 服务器配置 `server.properties` 已正确配置：
    - 将默认的`enable-rcon=false` 改成 `enable-rcon=true`
    - 将默认为空的 `rcon.password` 设定一个**强密码**
-（上述3个配置有误，本程序会报错。）
 3. 启动程序：运行 `python main.py`，或者 运行`start 一键启动.bat` 。
 4. 如有需要，自行内网穿透。
 
@@ -66,7 +60,7 @@ pip install gevent --only-binary gevent -i https://pypi.tuna.tsinghua.edu.cn/sim
 
 ---
 
-本项目采用 [MIT 许可证](LICENSE)。
+[MIT 许可证](LICENSE)。
 如有好的建议或功能需求，请通过 GitHub 反馈。
 本项目代码完全由 deepseek v4 生成，个人定制自用，请自行检查代码。
 
