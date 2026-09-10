@@ -1,7 +1,7 @@
 # 创建虚拟环境
 D:\_Project\Python\python_main\x64\python.exe -m venv myenv
 
-# 激活虚拟环境（Windows 批处理）
+# 激活虚拟环境
 myenv\Scripts\activate
 
 # 安装环境
