@@ -1,4 +1,3 @@
-setuptools==58.0.0
 flask
 flask-socketio
 flask-compress
@@ -7,3 +6,4 @@ pyyaml
 psutil
 mcstatus
 gevent
+# pyinstaller
