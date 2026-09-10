@@ -142,25 +142,6 @@
             min-height: 0;
         }
 
-        /* 反作弊日志左右分栏 - 保留但不再使用，改为新结构 */
-        .split-panel {
-            display: flex;
-            gap: 10px;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-        .split-half {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1a;
-            border-radius: 4px;
-            overflow: hidden;
-            min-height: 0;
-            border: 1px solid #2c2c2c;
-        }
-
         /* ===========================
            Monaco Editor 控制台区域
            =========================== */
@@ -336,42 +317,6 @@
             margin-left: 12px;
         }
 
-        .ip-group {
-            margin-bottom: 12px;
-            border: 1px solid #2c2c2c;
-            border-radius: 4px;
-            background: #0f0f0f;
-        }
-        .ip-group-header {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            cursor: pointer;
-            background: #1a1a1a;
-            border-bottom: 1px solid #2c2c2c;
-            font-weight: 700;
-        }
-        .ip-group-header:hover {
-            background: #252525;
-        }
-        .group-toggle-icon {
-            font-size: 16px;
-            margin-right: 8px;
-            color: #fff;
-        }
-        .group-title {
-            color: #fff;
-            margin-right: 12px;
-        }
-        .group-stats {
-            color: #aaa;
-            font-size: 13px;
-        }
-        .ip-group-content {
-            padding: 8px;
-            background: #0f0f0f;
-        }
-
         /* IP 查询区域（右侧） */
         .ip-query-area {
             flex: 1;
@@ -460,7 +405,7 @@
         }
 
         /* ===========================
-           折叠/展开按钮
+           折叠/展开按钮（保留样式，未使用）
            =========================== */
         .collapse-all-btn {
             padding: 4px 12px;
@@ -579,10 +524,6 @@
             .tab-button {
                 padding: 6px 12px;
                 font-size: 12px;
-            }
-            .split-panel {
-                flex-direction: column;
-                gap: 8px;
             }
         }
 
@@ -746,8 +687,9 @@
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
         <div class="loader"></div>
-        <div>正在加载控制台引擎 (CDN)，请稍候...</div>
+        <div>正在加载资源 请确保网络通畅...</div>
     </div>
+
     <!-- ===== 上传覆盖层 ===== -->
     <div id="upload-overlay">
         <div class="upload-card">
@@ -818,7 +760,7 @@
             <textarea id="joinquit-text" class="log-textarea" readonly wrap="off"></textarea>
         </div>
 
-        <!-- ===== 仅看关键词（已修改：添加分隔条） ===== -->
+        <!-- 仅看关键词 -->
         <div id="tab-grim" class="tab-content">
             <div class="sub-header">
                 <span>仅看关键词</span>
@@ -840,7 +782,6 @@
                     <button id="grim-cancel-config">取消</button>
                 </div>
             </div>
-            <!-- 新结构：左面板 + 分隔条 + 右面板 -->
             <div class="grim-split-container">
                 <div class="grim-panel grim-left" id="grim-left-panel">
                     <div class="sub-header" style="border-radius:0;border-bottom:1px solid #3a3a3a;">包含 关键词1 的日志</div>
@@ -861,9 +802,6 @@
                     <div class="sub-header">
                         <span>玩家登录IP记录</span>
                         <div style="display:flex;gap:8px;">
-                            <button id="collapse-all-btn" class="collapse-all-btn">[-]</button>
-                            <button id="expand-all-btn" class="collapse-all-btn">[+]</button>
-                            <button id="batch-query-ip-btn" class="collapse-all-btn">查询IP地址</button>
                             <div class="scroll-buttons">
                                 <button id="ip-scroll-top" class="scroll-btn">↑</button>
                                 <button id="ip-scroll-bottom" class="scroll-btn">↓</button>
@@ -946,11 +884,9 @@
                 rawDisplayLines: [],
                 ipLoginRecords: [],
                 expandedIps: new Set(),
-                expandedGroups: new Set(),
                 autoScrollEnabled: true,
                 autoWrapEnabled: false,
                 filterEnabled: true,
-                ipLocationCache: new Map(),
                 highlightRules: HIGHLIGHT_RULES,
                 anticheatConfig: { ...DEFAULT_ANTICHEAT_CONFIG },
                 totalLines: 0,
@@ -1018,184 +954,11 @@
                         }
                     };
                     el._scrollAnim = requestAnimationFrame(animate);
-                },
-                extractProvinceCity(full) {
-                    if (!full) return { province: "未知", city: "", full: "未知" };
-                    let str = full.replace(/^中国\s*/, "");
-                    let province = "未知";
-                    const provinces = ["北京", "天津", "上海", "重庆", "河北", "山西", "辽宁", "吉林", "黑龙江", "江苏", "浙江", "安徽",
-                        "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "海南", "四川", "贵州", "云南", "陕西", "甘肃",
-                        "青海", "台湾", "内蒙古", "广西", "西藏", "宁夏", "新疆", "香港", "澳门"
-                    ];
-                    for (const p of provinces)
-                        if (str.startsWith(p)) { province = p; break; }
-                    return { province, city: "", full: str };
-                }
-            };
-            const provinceMap = {
-                "Anhui": "安徽",
-                "Beijing": "北京",
-                "Chongqing": "重庆",
-                "Fujian": "福建",
-                "Gansu": "甘肃",
-                "Guangdong": "广东",
-                "Guangxi": "广西",
-                "Guizhou": "贵州",
-                "Hainan": "海南",
-                "Hebei": "河北",
-                "Heilongjiang": "黑龙江",
-                "Henan": "河南",
-                "Hubei": "湖北",
-                "Hunan": "湖南",
-                "Inner Mongolia": "内蒙古",
-                "Jiangsu": "江苏",
-                "Jiangxi": "江西",
-                "Jilin": "吉林",
-                "Liaoning": "辽宁",
-                "Ningxia": "宁夏",
-                "Qinghai": "青海",
-                "Shaanxi": "陕西",
-                "Shandong": "山东",
-                "Shanghai": "上海",
-                "Shanxi": "山西",
-                "Sichuan": "四川",
-                "Tianjin": "天津",
-                "Tibet": "西藏",
-                "Xinjiang": "新疆",
-                "Yunnan": "云南",
-                "Zhejiang": "浙江",
-                "Hong Kong": "香港",
-                "Macao": "澳门",
-                "Taiwan": "台湾"
-            };
-
-            // ============================================================
-            // 4. IP 归属地查询服务
-            // ============================================================
-            const IpLocationService = {
-                _apiFetchers: [{
-                    name: 'ip-api.com',
-                    fetch: async (ips) => {
-                        const resp = await fetch("http://ip-api.com/batch", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(ips)
-                        });
-                        const data = await resp.json();
-                        if (!Array.isArray(data) || data.length !== ips.length) {
-                            throw new Error("返回格式错误或长度不匹配");
-                        }
-                        return data;
-                    }
-                }, {
-                    name: 'ipapi.co',
-                    fetch: async (ips) => {
-                        const results = [];
-                        for (const ip of ips) {
-                            try {
-                                const resp = await fetch(`https://ipapi.co/${ip}/json/`);
-                                const data = await resp.json();
-                                if (data.error) throw new Error(data.reason);
-                                results.push({
-                                    status: "success",
-                                    country: data.country_name,
-                                    regionName: data.region,
-                                    city: data.city
-                                });
-                            } catch {
-                                results.push({ status: "fail" });
-                            }
-                        }
-                        return results;
-                    }
-                }, {
-                    name: 'ipinfo.io',
-                    fetch: async (ips) => {
-                        const results = [];
-                        for (const ip of ips) {
-                            try {
-                                const resp = await fetch(`https://ipinfo.io/${ip}/json`);
-                                const data = await resp.json();
-                                if (data.bogon || data.error) throw new Error("无效IP");
-                                results.push({
-                                    status: "success",
-                                    country: data.country,
-                                    regionName: data.region,
-                                    city: data.city
-                                });
-                            } catch {
-                                results.push({ status: "fail" });
-                            }
-                        }
-                        return results;
-                    }
-                }],
-
-                async batchQuery(ips, progressCb) {
-                    const resultMap = new Map();
-                    let completed = 0;
-                    const chunks = [];
-                    for (let i = 0; i < ips.length; i += 100) chunks.push(ips.slice(i, i + 100));
-
-                    for (const chunk of chunks) {
-                        const needQuery = chunk.filter(ip => !AppState.ipLocationCache.has(ip));
-                        if (needQuery.length > 0) {
-                            let batchSuccess = false;
-                            for (const api of this._apiFetchers) {
-                                try {
-                                    const data = await api.fetch(needQuery);
-                                    for (let idx = 0; idx < needQuery.length; idx++) {
-                                        const ip = needQuery[idx],
-                                            info = data[idx];
-                                        let loc = { province: "未知", city: "", full: "未知" };
-                                        if (info && info.status === "success") {
-                                            let region = info.regionName || "";
-                                            if (provinceMap[region]) region = provinceMap[region];
-                                            const fullStr =
-                                                `${info.country} ${region} ${info.city}`;
-                                            loc = Utils.extractProvinceCity(fullStr);
-                                            if (loc.province === "未知" && region) {
-                                                loc.province = region;
-                                                loc.full = `${info.country} ${region}`;
-                                            } else if (loc.province !== "未知") {
-                                                loc.full = `${info.country} ${loc.province}`;
-                                            }
-                                        }
-                                        AppState.ipLocationCache.set(ip, loc);
-                                        resultMap.set(ip, loc);
-                                        completed++;
-                                        if (progressCb) progressCb(completed, ips.length);
-                                    }
-                                    batchSuccess = true;
-                                    break;
-                                } catch (e) {
-                                    console.warn(`${api.name} 查询失败:`, e);
-                                }
-                            }
-                            if (!batchSuccess) {
-                                for (const ip of needQuery) {
-                                    const loc = { province: "未知", city: "", full: "未知" };
-                                    AppState.ipLocationCache.set(ip, loc);
-                                    resultMap.set(ip, loc);
-                                    completed++;
-                                    if (progressCb) progressCb(completed, ips.length);
-                                }
-                            }
-                            if (chunks.length > 1) await new Promise(r => setTimeout(r, 1000));
-                        } else {
-                            for (const ip of chunk) {
-                                resultMap.set(ip, AppState.ipLocationCache.get(ip));
-                                completed++;
-                                if (progressCb) progressCb(completed, ips.length);
-                            }
-                        }
-                    }
-                    return resultMap;
                 }
             };
 
             // ============================================================
-            // 5. 核心数据处理
+            // 4. 核心数据处理
             // ============================================================
             const DataProcessor = {
                 extractPlayerName(line) {
@@ -1240,7 +1003,7 @@
             };
 
             // ============================================================
-            // 6. UI 管理器
+            // 5. UI 管理器
             // ============================================================
             const UIManager = {
                 elements: {},
@@ -1285,10 +1048,9 @@
                 saveAnticheatConfig(config) {
                     localStorage.setItem('anticheatConfig', JSON.stringify(config));
                 },
-                // 新增：初始化 Monaco Editor
+                // 初始化 Monaco Editor
                 initMonaco() {
                     const self = this;
-                    // 必须添加：显示遮罩，确保 CDN 加载期间禁止用户操作
                     const overlay = document.getElementById('loading-overlay');
                     if (overlay) overlay.style.display = 'flex';
 
@@ -1296,7 +1058,6 @@
                         const container = document.getElementById('monaco-container');
                         if (!container) return;
 
-                        // 动态生成颜色 CSS 类（完美保留原高亮规则）
                         const style = document.createElement('style');
                         let css = '';
                         AppState.highlightRules.forEach(rule => {
@@ -1323,23 +1084,19 @@
                             lineHeight: 20
                         });
 
-                        // 监听滚动更新自动滚动复选框（防抖）
                         AppState.monacoEditor.onDidScrollChange(function() {
                             self.updateAutoScrollCheck();
                         });
 
-                        // ===== 修复：加载成功，隐藏遮罩解除禁止 =====
                         if (overlay) overlay.style.display = 'none';
 
                     }, function(err) {
-                        // ===== 新增：加载失败提示 =====
                         console.error('Monaco CDN 加载失败:', err);
                         if (overlay) {
                             overlay.innerHTML = '<div style="color: #ff4343; text-align: center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
                         }
                     });
                 },
-                // 新增：应用颜色高亮
                 updateDecorations() {
                     if (!AppState.monacoEditor) return;
                     const model = AppState.monacoEditor.getModel();
@@ -1384,14 +1141,12 @@
                         this.setAllWrapMode(this.elements.autoWrap.checked);
                     });
 
-                    // 过滤切换：重新加载 Monaco
                     this.elements.filterErrors.addEventListener('change', () => {
                         AppState.filterEnabled = this.elements.filterErrors.checked;
                         this.reloadConsoleLog();
                         this.showStatus(`屏蔽报错: ${AppState.filterEnabled ? '开启' : '关闭'}`, 2000);
                     });
 
-                    // 控制台按钮操作 Monaco
                     document.getElementById('scroll-top-btn').addEventListener('click', () => {
                         if (AppState.monacoEditor) AppState.monacoEditor.revealLine(1);
                     });
@@ -1409,10 +1164,6 @@
 
                     document.getElementById('query-ip-btn').addEventListener('click', () => this.queryIP(this.elements.ipInput.value));
                     this.elements.ipInput.addEventListener('keypress', e => { if (e.key === 'Enter') this.queryIP(this.elements.ipInput.value); });
-
-                    document.getElementById('collapse-all-btn').addEventListener('click', () => this.collapseAllIps());
-                    document.getElementById('expand-all-btn').addEventListener('click', () => this.expandAllGroups());
-                    document.getElementById('batch-query-ip-btn').addEventListener('click', () => this.batchQueryIpLocation());
 
                     this.elements.ipPanel.addEventListener('click', e => this.handleIpPanelClick(e));
 
@@ -1522,13 +1273,11 @@
                     set(this.elements.joinquitText);
                     set(this.elements.grimText);
                     set(this.elements.serverText);
-                    // Monaco 自动换行
                     if (AppState.monacoEditor) {
                         AppState.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
                     }
                     AppState.autoWrapEnabled = enabled;
                 },
-                // 重构后的 appendConsoleLines：加入 Monaco
                 appendConsoleLines(lineObjects) {
                     if (!lineObjects || lineObjects.length === 0) return;
                     let validLines = lineObjects;
@@ -1549,7 +1298,6 @@
                     }
                     this.updateDecorations();
                 },
-                // 切换过滤时的重新加载
                 reloadConsoleLog() {
                     if (!AppState.monacoEditor || !AppState.rawDisplayLines) return;
                     const model = AppState.monacoEditor.getModel();
@@ -1593,6 +1341,7 @@
                         textarea.selectionEnd = selStart;
                     }
                 },
+                // 简化后的 renderIpPanel：不再按省份分组
                 renderIpPanel() {
                     const ipMap = new Map();
                     for (const rec of AppState.ipLoginRecords) {
@@ -1606,62 +1355,22 @@
                             '<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>';
                         return;
                     }
-                    const ipItems = [];
-                    for (const [ip, data] of ipMap.entries()) {
-                        let province = "未知";
-                        const cached = AppState.ipLocationCache.get(ip);
-                        if (cached && cached.province) province = cached.province;
-                        ipItems.push({
-                            ip,
-                            province,
-                            fullLocation: cached ? cached.full : "未知",
-                            records: data.records,
-                            totalLogins: data.records.length,
-                            uniquePlayers: data.playersSet.size,
-                            playerNames: Array.from(data.playersSet).sort()
-                        });
-                    }
-                    const groupMap = new Map();
-                    for (const item of ipItems) {
-                        const key = item.province;
-                        if (!groupMap.has(key)) groupMap.set(key, { province: item.province, items: [],
-                            totalLogins: 0, uniquePlayersSet: new Set() });
-                        const grp = groupMap.get(key);
-                        grp.items.push(item);
-                        grp.totalLogins += item.totalLogins;
-                        item.playerNames.forEach(p => grp.uniquePlayersSet.add(p));
-                    }
                     let html = "";
-                    const sortedGroups = Array.from(groupMap.entries()).sort((a, b) => b[1].items.length - a[1].items
-                        .length);
-                    for (const [prov, grp] of sortedGroups) {
-                        const groupExpanded = AppState.expandedGroups.has(prov);
-                        html +=
-                            `<div class="ip-group" data-group-key="${prov}">
-                    <div class="ip-group-header" data-group-key="${prov}">
-                        <span class="group-toggle-icon">${groupExpanded ? "▼" : "▶"}</span>
-                        <span class="group-title">${prov}</span>
-                        <span class="group-stats">(${grp.items.length}个IP, ${grp.totalLogins}次登录, ${grp.uniquePlayersSet.size}个玩家)</span>
-                    </div>
-                    <div class="ip-group-content" data-group-key="${prov}" style="${groupExpanded ? "" : "display:none;"}">`;
-                        for (const item of grp.items) {
-                            const cls = item.uniquePlayers > 1 ? "multi-player" : "single-player";
-                            const playerNames = item.playerNames.join(" // ");
-                            const ipExpanded = AppState.expandedIps.has(item.ip);
-                            html +=
-                                `<div class="ip-card" data-ip="${item.ip}">
-                        <div class="ip-header" data-ip="${item.ip}">
-                            <span class="toggle-icon">${ipExpanded ? "▼" : "▶"}</span>
-                            <span class="ip-address ${cls}" data-ip="${item.ip}">${item.ip}</span>
-                            <span class="stats">(${item.totalLogins}次登录, ${item.uniquePlayers}个玩家: ${playerNames})</span>
-                        </div>
-                        <div class="ip-details ${ipExpanded ? "expanded" : ""}" data-ip="${item.ip}">`;
-                            const sortedRecs = [...item.records].sort((a, b) => a.time.localeCompare(b.time));
-                            for (const rec of sortedRecs) {
-                                html +=
-                                    `<div class="login-record-row"><span class="login-record-time">${rec.time}</span><span class="login-record-player">${Utils.escapeHtml(rec.player)}</span></div>`;
-                            }
-                            html += `</div></div>`;
+                    for (const [ip, data] of ipMap.entries()) {
+                        const playerNames = Array.from(data.playersSet).sort().join(" // ");
+                        const uniquePlayers = data.playersSet.size;
+                        const cls = uniquePlayers > 1 ? "multi-player" : "single-player";
+                        const ipExpanded = AppState.expandedIps.has(ip);
+                        html += `<div class="ip-card" data-ip="${ip}">
+                            <div class="ip-header" data-ip="${ip}">
+                                <span class="toggle-icon">${ipExpanded ? "▼" : "▶"}</span>
+                                <span class="ip-address ${cls}" data-ip="${ip}">${ip}</span>
+                                <span class="stats">(${data.records.length}次登录, ${uniquePlayers}个玩家: ${playerNames})</span>
+                            </div>
+                            <div class="ip-details ${ipExpanded ? "expanded" : ""}" data-ip="${ip}">`;
+                        const sortedRecs = [...data.records].sort((a, b) => a.time.localeCompare(b.time));
+                        for (const rec of sortedRecs) {
+                            html += `<div class="login-record-row"><span class="login-record-time">${rec.time}</span><span class="login-record-player">${Utils.escapeHtml(rec.player)}</span></div>`;
                         }
                         html += `</div></div>`;
                     }
@@ -1670,34 +1379,15 @@
                         Utils.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
                     }
                 },
+                // 简化后的 handleIpPanelClick：删除分组头处理
                 handleIpPanelClick(e) {
-                    const groupHeader = e.target.closest(".ip-group-header");
-                    if (groupHeader) {
-                        const key = groupHeader.getAttribute("data-group-key");
-                        if (key) {
-                            const content = this.elements.ipPanel.querySelector(
-                                `.ip-group-content[data-group-key="${key}"]`);
-                            const icon = groupHeader.querySelector(".group-toggle-icon");
-                            if (content) {
-                                if (content.style.display !== "none") {
-                                    content.style.display = "none";
-                                    if (icon) icon.textContent = "▶";
-                                    AppState.expandedGroups.delete(key);
-                                } else {
-                                    content.style.display = "block";
-                                    if (icon) icon.textContent = "▼";
-                                    AppState.expandedGroups.add(key);
-                                }
-                            }
-                        }
-                        e.stopPropagation();
-                        return;
-                    }
                     const ipAddrSpan = e.target.closest(".ip-address");
                     if (ipAddrSpan) {
                         const ip = ipAddrSpan.getAttribute("data-ip");
-                        if (ip) { this.elements.ipInput.value = ip;
-                            this.queryIP(ip); }
+                        if (ip) {
+                            this.elements.ipInput.value = ip;
+                            this.queryIP(ip);
+                        }
                         e.stopPropagation();
                         return;
                     }
@@ -1719,47 +1409,6 @@
                                 }
                             }
                         }
-                    }
-                },
-                collapseAllIps() {
-                    const contents = this.elements.ipPanel.querySelectorAll(".ip-group-content");
-                    contents.forEach(c => c.style.display = "none");
-                    const icons = this.elements.ipPanel.querySelectorAll(".group-toggle-icon");
-                    icons.forEach(icon => { if (icon) icon.textContent = "▶"; });
-                    AppState.expandedGroups.clear();
-                },
-                expandAllGroups() {
-                    const contents = this.elements.ipPanel.querySelectorAll(".ip-group-content");
-                    contents.forEach(c => c.style.display = "block");
-                    const icons = this.elements.ipPanel.querySelectorAll(".group-toggle-icon");
-                    icons.forEach(icon => { if (icon) icon.textContent = "▼"; });
-                    const groups = this.elements.ipPanel.querySelectorAll(".ip-group");
-                    groups.forEach(g => {
-                        const key = g.getAttribute("data-group-key");
-                        if (key) AppState.expandedGroups.add(key);
-                    });
-                },
-                async batchQueryIpLocation() {
-                    const ipsSet = new Set();
-                    for (const rec of AppState.ipLoginRecords) ipsSet.add(rec.ip);
-                    const ips = Array.from(ipsSet);
-                    if (ips.length === 0) return this.showStatus("没有可查询的IP", 2000);
-                    this.showStatus(`正在查询 ${ips.length} 个IP的归属地...`, 0);
-                    const btn = document.getElementById('batch-query-ip-btn');
-                    btn.disabled = true;
-                    btn.textContent = "查询中...";
-                    try {
-                        await IpLocationService.batchQuery(ips, (done, total) => {
-                            this.showStatus(`查询进度: ${done}/${total}`, 0);
-                        });
-                        this.showStatus(`查询完成，共 ${ips.length} 个IP`, 2000);
-                        this.renderIpPanel();
-                    } catch (e) {
-                        console.error(e);
-                        this.showStatus("查询失败，请重试", 2000);
-                    } finally {
-                        btn.disabled = false;
-                        btn.textContent = "查询IP地址";
                     }
                 },
                 async queryIP(ip) {
@@ -1887,7 +1536,6 @@
                         }
                     }
                 },
-                // 修复后的防抖判断
                 updateAutoScrollCheck: function() {
                     const self = this;
                     if (this._scrollCheckTimer) clearTimeout(this._scrollCheckTimer);
@@ -1924,7 +1572,7 @@
             };
 
             // ============================================================
-            // 7. 异步分批加载函数
+            // 6. 异步分批加载函数
             // ============================================================
             const BATCH_SIZE = 10000;
 
@@ -1942,7 +1590,6 @@
                 AppState.ipLoginRecords = [];
                 AppState.totalLines = 0;
 
-                // 清空 Monaco
                 if (AppState.monacoEditor) {
                     AppState.monacoEditor.setValue('');
                     if (AppState.monacoDecorations) AppState.monacoDecorations.clear();
@@ -2005,7 +1652,7 @@
             }
 
             // ============================================================
-            // 8. 反作弊标签页分隔条拖拽（离线版）
+            // 7. 反作弊标签页分隔条拖拽（离线版）
             // ============================================================
             (function initGrimDivider() {
                 const divider = document.getElementById('grim-divider');
@@ -2080,7 +1727,7 @@
             })();
 
             // ============================================================
-            // 9. 初始化
+            // 8. 初始化
             // ============================================================
             document.addEventListener('DOMContentLoaded', function() {
                 UIManager.init();
