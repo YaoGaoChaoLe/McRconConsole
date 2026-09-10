@@ -6,3 +6,40 @@ myenv\Scripts\activate
 
 # 安装环境
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 别管这个。
+pyinstaller -F -n McRconConsole ^
+  --collect-all gevent ^
+  --collect-all engineio ^
+  --collect-all flask_socketio ^
+  --hidden-import engineio.async_drivers.gevent ^
+  --hidden-import engineio.async_drivers.threading ^
+  main.py
