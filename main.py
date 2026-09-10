@@ -3,8 +3,12 @@ import builtins
 import time
 from gevent import monkey
 monkey.patch_all()
+import sys
 import os
 
+# 如果是打包后的 exe，将工作目录切换到 exe 所在目录
+if getattr(sys, 'frozen', False):
+    os.chdir(os.path.dirname(sys.executable))
 # ===== 全局 print 添加时间戳 =====
 _original_print = builtins.print
 def _timestamp_print(*args, **kwargs):
