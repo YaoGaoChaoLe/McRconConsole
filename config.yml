@@ -9,7 +9,7 @@ host: "127.0.0.1"
 port: 5000
 
 # 服务器 server.properties 文件绝对路径
-server_properties_path: 'D:\.MC_server\MSL\Server1\server.properties'
+server_properties_path: 'D:\Server1\server.properties'
 
 # 数据库文件名 （留空则自动用“.\stats.db”）
 db_path: "数据库.db"

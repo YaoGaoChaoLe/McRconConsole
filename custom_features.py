@@ -5,7 +5,8 @@ import __main__
 
 def 扩展_自定义功能(line):
     """ 当有玩家发送违规词语[Meteor on Crack] 那么就直接/ban-ip """
-    if "Meteor on Crack123" in line:
+    if "Meteor on Crack" in line:
+        return 0 # 关掉了 ovo
         rcon = getattr(__main__, 'rcon_client', None)
         if rcon is None:return
         player = None

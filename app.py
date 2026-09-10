@@ -3,7 +3,9 @@ import os
 import time
 from functools import wraps
 
-from flask import Flask, request, jsonify, send_from_directory, redirect
+import sys
+
+from flask import Flask, request, jsonify, send_from_directory
 from flask_socketio import emit
 from flask_compress import Compress   # 新增
 from utils import get_filtered_lines
@@ -13,7 +15,12 @@ def create_app(config, rcon_client, db, mail_notifier, socketio_instance):
     app = Flask(__name__)
     Compress(app)
     app.config['SECRET_KEY'] = config.API_PASSWORD
-
+    # ===== 获取 exe 所在目录（打包后）或源码所在目录（开发时） =====
+    if getattr(sys, 'frozen', False):
+        BASE_DIR = os.path.dirname(sys.executable)
+    else:
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # ================================================================
     def require_auth(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -28,11 +35,11 @@ def create_app(config, rcon_client, db, mail_notifier, socketio_instance):
 
     @app.route('/')
     def index():
-        return redirect('/main_console_rcon.html')
-    
+        return "Not Found", 404
+
     @app.route('/main_console_rcon.html')
     def main_console():
-        return send_from_directory('.', 'main_console_rcon.html')
+        return send_from_directory(BASE_DIR, 'main_console_rcon.html')
 
     @app.route('/api/highlight_rules')
     def get_highlight_rules():

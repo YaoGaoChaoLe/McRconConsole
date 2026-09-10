@@ -32,10 +32,8 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --o
 
 
 
+#  ====== 别管这个 =======
 
-
-
-# 别管这个。
 pyinstaller -F -n McRconConsole ^
   --collect-all gevent ^
   --collect-all engineio ^
@@ -43,3 +41,9 @@ pyinstaller -F -n McRconConsole ^
   --hidden-import engineio.async_drivers.gevent ^
   --hidden-import engineio.async_drivers.threading ^
   main.py
+
+.\
+    config.yml
+    custom_features.py
+    main_console_rcon.html
+    McRconConsole.exe
