@@ -199,23 +199,6 @@
             flex-shrink: 0;
         }
 
-        .collapse-all-btn {
-            padding: 4px 12px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: .2s;
-        }
-
-        .collapse-all-btn:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
         .ip-panel {
             flex: 1;
             overflow: auto;
@@ -790,49 +773,6 @@
             min-height: 200px;
         }
 
-        /* ===== IP 组折叠 ===== */
-        .ip-group {
-            margin-bottom: 12px;
-            border: 1px solid #2c2c2c;
-            border-radius: 4px;
-            background: #0f0f0f;
-        }
-
-        .ip-group-header {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            cursor: pointer;
-            background: #1a1a1a;
-            border-bottom: 1px solid #2c2c2c;
-            font-weight: 700;
-        }
-
-        .ip-group-header:hover {
-            background: #252525;
-        }
-
-        .group-toggle-icon {
-            font-size: 16px;
-            margin-right: 8px;
-            color: #fff;
-        }
-
-        .group-title {
-            color: #fff;
-            margin-right: 12px;
-        }
-
-        .group-stats {
-            color: #aaa;
-            font-size: 13px;
-        }
-
-        .ip-group-content {
-            padding: 8px;
-            background: #0f0f0f;
-        }
-
         /* ===== Monaco Editor 控制台区域 ===== */
         #monaco-container {
             width: 100%;
@@ -869,23 +809,6 @@
             scrollbar-width: thin;
         }
 
-        #console-log-container::-webkit-scrollbar {
-            width: 12px;
-        }
-        #console-log-container::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        #console-log-container::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
-            border-radius: 6px;
-        }
-        #console-log-container::-webkit-scrollbar-thumb:hover {
-            background: #0fc;
-        }
-        #console-log-container {
-            scrollbar-width: auto;
-        }
-
         /* ===== 响应式 ===== */
         @media (max-width: 600px) {
             .tab-button {
@@ -894,10 +817,6 @@
             }
             .ip-query-row input {
                 flex: 1;
-            }
-            .split-panel {
-                flex-direction: column;
-                gap: 8px;
             }
         }
 
@@ -1053,7 +972,6 @@
             margin-left: 98px;
         }
 
-
         /* ===== 全局加载遮罩 ===== */
         #loading-overlay {
             position: fixed;
@@ -1101,8 +1019,9 @@
     <!-- 加载遮罩 -->
     <div id="loading-overlay">
         <div class="loader"></div>
-        <div>正在加载控制台引擎 (CDN)，请稍候...</div>
+        <div>正在加载资源 请确保网络通畅...</div>
     </div>
+
     <!-- ===== 顶部状态栏 ===== -->
     <div class="top-bar">
         <div class="status-text" id="status"></div>
@@ -1218,9 +1137,6 @@
                     <div class="sub-header">
                         <span>玩家登录IP记录</span>
                         <div style="display:flex;gap:8px;">
-                            <button class="collapse-all-btn" id="collapse-all-btn">[-]</button>
-                            <button class="collapse-all-btn" id="expand-all-btn">[+]</button>
-                            <button class="collapse-all-btn" id="batch-query-ip-btn">查询IP地址</button>
                             <div class="scroll-buttons">
                                 <button class="scroll-btn" id="ip-scroll-top" title="滚动到顶部">↑</button>
                                 <button class="scroll-btn" id="ip-scroll-bottom" title="滚动到底部">↓</button>
@@ -1362,7 +1278,6 @@
                 historyIdx: -1,
                 highlightRules: [],
                 expandedIps: new Set(),
-                expandedGroups: new Set(),
                 immersiveMode: false,
                 autoScrollEnabled: true,
                 autoWrapEnabled: false,
@@ -1381,7 +1296,6 @@
                 currentStatsRange: '1d',
                 statsRefreshTimer: null,
                 resizeHandlerAttached: false,
-                ipLocationCache: new Map(),
                 immersiveChart: null,
                 immersiveStatsTimer: null,
                 anticheatKeywords: [],
@@ -1390,10 +1304,6 @@
                     rightKeywords: ["[Server]", "moved too quickly"]
                 },
                 rawLogLines: [], // 用于保存原始日志，以便重新过滤
-                minimapRefreshTimer: null,
-                minimapDragging: false,
-                minimapStartY: 0,
-                minimapHasMoved: false,
                 fullTimes: [],
                 fullCounts: [],
                 fullMissingRanges: []
@@ -1439,7 +1349,7 @@
 
                     function animate(time) {
                         var progress = Math.min((time - startTime) / duration, 1);
-                        var eased = progress * (2 - progress); // easeOutQuad
+                        var eased = progress * (2 - progress);
                         var targetScroll = el.scrollHeight - el.clientHeight;
                         var newTop = startScroll + (targetScroll - startScroll) * eased;
                         el.scrollTop = Math.min(Math.max(newTop, 0), targetScroll);
@@ -1477,67 +1387,7 @@
                         }
                     }
                     el._scrollAnim = requestAnimationFrame(animate);
-                },
-
-                extractProvinceCity: function(location) {
-                    if (!location) return { province: '未知', city: '', full: '未知' };
-                    var cleaned = location.replace(/^中国\s*/, '');
-                    var province = '未知';
-                    var provList = [
-                        '北京', '天津', '上海', '重庆',
-                        '河北', '山西', '辽宁', '吉林', '黑龙江',
-                        '江苏', '浙江', '安徽', '福建', '江西', '山东',
-                        '河南', '湖北', '湖南', '广东', '海南',
-                        '四川', '贵州', '云南', '陕西', '甘肃', '青海',
-                        '台湾', '内蒙古', '广西', '西藏', '宁夏', '新疆',
-                        '香港', '澳门'
-                    ];
-                    for (var i = 0; i < provList.length; i++) {
-                        if (cleaned.startsWith(provList[i])) {
-                            province = provList[i];
-                            break;
-                        }
-                    }
-                    return { province: province, city: '', full: cleaned };
                 }
-            };
-
-            // province mapping (english -> chinese)
-            var provMap = {
-                'Anhui': '安徽',
-                'Beijing': '北京',
-                'Chongqing': '重庆',
-                'Fujian': '福建',
-                'Gansu': '甘肃',
-                'Guangdong': '广东',
-                'Guangxi': '广西',
-                'Guizhou': '贵州',
-                'Hainan': '海南',
-                'Hebei': '河北',
-                'Heilongjiang': '黑龙江',
-                'Henan': '河南',
-                'Hubei': '湖北',
-                'Hunan': '湖南',
-                'Inner Mongolia': '内蒙古',
-                'Jiangsu': '江苏',
-                'Jiangxi': '江西',
-                'Jilin': '吉林',
-                'Liaoning': '辽宁',
-                'Ningxia': '宁夏',
-                'Qinghai': '青海',
-                'Shaanxi': '陕西',
-                'Shandong': '山东',
-                'Shanghai': '上海',
-                'Shanxi': '山西',
-                'Sichuan': '四川',
-                'Tianjin': '天津',
-                'Tibet': '西藏',
-                'Xinjiang': '新疆',
-                'Yunnan': '云南',
-                'Zhejiang': '浙江',
-                'Hong Kong': '香港',
-                'Macao': '澳门',
-                'Taiwan': '台湾'
             };
 
             // ============================================================
@@ -1555,12 +1405,10 @@
                         raw.includes('[Rcon]') || raw.includes('[TEAM_ONLY]') || raw.includes('[SHOUT]') ||
                         /<[a-zA-Z0-9_]+>/.test(raw);
                     var isJoinQuit = raw.includes('lost connection');
-                    // 修改：基于可配置的 grimConfig
                     var isGrim = w.grimConfig.leftKeywords.some(function(kw) { return raw.includes(kw); });
                     var isServer = w.grimConfig.rightKeywords.some(function(kw) { return raw.includes(kw); });
                     var isLogin = raw.includes('logged in');
 
-                    // 清理前缀
                     raw = raw.replace('[Server thread/INFO]: [Not Secure] ', '');
                     raw = raw.replace('[Server thread/INFO]: ', '');
 
@@ -1595,7 +1443,7 @@
                     w.serverLines = [];
                     w.ipLoginRecords = [];
                     var lines = rawText.split(/\r?\n/);
-                    w.rawLogLines = lines; // 保存原始行
+                    w.rawLogLines = lines;
                     for (var i = 0; i < lines.length; i++) {
                         this.processLine(lines[i]);
                     }
@@ -1606,89 +1454,7 @@
             };
 
             // ============================================================
-            // IP 批量查询工具 i
-            // ============================================================
-            var i = {
-                batchQuery: async function(ips, onProgress) {
-                    var cache = w.ipLocationCache;
-                    var resultMap = new Map();
-                    var total = ips.length;
-                    var done = 0;
-
-                    // 分批，每批100个
-                    var batches = [];
-                    for (var idx = 0; idx < ips.length; idx += 100) {
-                        batches.push(ips.slice(idx, idx + 100));
-                    }
-
-                    for (var b = 0; b < batches.length; b++) {
-                        var batch = batches[b];
-                        var needQuery = batch.filter(function(ip) { return !cache.has(ip); });
-
-                        if (needQuery.length > 0) {
-                            try {
-                                var resp = await fetch('http://ip-api.com/batch', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(needQuery)
-                                });
-                                var data = await resp.json();
-                                if (!Array.isArray(data)) throw new Error('批量查询返回格式错误');
-
-                                for (var k = 0; k < needQuery.length; k++) {
-                                    var ip = needQuery[k];
-                                    var info = data[k];
-                                    var locationInfo = { province: '未知', city: '', full: '未知' };
-                                    if (info && info.status === 'success') {
-                                        var region = info.regionName || '';
-                                        if (provMap[region]) region = provMap[region];
-                                        var full = info.country + ' ' + region + ' ' + info.city;
-                                        var extracted = S.extractProvinceCity(full);
-                                        if (extracted.province === '未知' && region) {
-                                            extracted.province = region;
-                                            extracted.full = info.country + ' ' + region;
-                                        } else if (extracted.province !== '未知') {
-                                            extracted.full = info.country + ' ' + extracted.province;
-                                        }
-                                        locationInfo = extracted;
-                                    }
-                                    cache.set(ip, locationInfo);
-                                    resultMap.set(ip, locationInfo);
-                                    done++;
-                                    if (onProgress) onProgress(done, total);
-                                }
-                            } catch (err) {
-                                console.error('批量查询失败:', err);
-                                for (var p = 0; p < needQuery.length; p++) {
-                                    var ip2 = needQuery[p];
-                                    var fallback = { province: '未知', city: '', full: '未知' };
-                                    cache.set(ip2, fallback);
-                                    resultMap.set(ip2, fallback);
-                                    done++;
-                                    if (onProgress) onProgress(done, total);
-                                }
-                            }
-                        } else {
-                            // 全部命中缓存
-                            for (var q = 0; q < batch.length; q++) {
-                                var ip3 = batch[q];
-                                resultMap.set(ip3, cache.get(ip3));
-                                done++;
-                                if (onProgress) onProgress(done, total);
-                            }
-                        }
-
-                        if (batches.length > 1) {
-                            await new Promise(function(resolve) { setTimeout(resolve, 1000); });
-                        }
-                    }
-
-                    return resultMap;
-                }
-            };
-
-            // ============================================================
-            // 界面控制 h（已完全移除旧缩略图 d 对象）
+            // 界面控制 h
             // ============================================================
             var h = {
                 elements: {},
@@ -1711,8 +1477,6 @@
                         immersiveBtn: document.getElementById('immersive-floating-btn'),
                         rconToggleBtn: document.getElementById('rcon-toggle-btn'),
                         rconWindow: document.getElementById('rcon-floating'),
-                        collapseAllBtn: document.getElementById('collapse-all-btn'),
-                        batchQueryBtn: document.getElementById('batch-query-ip-btn'),
                         immersiveConsole: document.getElementById('immersive-console'),
                         immersiveChat: document.getElementById('immersive-chat'),
                         immersiveGrim: document.getElementById('immersive-grim'),
@@ -1725,7 +1489,6 @@
                     this.initDraggable();
                     this.initMonaco();
 
-                    // 监听滚动更新自动滚动复选框 (移除了 consoleContainer)
                     var self = this;
                     ['chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(function(id) {
                         var el = self.elements[id];
@@ -1739,7 +1502,6 @@
 
                 initMonaco: function() {
                     var self = this;
-                    // 必须先显示遮罩，确保 CDN 加载期间禁止用户操作
                     var overlay = document.getElementById('loading-overlay');
                     if (overlay) overlay.style.display = 'flex';
 
@@ -1747,7 +1509,6 @@
                         var container = document.getElementById('monaco-container');
                         if (!container) return;
 
-                        // 动态生成颜色 CSS 类（完美保留原高亮规则）
                         var style = document.createElement('style');
                         var css = '';
                         w.highlightRules.forEach(function(rule) {
@@ -1763,7 +1524,7 @@
                             theme: 'vs-dark',
                             minimap: {
                                 enabled: true, 
-                                renderCharacters: false // 几百万行优化
+                                renderCharacters: false
                             },
                             wordWrap: w.autoWrapEnabled ? 'on' : 'off',
                             scrollBeyondLastLine: false,
@@ -1774,28 +1535,24 @@
                             lineHeight: 20
                         });
 
-                        // 监听滚动更新自动滚动复选框
                         self.monacoEditor.onDidScrollChange(function() {
                             self.updateAutoScrollCheck();
                         });
 
-                        // 如果已有数据，重新渲染并加高亮
                         if (self.monacoModel.getValueLength() > 0) {
                             self.updateDecorations();
                         }
 
-                        // ===== 新增：加载成功，解除禁止 =====
                         if (overlay) overlay.style.display = 'none';
 
                     }, function(err) {
-                        // ===== 新增：加载失败提示 =====
                         console.error('Monaco CDN 加载失败:', err);
                         if (overlay) {
                             overlay.innerHTML = '<div style="color: #ff4343; text-align: center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
                         }
                     });
                 },
-                // 新增：应用颜色高亮（基于原 w.highlightRules）
+
                 updateDecorations: function() {
                     if (!this.monacoEditor) return;
                     var model = this.monacoEditor.getModel();
@@ -1805,7 +1562,6 @@
                     for (var i = 0; i < rules.length; i++) {
                         var rule = rules[i];
                         var keyword = rule.keyword;
-                        // 转义正则特殊字符
                         var regexStr = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         var regex = new RegExp(regexStr, "i");
 
@@ -1821,7 +1577,6 @@
                         }
                     }
 
-                    // 应用新装饰并清空旧的
                     if (this.monacoDecorations) {
                         this.monacoDecorations.clear();
                     }
@@ -1836,7 +1591,6 @@
                         self.setAllWrapMode(self.elements.autoWrap.checked);
                     });
 
-                    // 修改滚动按钮事件，操作 Monaco API
                     document.getElementById('scroll-top-btn').addEventListener('click', function() {
                         if (self.monacoEditor) {
                             self.monacoEditor.revealLine(1);
@@ -1869,21 +1623,10 @@
                         if (e.key === 'Enter') self.queryIP(self.elements.ipInput.value);
                     });
 
-                    if (this.elements.collapseAllBtn) {
-                        this.elements.collapseAllBtn.addEventListener('click', function() { self.collapseAllIps(); });
-                    }
-                    var expandBtn = document.getElementById('expand-all-btn');
-                    if (expandBtn) {
-                        expandBtn.addEventListener('click', function() { self.expandAllGroups(); });
-                    }
-
                     this.elements.ipPanel.addEventListener('click', function(e) { self.handleIpPanelClick(e); });
 
                     this.elements.immersiveBtn.addEventListener('click', function() { self.toggleImmersiveMode(); });
                     this.elements.rconToggleBtn.addEventListener('click', function() { self.toggleRconWindow(); });
-                    if (this.elements.batchQueryBtn) {
-                        this.elements.batchQueryBtn.addEventListener('click', function() { self.batchQueryIpLocation(); });
-                    }
 
                     document.getElementById('chat-scroll-top') && document.getElementById('chat-scroll-top')
                         .addEventListener('click', function() { S.smoothScrollToTop(self.elements.chatText, 200); });
@@ -1904,7 +1647,7 @@
                         .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel,
                             200); });
 
-                    // ===== 新增：Grim 关键词配置 =====
+                    // ===== Grim 关键词配置 =====
                     this.elements.grimConfigToggle.addEventListener('click', function() {
                         var panel = document.getElementById('grim-config-panel');
                         panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
@@ -1918,7 +1661,6 @@
                     });
                 },
 
-                // 新增：更新反作弊关键词配置
                 applyAnticheatConfig: function() {
                     var leftRaw = document.getElementById('grim-left-keywords').value.trim();
                     var rightRaw = document.getElementById('grim-right-keywords').value.trim();
@@ -1928,13 +1670,11 @@
                     w.grimConfig.leftKeywords = leftKeywords;
                     w.grimConfig.rightKeywords = rightKeywords;
 
-                    // 重新过滤所有日志
                     this.reclassifyAnticheatLines();
                     document.getElementById('grim-config-panel').style.display = 'none';
                     this.showStatus('反作弊关键词已更新', 2000);
                 },
 
-                // 新增：重置关键词为默认
                 resetAnticheatConfig: function() {
                     w.grimConfig = {
                         leftKeywords: ["触发了", "[Server]"],
@@ -1946,7 +1686,6 @@
                     this.showStatus('已重置为默认关键词', 2000);
                 },
 
-                // 新增：当关键词改变时，重新分类日志（支持在线和离线）
                 reclassifyAnticheatLines: function() {
                     var leftKeys = w.grimConfig.leftKeywords;
                     var rightKeys = w.grimConfig.rightKeywords;
@@ -2016,8 +1755,7 @@
                     apply(this.elements.joinquitText);
                     apply(this.elements.grimText);
                     apply(this.elements.serverText);
-                    
-                    // 原 consoleContainer 和 d.refresh() 已移除，改用 Monaco API
+
                     if (this.monacoEditor) {
                         this.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
                     }
@@ -2046,11 +1784,9 @@
 
                 updateAutoScrollCheck: function() {
                     var self = this;
-                    // 使用定时器延迟判断，防止 Monaco 平滑滚动过程中导致误判取消自动滚动
                     if (this._scrollCheckTimer) clearTimeout(this._scrollCheckTimer);
                     this._scrollCheckTimer = setTimeout(function() {
                         var allAtBottom = true;
-                        // 监控 Monaco 的滚动状态
                         if (self.monacoEditor) {
                             var scrollTop = self.monacoEditor.getScrollTop();
                             var scrollHeight = self.monacoEditor.getScrollHeight();
@@ -2077,14 +1813,13 @@
                             self.elements.autoScroll.checked = allAtBottom;
                             w.autoScrollEnabled = allAtBottom;
                         }
-                    }, 100); // 100毫秒延迟，等待滚动动画和布局稳定
+                    }, 100);
                 },
 
                 appendLogLines: function(lines) {
                     if (!this.monacoEditor || !lines.length) return;
                     var model = this.monacoEditor.getModel();
                     var lastLine = model.getLineCount();
-                    // 追加日志到 Model 末尾（保持原自动滚动逻辑）
                     var text = lines.join('\n');
                     model.pushEditOperations([], [{
                         range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
@@ -2158,6 +1893,7 @@
                     }
                 },
 
+                // 简化后的 renderIpPanel：不再按省份分组
                 renderIpPanel: function() {
                     var map = new Map();
                     for (var i = 0; i < w.ipLoginRecords.length; i++) {
@@ -2175,86 +1911,31 @@
                         return;
                     }
 
-                    var ipList = [];
+                    var html = '';
                     for (var pair of map.entries()) {
                         var ip = pair[0];
                         var data = pair[1];
-                        var province = '未知';
-                        var cached = w.ipLocationCache.get(ip);
-                        if (cached && cached.province) province = cached.province;
-                        var fullLocation = cached ? cached.full : '未知';
-                        ipList.push({
-                            ip: ip,
-                            province: province,
-                            fullLocation: fullLocation,
-                            records: data.records,
-                            totalLogins: data.records.length,
-                            uniquePlayers: data.playersSet.size,
-                            playerNames: Array.from(data.playersSet).sort()
-                        });
-                    }
-
-                    // 按省份分组
-                    var groupMap = new Map();
-                    for (var j = 0; j < ipList.length; j++) {
-                        var item = ipList[j];
-                        var prov = item.province;
-                        if (!groupMap.has(prov)) {
-                            groupMap.set(prov, { province: prov, items: [], totalLogins: 0, uniquePlayersSet: new Set() });
-                        }
-                        var g = groupMap.get(prov);
-                        g.items.push(item);
-                        g.totalLogins += item.totalLogins;
-                        item.playerNames.forEach(function(name) { g.uniquePlayersSet.add(name); });
-                    }
-
-                    var html = '';
-                    var sortedGroups = Array.from(groupMap.entries()).sort(function(a, b) {
-                        return b[1].items.length - a[1].items.length;
-                    });
-
-                    for (var gi = 0; gi < sortedGroups.length; gi++) {
-                        var key = sortedGroups[gi][0];
-                        var group = sortedGroups[gi][1];
-                        var expanded = w.expandedGroups.has(key);
-                        html += '<div class="ip-group" data-group-key="' + key + '">';
-                        html += '<div class="ip-group-header" data-group-key="' + key + '">';
-                        html += '<span class="group-toggle-icon">' + (expanded ? '▼' : '▶') + '</span>';
-                        html += '<span class="group-title">' + key + '</span>';
-                        html += '<span class="group-stats">(' + group.items.length + '个IP, ' + group.totalLogins +
-                            '次登录, ' + group.uniquePlayersSet.size + '个玩家)</span>';
+                        var uniquePlayers = data.playersSet.size;
+                        var cls = uniquePlayers > 1 ? 'multi-player' : 'single-player';
+                        var names = Array.from(data.playersSet).sort().join(' // ');
+                        var ipExpanded = w.expandedIps.has(ip);
+                        html += '<div class="ip-card" data-ip="' + ip + '">';
+                        html += '<div class="ip-header" data-ip="' + ip + '">';
+                        html += '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>';
+                        html += '<span class="ip-address ' + cls + '" data-ip="' + ip + '">' + ip + '</span>';
+                        html += '<span class="stats">(' + data.records.length + '次登录, ' + uniquePlayers +
+                            '个玩家: ' + names + ')</span>';
                         html += '</div>';
-                        html += '<div class="ip-group-content" data-group-key="' + key + '" style="' + (expanded ? '' :
-                            'display:none;') + '">';
-
-                        var items = group.items;
-                        for (var ii = 0; ii < items.length; ii++) {
-                            var it = items[ii];
-                            var cls = it.uniquePlayers > 1 ? 'multi-player' : 'single-player';
-                            var names = it.playerNames.join(' // ');
-                            var ipExpanded = w.expandedIps.has(it.ip);
-                            html += '<div class="ip-card" data-ip="' + it.ip + '">';
-                            html += '<div class="ip-header" data-ip="' + it.ip + '">';
-                            html += '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>';
-                            html += '<span class="ip-address ' + cls + '" data-ip="' + it.ip + '">' + it.ip +
-                            '</span>';
-                            html += '<span class="stats">(' + it.totalLogins + '次登录, ' + it.uniquePlayers +
-                                '个玩家: ' + names + ')</span>';
+                        html += '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + ip + '">';
+                        var sortedRecs = data.records.slice().sort(function(a, b) {
+                            return a.time.localeCompare(b.time);
+                        });
+                        for (var ri = 0; ri < sortedRecs.length; ri++) {
+                            var rec2 = sortedRecs[ri];
+                            html += '<div class="login-record-row">';
+                            html += '<span class="login-record-time">' + rec2.time + '</span>';
+                            html += '<span class="login-record-player">' + S.escapeHtml(rec2.player) + '</span>';
                             html += '</div>';
-                            html += '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + it
-                                .ip + '">';
-                            var sortedRecs = it.records.slice().sort(function(a, b) {
-                                return a.time.localeCompare(b.time);
-                            });
-                            for (var ri = 0; ri < sortedRecs.length; ri++) {
-                                var rec2 = sortedRecs[ri];
-                                html += '<div class="login-record-row">';
-                                html += '<span class="login-record-time">' + rec2.time + '</span>';
-                                html += '<span class="login-record-player">' + S.escapeHtml(rec2.player) +
-                                    '</span>';
-                                html += '</div>';
-                            }
-                            html += '</div></div>';
                         }
                         html += '</div></div>';
                     }
@@ -2273,34 +1954,10 @@
                     }, 100);
                 },
 
+                // 简化后的 handleIpPanelClick：删除分组头处理
                 handleIpPanelClick: function(e) {
                     var target = e.target;
 
-                    // 点击组头
-                    var groupHeader = target.closest('.ip-group-header');
-                    if (groupHeader) {
-                        var key = groupHeader.getAttribute('data-group-key');
-                        if (key) {
-                            var content = this.elements.ipPanel.querySelector('.ip-group-content[data-group-key="' +
-                                key + '"]');
-                            var icon = groupHeader.querySelector('.group-toggle-icon');
-                            if (content) {
-                                if (content.style.display === 'none') {
-                                    content.style.display = 'block';
-                                    if (icon) icon.textContent = '▼';
-                                    w.expandedGroups.add(key);
-                                } else {
-                                    content.style.display = 'none';
-                                    if (icon) icon.textContent = '▶';
-                                    w.expandedGroups.delete(key);
-                                }
-                            }
-                        }
-                        e.stopPropagation();
-                        return;
-                    }
-
-                    // 点击IP地址（快速查询）
                     var ipAddr = target.closest('.ip-address');
                     if (ipAddr) {
                         var ip = ipAddr.getAttribute('data-ip');
@@ -2312,7 +1969,6 @@
                         return;
                     }
 
-                    // 点击IP卡片头部（展开/折叠）
                     var header = target.closest('.ip-header');
                     if (header) {
                         var ip2 = header.getAttribute('data-ip');
@@ -2332,64 +1988,6 @@
                             }
                         }
                     }
-                },
-
-                collapseAllIps: function() {
-                    var contents = this.elements.ipPanel.querySelectorAll('.ip-group-content');
-                    for (var i = 0; i < contents.length; i++) {
-                        contents[i].style.display = 'none';
-                    }
-                    var icons = this.elements.ipPanel.querySelectorAll('.group-toggle-icon');
-                    for (var j = 0; j < icons.length; j++) {
-                        if (icons[j]) icons[j].textContent = '▶';
-                    }
-                    w.expandedGroups.clear();
-                },
-
-                expandAllGroups: function() {
-                    var contents = this.elements.ipPanel.querySelectorAll('.ip-group-content');
-                    for (var i = 0; i < contents.length; i++) {
-                        contents[i].style.display = 'block';
-                    }
-                    var icons = this.elements.ipPanel.querySelectorAll('.group-toggle-icon');
-                    for (var j = 0; j < icons.length; j++) {
-                        if (icons[j]) icons[j].textContent = '▼';
-                    }
-                    var groups = this.elements.ipPanel.querySelectorAll('.ip-group');
-                    for (var k = 0; k < groups.length; k++) {
-                        var key = groups[k].getAttribute('data-group-key');
-                        if (key) w.expandedGroups.add(key);
-                    }
-                },
-
-                batchQueryIpLocation: function() {
-                    var ipSet = new Set();
-                    for (var i = 0; i < w.ipLoginRecords.length; i++) {
-                        ipSet.add(w.ipLoginRecords[i].ip);
-                    }
-                    var ips = Array.from(ipSet);
-                    if (ips.length === 0) {
-                        this.showStatus('没有可查询的IP', 2000);
-                        return;
-                    }
-                    this.showStatus('正在查询 ' + ips.length + ' 个IP的归属地...', 0);
-                    var btn = this.elements.batchQueryBtn;
-                    btn.disabled = true;
-                    btn.textContent = '查询中...';
-                    var self = this;
-
-                    i.batchQuery(ips, function(done, total) {
-                        self.showStatus('查询进度: ' + done + '/' + total, 0);
-                    }).then(function() {
-                        self.showStatus('查询完成，共 ' + ips.length + ' 个IP', 2000);
-                        self.renderIpPanel();
-                    }).catch(function(err) {
-                        console.error(err);
-                        self.showStatus('查询失败，请重试', 2000);
-                    }).finally(function() {
-                        btn.disabled = false;
-                        btn.textContent = '查询IP地址';
-                    });
                 },
 
                 queryIP: function(ip) {
@@ -2519,7 +2117,7 @@
 
                 screenCaptureLoop: function() {
                     var self = this;
-                    if (w.currentTab !== 'screen') return; // 不在屏幕页则停止
+                    if (w.currentTab !== 'screen') return;
                     fetch('/api/screen', {
                         headers: { 'Authorization': 'Bearer ' + w.apiPassword }
                     }).then(function(resp) { return resp.json(); }).then(function(data) {
@@ -2530,14 +2128,13 @@
                                 img.style.display = 'block';
                             }
                         }
-                        // 无论成功失败都继续循环
                     }).catch(function(err) {
                         console.error('屏幕获取失败:', err);
                     }).finally(function() {
                         if (w.currentTab === 'screen') {
                             w.screenCaptureTimer = setTimeout(function() {
                                 self.screenCaptureLoop();
-                            }, 500); // 500ms 后获取下一张，可调整
+                            }, 500);
                         } else {
                             w.screenCaptureTimer = null;
                         }
@@ -2569,7 +2166,7 @@
                     ta.select();
                     document.execCommand('copy');
                     document.body.removeChild(ta);
-                    this.showStatus('已复制 ' + count + ' 行', 2000);
+                    this.showStatus('已复制内容', 2000);
                 },
 
                 showStatus: function(msg, timeout) {
@@ -2589,7 +2186,6 @@
                     if (!w.immersiveMode) return;
                     var self = this;
 
-                    // 更新控制台 (从 Monaco Model 获取)
                     if (this.elements.immersiveConsole) {
                         var consoleLines = [];
                         if (this.monacoEditor) {
@@ -2638,7 +2234,6 @@
                         }
                     }
 
-                    // 聊天
                     if (this.elements.immersiveChat) {
                         var chatText = w.chatLines.slice(-500).join('\n');
                         if (this.elements.immersiveChat.innerText !== chatText) {
@@ -2654,7 +2249,6 @@
                         }
                     }
 
-                    // 反作弊
                     if (this.elements.immersiveGrim) {
                         var grimText = w.grimLines.slice(-500).join('\n');
                         if (this.elements.immersiveGrim.innerText !== grimText) {
@@ -2915,7 +2509,6 @@
                             }
                         }
 
-                        // 限制数据长度
                         if (w.performanceData.cpu.length > 60) {
                             w.performanceData.cpu.shift();
                             w.performanceData.mem.shift();
@@ -3364,7 +2957,6 @@
                         headers: { 'Authorization': 'Bearer ' + w.apiPassword }
                     }).then(function(resp) { return resp.json(); }).then(function(data) {
                         if (data.lines && data.lines.length) {
-                            // 追加到 Monaco Editor
                             if (h.monacoEditor) {
                                 var model = h.monacoEditor.getModel();
                                 var lastLine = model.getLineCount();
@@ -3507,21 +3099,17 @@
                     h.elements.immersiveBtn.style.display = 'flex';
                     h.elements.rconToggleBtn.style.display = 'flex';
 
-                    // 加载原始日志（用于初始化各记录）
                     var rawResp = await fetch('/api/latest_raw', {
                         headers: { 'Authorization': 'Bearer ' + password }
                     });
                     var rawText = await rawResp.text();
                     r.refreshAllDataFromRaw(rawText);
 
-                    // 启动WebSocket
                     a.init();
 
-                    // 切换到控制台
                     await l('console');
                     h.showStatus('就绪', 2000);
 
-                    // 显示RCON窗口
                     if (h.elements.rconWindow) {
                         var win = h.elements.rconWindow;
                         win.style.display = 'flex';
@@ -3618,7 +3206,6 @@
             // 主启动流程
             // ============================================================
             (async function() {
-                // 加载高亮规则
                 try {
                     var hr = await fetch('/api/highlight_rules');
                     var hrData = await hr.json();
@@ -3627,17 +3214,14 @@
                     w.highlightRules = [];
                 }
 
-                // 初始化界面
                 h.init();
 
-                // 标签切换事件
                 document.querySelectorAll('.tab-button').forEach(function(btn) {
                     btn.addEventListener('click', function() {
                         l(btn.getAttribute('data-tab'));
                     });
                 });
 
-                // 统计范围选择事件
                 document.getElementById('range-selector').addEventListener('click', function(e) {
                     var btn = e.target.closest('.range-btn');
                     if (btn) {
@@ -3646,7 +3230,6 @@
                     }
                 });
 
-                // 启动登录
                 await c();
             })();
 
