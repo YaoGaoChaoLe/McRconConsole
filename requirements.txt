@@ -6,5 +6,7 @@ pyyaml
 psutil
 mcstatus
 gevent
-# pyinstaller
-# setuptools
+
+# 打包
+pyinstaller
+setuptools
