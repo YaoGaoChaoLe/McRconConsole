@@ -7,3 +7,4 @@ psutil
 mcstatus
 gevent
 # pyinstaller
+# setuptools
