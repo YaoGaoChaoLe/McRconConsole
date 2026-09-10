@@ -1,0 +1,9 @@
+setuptools==58.0.0
+flask
+flask-socketio
+flask-compress
+mcrcon
+pyyaml
+psutil
+mcstatus
+gevent
