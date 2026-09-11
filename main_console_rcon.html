@@ -1035,11 +1035,11 @@
 
     <!-- ===== 标签栏 ===== -->
     <div class="tab-bar" id="tab-bar">
+        <button class="tab-button" data-tab="stats">统计</button>
         <button class="tab-button" data-tab="console">控制台</button>
         <button class="tab-button" data-tab="chat">聊天记录</button>
         <button class="tab-button" data-tab="grim">反作弊日志</button>
         <button class="tab-button" data-tab="playerip">登录查询</button>
-        <button class="tab-button" data-tab="stats">统计</button>
         <button class="tab-button" data-tab="screen">屏幕</button>
         <button class="tab-button" data-tab="joinquit">退出</button>
     </div>
@@ -1552,12 +1552,12 @@
                         }
                     });
                 },
-
                 updateDecorations: function() {
                     if (!this.monacoEditor) return;
                     var model = this.monacoEditor.getModel();
                     var rules = w.highlightRules;
                     var newDecorations = [];
+                    var matchedLines = new Set(); // 新增：记录已经匹配过的行，实现“从上到下优先级高”
 
                     for (var i = 0; i < rules.length; i++) {
                         var rule = rules[i];
@@ -1565,15 +1565,23 @@
                         var regexStr = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         var regex = new RegExp(regexStr, "i");
 
-                        var matches = model.findMatches(regex.source, false, true, true, null, true);
+                        // 注意：这里的第四个参数改为了 false（不区分大小写），解决了 warn 匹配不到 WARN 的问题
+                        var matches = model.findMatches(regex.source, false, true, false, null, true);
+                        
                         for (var j = 0; j < matches.length; j++) {
-                            newDecorations.push({
-                                range: matches[j].range,
-                                options: { 
-                                    isWholeLine: true, 
-                                    inlineClassName: 'color-' + rule.color.replace('#', '') 
-                                }
-                            });
+                            var lineNum = matches[j].range.startLineNumber;
+                            
+                            // 如果当前行已经被更高优先级的规则匹配过，则直接跳过，防止颜色被覆盖
+                            if (!matchedLines.has(lineNum)) {
+                                matchedLines.add(lineNum);
+                                newDecorations.push({
+                                    range: matches[j].range,
+                                    options: { 
+                                        isWholeLine: true, 
+                                        inlineClassName: 'color-' + rule.color.replace('#', '') 
+                                    }
+                                });
+                            }
                         }
                     }
 
@@ -1582,7 +1590,6 @@
                     }
                     this.monacoDecorations = this.monacoEditor.createDecorationsCollection(newDecorations);
                 },
-
                 bindEvents: function() {
                     var self = this;
 
@@ -1707,8 +1714,8 @@
                             var line = rawLines[i];
                             var cleaned = line.replace('[Server thread/INFO]: [Not Secure] ', '')
                                 .replace('[Server thread/INFO]: ', '');
-                            if (leftKeys.some(kw => line.includes(kw))) newGrim.push(cleaned);
-                            if (rightKeys.some(kw => line.includes(kw))) newServer.push(cleaned);
+                            if (leftKeys.some(kw => line.toLowerCase().includes(kw.toLowerCase()))) newGrim.push(cleaned);
+                            if (rightKeys.some(kw => line.toLowerCase().includes(kw.toLowerCase()))) newServer.push(cleaned);
                         }
                         index = end;
                         var pct = Math.round((index / total) * 100);
@@ -3028,6 +3035,21 @@
                 if (tab === 'console') {
                     if (h.monacoEditor) h.monacoEditor.layout();
                     o.stopAutoRefresh();
+                    
+                    // ===== 新增：切换到控制台时自动开启自动滚动 =====
+                    w.autoScrollEnabled = true;
+                    if (h.elements.autoScroll) {
+                        h.elements.autoScroll.checked = true;
+                    }
+                    // 如果编辑器有内容，立即滚动到底部看最新日志
+                    if (h.monacoEditor) {
+                        var lineCount = h.monacoEditor.getModel().getLineCount();
+                        if (lineCount > 0) {
+                            h.monacoEditor.revealLineInCenter(lineCount, monaco.editor.ScrollType.Smooth);
+                        }
+                    }
+                    // ================================================
+                    
                 } else if (tab === 'stats') {
                     s.stop();
                     var activeBtn = document.querySelector('#range-selector .range-btn.active');
@@ -3051,7 +3073,6 @@
                     o.stopAutoRefresh();
                 }
             }
-
             // ============================================================
             // 登录流程 c
             // ============================================================

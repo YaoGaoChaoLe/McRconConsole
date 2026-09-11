@@ -6,8 +6,6 @@ def should_keep_log_line(line: str, filter_keywords) -> bool:
     for kw in filter_keywords:
         if kw.lower() in line_lower:
             return False
-    if line.lstrip().startswith("at "):
-        return False
     return True
 
 

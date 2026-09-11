@@ -1,7 +1,7 @@
 # 这是主配置文件。所有设置在这里修改。
 
 ######################## 初始化配置 ########################
-# 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。或用内网穿透(TCP)穿透 127.0.0.1:5000。
+# 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。
 
 # 本地IP地址
 host: "127.0.0.1"
@@ -9,7 +9,7 @@ host: "127.0.0.1"
 port: 5000
 
 # 服务器 server.properties 文件绝对路径
-server_properties_path: 'D:\Server1\server.properties'
+server_properties_path: 'D:\MC\MSL\Server\server.properties'
 
 # 数据库文件名 （留空则自动用“.\stats.db”）
 db_path: "数据库.db"
@@ -80,14 +80,14 @@ highlight_rules:
 # 黄色:#fbff00
   - keyword: "warn"
     color: "#fbff00"
-  - keyword: "java.lang"
-    color: "#fbff00"
 # 艳青色:#00ffea
-  - keyword: "IP limit exceeded"
-    color: "#00ffea"
   - keyword: "触发了"
     color: "#00ffea"
   - keyword: "Grim"
+    color: "#00ffea"
+  - keyword: "[Rcon]"
+    color: "#00ffea"
+  - keyword: "[Server]"
     color: "#00ffea"
 # 灰色:#666666
   - keyword: "lost connection"
@@ -100,6 +100,8 @@ highlight_rules:
     color: "#666666"
   - keyword: "Thread RCON"
     color: "#666666"
+  - keyword: "issued server command"
+    color: "#666666"
 # 绿色:#3BF010
   - keyword: "logged in with entity"
     color: "#3BF010"
@@ -108,7 +110,7 @@ highlight_rules:
     color: "#ffffff"
 
 
-# 反作弊日志关键词（包含这些词的日志行，会出现在前端“反作弊日志”标签页，并同步写入 AntiCheatLog.txt）
+# 包含这些词的日志行，会默认出现在前端“反作弊日志”标签页，并同步写入 AntiCheatLog.txt
 anticheat_keywords:
   - "触发了"
   - "[Server]"
@@ -116,7 +118,10 @@ anticheat_keywords:
 
 # 日志过滤关键词（包含这些词 的日志行 不会显示在前端）
 filter_keywords: 
+  - "PacketEvents caught an unhandled exception while calling your listener" # 无用的PacketEvents报错
+  - "generated an exception while executing task" # 无用的反作弊报错
+  - "java.lang." # 无用的数组溢出报错
+  - "\tat" # 无用的报错堆栈
   - "failed to"
   - "voicechat"
-  - "PacketEvents caught an unhandled exception while calling your listener"
-  - "java.lang."
+  - "Named entity "
