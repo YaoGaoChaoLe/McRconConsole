@@ -19,7 +19,7 @@
 - 将默认为空的 `rcon.password` 随便设一个密码，确保它不是空的。
 - 如果需要管理多个服务器：请确保 各个服务器配置中的`rcon.port`端口号不能一样。
 ### 3. 打开 本项目的`config.yml`，填写正确的配置。
-### 4. 运行 McRconConsole.exe
+### 4. 运行 `McRconConsole.exe`
 
 ---
 ## 通过源码部署
@@ -27,7 +27,6 @@
 - Python 3.8+
 - 互联网连接
 - Windows / Linux / macOS
-  (本项目基于 window10专业版 开发，其它系统可能会出现小问题。)
 
 ### 2. 创建、进入 虚拟环境（可选）（推荐）
 ```bash
