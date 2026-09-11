@@ -2,85 +2,112 @@
 
 ######################## 初始化配置 ########################
 # 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。
-
-# 本地IP地址
 host: "127.0.0.1"
-# 本地端口号
 port: 5000
 
-# 服务器 server.properties 文件绝对路径
-server_properties_path: 'D:\MC\MSL\Server\server.properties'
+# 前端登录密码. 请务必改成强密码。
+admin_password: "REVGJIW83R90EFKJG34TFJKGEPBWEG"
 
-# 数据库文件名 （留空则自动用“.\stats.db”）
+# 数据库文件名
 db_path: "数据库.db"
 
+# 间隔 多少秒 统计一次人数
+sample_interval_seconds: 300
 
-######################## 玩家统计图 ########################
-# 查询服务器在线玩家,并在前端绘制成表格,且记录到 数据库.db 中
-# 服务器IP
-public_server_addresses:
-  - "7891.ovvo.space"
-  - "1145.ovvo.space"
-  - "cn-gz-2.qwq.fan:24803"
-sample_interval_seconds: 300  # 间隔 多少秒 查询一次人数? 建议一次性设置好 不要随便改
 
+######################## 配置服务器 ########################
+servers:
+  - name: "#1 小游戏服" # 自定义服务器名字
+    server_properties_path: 'D:\.MC_server\MSL\Server2\server.properties' # 服务器 server.properties 文件绝对路径
+    public_server_addresses: # 玩家加入的服务器IP。这将用于人数统计。
+      - "7891.ovvo.space"
+    crash_recovery_commands: # 如果检测到服务器崩溃时，就执行这些批处理命令。
+      - "taskkill /F /T /IM java.exe"
+      - "taskkill /F /T /IM frpc_custom.exe"
+      - "taskkill /F /T /IM MSL.exe"
+      - 'D:\.MC_server\MSL.exe'
+    email: # 如果检测到服务器崩溃时，就发送邮件通知
+      enabled: false # 是否启用（true/false）
+      smtp_server: "smtp.163.com" # 邮箱的smtp服务器 地址 (默认:网易邮箱smtp.163.com)
+      smtp_port: 25 # 邮箱的smtp服务器 端口 (默认:网易邮箱25)
+      user: "" # 发件人的用户名
+      from: "" # 发件人邮箱号
+      to: "" # 收件人邮箱
+      password: "" # 发件人 的 发件授权码（不是邮箱登录密码）| 以网易163邮箱为例：电脑端前往 发件人的邮箱 > 设置 > POP3/SMTP/IMAP > 开启 [POP3(或IMAP)/SMTP] 服务 > 获取授权码 > 填入这个 {password} 中。
+      subject: "主服爆炸了" # 邮件标题
+      body: | # 邮件正文
+        主服似乎爆炸了！
+        服务端异常关闭，
+        请立即检查！！！！
+
+  # 支持多个服务器的配置，形式同上。| 如果你只有一个服务器，请删除以下代码。
+  - name: "#2 生存服"
+    server_properties_path: 'D:\.MC_server\MSL\Server1\server.properties'
+    public_server_addresses:
+      - "1145.ovvo.space"
+    crash_recovery_commands:
+      - "taskkill /F /T /IM java.exe"
+      - "taskkill /F /T /IM frpc_custom.exe"
+      - "taskkill /F /T /IM MSL.exe"
+      - 'D:\.MC_server\MSL.exe'
+    email:
+      enabled: false
+      smtp_server: "smtp.163.com"
+      smtp_port: 25
+      user: ""
+      from: ""
+      to: ""
+      password: ""
+      subject: "#2 生存服 - 崩溃警告"
+      body: |
+        服务器似乎爆炸了！
+        服务端异常关闭，
+        请立即检查！！！！
+
+  - name: "#3 竞技服"
+    server_properties_path: 'D:\.MC_server\MSL\Server\server.properties'
+    public_server_addresses:
+      - "cn-gz-2.qwq.fan:24803"
+    crash_recovery_commands:
+      - "taskkill /F /T /IM java.exe"
+      - "taskkill /F /T /IM frpc_custom.exe"
+      - "taskkill /F /T /IM MSL.exe"
+      - 'D:\.MC_server\MSL.exe'
+    email:
+      enabled: false
+      smtp_server: "smtp.163.com"
+      smtp_port: 25
+      user: ""
+      from: ""
+      to: ""
+      password: ""
+      subject: "#3 竞技服 - 崩溃警告"
+      body: |
+        服务器似乎爆炸了！
+        服务端异常关闭，
+        请立即检查！！！！
 
 
 ######################## 崩溃检查 ########################
-# 当日志行出现以下文本时，会检查 服务器目录文件下 是否新生成crash崩溃日志，判断是否真的崩溃了
-alert_keywords:
+alert_keywords: # 当日志行出现以下文本时，会检查 服务器目录文件下 是否新生成crash崩溃日志，判断是否真的崩溃了
   - "shutdown"
   - "crash"
-
-# 当日志行出现"crash"时，间隔几秒，检查是否生成crash日志。（一般保持默认10）
-crash_confirm_delay_seconds: 10
-
+crash_confirm_delay_seconds: 10 # 当日志行出现"crash"时，间隔几秒，检查是否生成crash日志。（一般保持默认10）
+alert_cooldown_seconds: 20 # 如果检测到服务器崩溃时，就发送邮件通知（如果你配置好了的话）。发送邮件后，几秒之内不会再次发送。默认20
 
 
-# 如果 服务器真的崩了，那就 执行以下.cmd命令，用于 强制重启服务器。
-crash_recovery_commands:
-  - "taskkill /F /T /IM java.exe"
-  - "taskkill /F /T /IM frpc_custom.exe"
-  - "taskkill /F /T /IM MSL.exe"
-  - 'D:\.MC_server\MSL.exe'     # [注意反斜杠 “ \ ”，而不是 “ / ” ]
-
-
-# 如果 服务器真的崩了，那就 发送一封邮件
-email:
-  enabled: false   # 是否启用（true/false）
-  smtp_server: "smtp.163.com"     # 邮箱的smtp服务器 地址 (默认:网易邮箱smtp.163.com)
-  smtp_port: 25     # 邮箱的smtp服务器 端口 (默认:网易邮箱25)
-  user: ""     # 发件人的用户名
-  from: ""     # 发件人邮箱号
-  to: ""       # 收件人邮箱
-
-  # 发件人 的 发件授权码（不是邮箱登录密码）
-  # 以网易163邮箱为例：电脑端前往 发件人的邮箱 > 设置 > POP3/SMTP/IMAP > 开启 [POP3(或IMAP)/SMTP] 服务 > 获取授权码 > 填入下面这个 {password} 中。
-  password: ""
-
-  # 邮件标题
-  subject: "【警告】服务器爆炸了"
-  # 邮件正文
-  body: |
-    服务器似乎爆炸了！
-    服务端异常关闭，
-    请立即检查！！！！
-# 发送邮件后，几秒之内不会再次发送
-alert_cooldown_seconds: 20
-
-
-# ==================== 前端日志 ====================
-# [优先级问题] 顺序不同 可能会导致颜色配置失效，需自行检查优先级。从上到下，优先级就是从高到低。    不区分大小写
+######################## 前端日志 ########################
+# [优先级问题] 顺序不同 可能会导致颜色配置失效。从上到下，优先级从高到低。不区分大小写
 highlight_rules:
-# 红色:#ff0000
+  # 黄色
+  - keyword: "/WARN]"
+    color: "#fbff00"
+  # 红色
   - keyword: "Server empty for"
     color: "#ff0000"
   - keyword: "error"
     color: "#ff0000"
-# 黄色:#fbff00
-  - keyword: "warn"
-    color: "#fbff00"
-# 艳青色:#00ffea
+  # 青色
   - keyword: "触发了"
     color: "#00ffea"
   - keyword: "Grim"
@@ -89,7 +116,7 @@ highlight_rules:
     color: "#00ffea"
   - keyword: "[Server]"
     color: "#00ffea"
-# 灰色:#666666
+  # 灰色
   - keyword: "lost connection"
     color: "#666666"
   - keyword: "left the game"
@@ -102,26 +129,23 @@ highlight_rules:
     color: "#666666"
   - keyword: "issued server command"
     color: "#666666"
-# 绿色:#3BF010
+  # 绿色
   - keyword: "logged in with entity"
     color: "#3BF010"
-# 白色:#ffffff
-  - keyword: "info"
-    color: "#ffffff"
 
 
-# 包含这些词的日志行，会默认出现在前端“反作弊日志”标签页，并同步写入 AntiCheatLog.txt
+# 包含这些词的日志行，会默认出现在前端"反作弊日志"标签页，并同步写入 AntiCheatLog_<服务器名>.txt
 anticheat_keywords:
   - "触发了"
   - "[Server]"
 
 
-# 日志过滤关键词（包含这些词 的日志行 不会显示在前端）
-filter_keywords: 
-  - "PacketEvents caught an unhandled exception while calling your listener" # 无用的PacketEvents报错
-  - "generated an exception while executing task" # 无用的反作弊报错
-  - "java.lang." # 无用的数组溢出报错
-  - "\tat" # 无用的报错堆栈
+# 日志过滤关键词（包含这些词的日志行,不会显示在前端）
+filter_keywords:
+  - "PacketEvents caught an unhandled exception while calling your listener"
+  - "generated an exception while executing task"
+  - "java.lang."
+  - "\tat"
   - "failed to"
   - "voicechat"
   - "Named entity "

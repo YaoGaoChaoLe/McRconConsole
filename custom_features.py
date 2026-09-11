@@ -1,26 +1,27 @@
-# custom_features.py 扩展_自定义功能 每当产生新的日志，都会调用这里。可以用来定制功能
+# custom_features.py
 import re
 import __main__
 
-
-def 扩展_自定义功能(line):
+def 扩展_自定义功能(line, server_name):
     """ 当有玩家发送违规词语[Meteor on Crack] 那么就直接/ban-ip """
     if "Meteor on Crack" in line:
-        return 0 # 关掉了 ovo
-        rcon = getattr(__main__, 'rcon_client', None)
-        if rcon is None:return
+        return 0 # 不启用喵 ovo
+
+        rcon_manager = getattr(__main__, 'rcon_manager', None)
+        if rcon_manager is None:
+            return
+
         player = None
-        
-        match1 = re.search(r'<([a-zA-Z0-9_]+)>', line)  # 格式1：<玩家名>
+        match1 = re.search(r'<([a-zA-Z0-9_]+)>', line)
         if match1:
             player = match1.group(1)
         else:
-            match2 = re.search(r'\|\s*([a-zA-Z0-9_]+)§7:', line)  # 格式2：| 玩家名§7:
+            match2 = re.search(r'\|\s*([a-zA-Z0-9_]+)§7:', line)
             if match2:
                 player = match2.group(1)
-        
-        if player is None:return  # 两种格式都没匹配到，放弃
-        
 
-        print(f"[CHEAT] 封禁作弊玩家: {player}")
-        rcon.send_command(f"ban-ip {player} 因为发送了某些消息，被封禁")
+        if player is None:
+            return
+
+        print(f"[CHEAT] 在 [{server_name}] 封禁作弊玩家: {player}")
+        rcon_manager.send_command(server_name, f"ban-ip {player} 因为发送了某些消息，被封禁")

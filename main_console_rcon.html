@@ -5,783 +5,118 @@
     <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
     <title>YaoGaoChaoLe_MiniGameServer</title>
     <style>
-        /* ===== 全局重置 & 布局 ===== */
-        * {
-            box-sizing: border-box;
-            font-family: '微软雅黑', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; font-family: '微软雅黑', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif; }
+        body { margin: 0; padding: 10px; background: #0a0a0a; height: 100vh; display: flex; flex-direction: column; color: #e0e0e0; }
+
+        .top-bar { display: flex; align-items: center; justify-content: space-between; background: #1e1e1e; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, .5); gap: 12px; flex-wrap: wrap; min-height: 48px; border: 1px solid #2c2c2c; }
+        .status-text { font-size: 14px; color: #0fc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 120px; }
+        .auto-scroll-check, .auto-wrap-check { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; color: #ccc; }
+        .auto-scroll-check input, .auto-wrap-check input { accent-color: #00ffcc; }
+
+        #server-select { background: #0f0f0f; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; padding: 5px 8px; font-size: 13px; min-width: 110px; cursor: pointer; font-weight: 600; }
+        #server-select:focus { outline: none; border-color: #0fc; box-shadow: 0 0 2px #0fc; }
+
+        .tab-bar { display: flex; flex-wrap: wrap; gap: 2px; background: #1a1a1a; padding: 5px 5px 0 5px; border-radius: 6px 6px 0 0; }
+        .tab-button { padding: 8px 16px; background: #2c2c2c; border: none; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; transition: .2s; color: #ddd; font-weight: 500; border-bottom: 2px solid transparent; }
+        .tab-button:hover { background: #3a3a3a; color: #fff; }
+        .tab-button.active { background: #0f0f0f; border-bottom-color: #0fc; font-weight: 600; color: #0fc; }
+
+        .panel-container { flex: 1; background: #0f0f0f; border-radius: 0 6px 6px 6px; box-shadow: 0 2px 4px rgba(0, 0, 0, .5); overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2c2c2c; border-top: none; }
+        .tab-content { flex: 1; display: none; background: #0f0f0f; flex-direction: column; overflow: hidden; min-height: 0; }
+        .tab-content.active { display: flex; }
+
+        .console-log-container { flex: 1; background: #1a1a1a; font-family: Consolas, monospace; font-size: 15px; line-height: 1.5; padding: 8px; overflow: auto; }
+        .console-log-line { font-family: inherit; font-size: inherit; line-height: inherit; }
+        .log-textarea { flex: 1; width: 100%; border: none; background: #1a1a1a; color: #e0e0e0; resize: none; font-family: Consolas, monospace; font-size: 15px; line-height: 1.5; outline: 0; padding: 8px; min-height: 0; }
+
+        .console-log-area .sub-header, .ip-query-area .sub-header, .ip-record-area .sub-header, .split-half .sub-header, .stats-area .sub-header { padding: 5px 10px; background: #252525; font-weight: 600; border-bottom: 1px solid #3a3a3a; flex-shrink: 0; color: #0fc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+
+        .player-ip-container { display: flex; flex-direction: column; height: 100%; gap: 12px; flex: 1; min-height: 0; }
+        .ip-record-area { flex: 2; min-height: 0; display: flex; flex-direction: column; background: #1a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #2c2c2c; }
+        .ip-record-area .sub-header { flex-shrink: 0; }
+        .ip-panel { flex: 1; overflow: auto; padding: 8px; }
+        .ip-card { margin-bottom: 8px; border: 1px solid #2c2c2c; border-radius: 4px; background: #0f0f0f; }
+        .ip-header { display: flex; align-items: center; padding: 8px 12px; cursor: pointer; background: #1a1a1a; border-bottom: 1px solid #2c2c2c; user-select: none; }
+        .ip-header:hover { background: #252525; }
+        .ip-header .toggle-icon { font-size: 16px; margin-right: 8px; color: #fff; }
+        .ip-header .ip-address { font-weight: 700; cursor: pointer; text-decoration: underline; margin-right: 12px; }
+        .ip-header .ip-address.single-player { color: #fff; }
+        .ip-header .ip-address.multi-player { color: #ff0; }
+        .ip-header .ip-address:hover { color: #fff; }
+        .ip-header .stats { color: #aaa; font-size: 13px; word-break: break-all; white-space: normal; flex: 1; }
+        .ip-details { padding: 8px 12px; display: none; }
+        .ip-details.expanded { display: block; }
+        .login-record-row { font-family: monospace; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed #2c2c2c; display: flex; }
+        .login-record-time { color: #0fc; width: 80px; flex-shrink: 0; }
+        .login-record-player { color: #fff; margin-left: 12px; }
+
+        .console-log-area, .ip-query-area { display: flex; flex-direction: column; background: #1a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #2c2c2c; }
+        .ip-query-area { flex: 1; min-height: 180px; }
+        .console-log-area { flex: 3; min-height: 0; }
+        .ip-query-row { display: flex; gap: 8px; padding: 10px; flex-wrap: wrap; align-items: center; }
+        .ip-query-row input { flex: 3; min-width: 150px; padding: 8px 12px; border: 1px solid #3a3a3a; background: #0f0f0f; color: #e0e0e0; border-radius: 4px; font-size: 14px; font-family: monospace; }
+        .ip-query-row input:focus { outline: 0; border-color: #0fc; box-shadow: 0 0 2px #0fc; }
+        .ip-query-row button { flex: 1; padding: 8px 16px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 700; transition: .2s; }
+        .ip-query-row button:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .ip-query-result { flex: 1; background: #0f0f0f; border: 1px solid #2c2c2c; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; overflow: auto; margin: 0 10px 10px 10px; color: #ccc; }
+
+        .console-log-area .sub-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .line-control { display: flex; align-items: center; gap: 8px; }
+        .line-control button, .scroll-btn { padding: 4px 12px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; transition: .2s; }
+        .line-control button:hover, .scroll-btn:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .scroll-buttons { display: flex; gap: 4px; margin-left: auto; }
+
+        .stats-container { display: flex; flex-direction: column; height: 100%; gap: 1px; padding: 1px; overflow: auto; }
+        .stats-chart-area { background: #1a1a1a; border-radius: 8px; border: 1px solid #2c2c2c; padding: 12px; min-height: 300px; overflow: hidden; position: relative; }
+        .stats-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .stats-chart-header span { color: #0fc; }
+        .range-selector { display: flex; gap: 8px; }
+        .range-btn { padding: 4px 12px; background: #2c2c2c; color: #ccc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; }
+        .range-btn.active { background: #0fc; color: #0a0a0a; border-color: #0fc; }
+        .range-btn:hover:not(.active) { background: #3a3a3a; color: #fff; }
+        .performance-charts-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+        .performance-charts-row .stats-chart-area { flex: 1; min-width: 280px; }
+        .performance-chart-container { min-height: auto; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-card { background: #1e1e1e; padding: 20px; border-radius: 8px; width: 300px; text-align: center; border: 1px solid #0fc; box-shadow: 0 0 10px rgba(0, 255, 204, .2); }
+        .modal-card h3 { color: #0fc; margin-top: 0; }
+        .modal-card input { width: 100%; padding: 8px; margin: 15px 0; border: 1px solid #3a3a3a; background: #0f0f0f; color: #e0e0e0; border-radius: 4px; }
+        .modal-card input:focus { outline: 0; border-color: #0fc; }
+        .modal-card button { padding: 8px 16px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-weight: 700; }
+        .modal-card button:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+
+        .rcon-floating-window { position: fixed; width: 450px; max-width: 85vw; height: 400px; background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 8px; box-shadow: 0 4px 12px rgba(255, 255, 255, .5); z-index: 10000; display: none; flex-direction: column; resize: both; overflow: hidden; min-width: 300px; min-height: 200px; opacity: .9; }
+        .rcon-floating-window .rcon-header { padding: 8px 12px; background: #252525; font-weight: 600; color: #0fc; border-bottom: 1px solid #3a3a3a; cursor: move; user-select: none; border-radius: 8px 8px 0 0; }
+        .rcon-floating-window .rcon-content { padding: 12px; display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
+        .rcon-floating-window .command-input-row { display: flex; gap: 8px; align-items: center; }
+        .rcon-floating-window .command-input-row input { flex: 3; padding: 8px 12px; border: 1px solid #3a3a3a; background: #0f0f0f; color: #e0e0e0; border-radius: 4px; font-size: 14px; font-family: monospace; }
+        .rcon-floating-window .command-input-row input:focus { outline: 0; border-color: #0fc; box-shadow: 0 0 2px #0fc; }
+        .rcon-floating-window .command-input-row button { flex: 1; padding: 8px 16px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 700; }
+        .rcon-floating-window .command-input-row button:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .rcon-floating-window .result-content { background: #0f0f0f; border: 1px solid #2c2c2c; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; overflow: auto; flex: 1; color: #ccc; }
+
+        .immersive-dashboard { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; display: none; flex-direction: row; gap: 2px; padding: 10px; box-sizing: border-box; z-index: 9999; }
+        body.immersive-mode { padding: 0; overflow: hidden; }
+        body.immersive-mode .console-log-area .sub-header, body.immersive-mode .panel-container, body.immersive-mode .tab-bar, body.immersive-mode .top-bar { display: none !important; }
+        body.immersive-mode .rcon-floating-window { display: none; }
+        body.immersive-mode .immersive-dashboard { display: flex !important; }
+        .floating-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
+        .floating-btn { padding: 5px 5px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; transition: .2s; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .floating-btn:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .immersive-dashboard .left-panel { flex: 7; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; }
+        .immersive-dashboard .right-panel { flex: 5; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; }
+        .immersive-dashboard .left-panel .panel:first-child { flex: 2; }
+        .immersive-dashboard .left-panel .panel:last-child { flex: 1; }
+        .immersive-dashboard .right-panel .panel:first-child { flex: 2; }
+        .immersive-dashboard .right-panel .panel:last-child { flex: 1; }
+        .immersive-dashboard .panel { background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 6px; display: flex; flex-direction: column; overflow: hidden; min-height: 0; min-width: 0; }
+        .immersive-dashboard .panel-header { background: #252525; padding: 6px 10px; font-weight: 600; color: #0fc; border-bottom: 1px solid #3a3a3a; flex-shrink: 0; }
+        .immersive-dashboard .panel-content { flex: 1; min-height: 0; overflow: auto; padding: 8px; font-family: monospace; font-size: 14px; color: #ccc; }
+        #immersive-stats { padding: 0; height: 100% !important; width: 100%; min-height: 200px; }
+
+        #monaco-container { width: 100%; height: 100%; border-left: 1px solid #2c2c2c; background: #1a1a1a; }
 
-        body {
-            margin: 0;
-            padding: 10px;
-            background: #0a0a0a;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            color: #e0e0e0;
-        }
-
-        /* ===== 顶部状态栏 ===== */
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1e1e1e;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .5);
-            gap: 12px;
-            flex-wrap: wrap;
-            min-height: 48px;
-            border: 1px solid #2c2c2c;
-        }
-
-        .status-text {
-            font-size: 14px;
-            color: #0fc;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .auto-scroll-check,
-        .auto-wrap-check {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
-            white-space: nowrap;
-            color: #ccc;
-        }
-
-        .auto-scroll-check input,
-        .auto-wrap-check input {
-            accent-color: #00ffcc;
-        }
-
-        /* ===== 标签栏 ===== */
-        .tab-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            background: #1a1a1a;
-            padding: 5px 5px 0 5px;
-            border-radius: 6px 6px 0 0;
-        }
-
-        .tab-button {
-            padding: 8px 16px;
-            background: #2c2c2c;
-            border: none;
-            border-radius: 6px 6px 0 0;
-            cursor: pointer;
-            font-size: 14px;
-            transition: .2s;
-            color: #ddd;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-button:hover {
-            background: #3a3a3a;
-            color: #fff;
-        }
-
-        .tab-button.active {
-            background: #0f0f0f;
-            border-bottom-color: #0fc;
-            font-weight: 600;
-            color: #0fc;
-        }
-
-        /* ===== 面板容器 ===== */
-        .panel-container {
-            flex: 1;
-            background: #0f0f0f;
-            border-radius: 0 6px 6px 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .5);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #2c2c2c;
-            border-top: none;
-        }
-
-        .tab-content {
-            flex: 1;
-            display: none;
-            background: #0f0f0f;
-            flex-direction: column;
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        .tab-content.active {
-            display: flex;
-        }
-
-        /* ===== 控制台相关 ===== */
-        .console-log-container {
-            flex: 1;
-            background: #1a1a1a;
-            font-family: Consolas, monospace;
-            font-size: 15px;
-            line-height: 1.5;
-            padding: 8px;
-            overflow: auto;
-        }
-
-        .console-log-line {
-            font-family: inherit;
-            font-size: inherit;
-            line-height: inherit;
-        }
-
-        .log-textarea {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background: #1a1a1a;
-            color: #e0e0e0;
-            resize: none;
-            font-family: Consolas, monospace;
-            font-size: 15px;
-            line-height: 1.5;
-            outline: 0;
-            padding: 8px;
-            min-height: 0;
-        }
-
-        /* ===== 通用子标题 ===== */
-        .console-log-area .sub-header,
-        .ip-query-area .sub-header,
-        .ip-record-area .sub-header,
-        .split-half .sub-header,
-        .stats-area .sub-header {
-            padding: 5px 10px;
-            background: #252525;
-            font-weight: 600;
-            border-bottom: 1px solid #3a3a3a;
-            flex-shrink: 0;
-            color: #0fc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        /* ===== IP 记录面板 ===== */
-        .player-ip-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            gap: 12px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .ip-record-area {
-            flex: 2;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1a;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #2c2c2c;
-        }
-
-        .ip-record-area .sub-header {
-            flex-shrink: 0;
-        }
-
-        .ip-panel {
-            flex: 1;
-            overflow: auto;
-            padding: 8px;
-        }
-
-        .ip-card {
-            margin-bottom: 8px;
-            border: 1px solid #2c2c2c;
-            border-radius: 4px;
-            background: #0f0f0f;
-        }
-
-        .ip-header {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            cursor: pointer;
-            background: #1a1a1a;
-            border-bottom: 1px solid #2c2c2c;
-            user-select: none;
-        }
-
-        .ip-header:hover {
-            background: #252525;
-        }
-
-        .ip-header .toggle-icon {
-            font-size: 16px;
-            margin-right: 8px;
-            color: #fff;
-        }
-
-        .ip-header .ip-address {
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: underline;
-            margin-right: 12px;
-        }
-
-        .ip-header .ip-address.single-player {
-            color: #fff;
-        }
-
-        .ip-header .ip-address.multi-player {
-            color: #ff0;
-        }
-
-        .ip-header .ip-address:hover {
-            color: #fff;
-        }
-
-        .ip-header .stats {
-            color: #aaa;
-            font-size: 13px;
-            word-break: break-all;
-            white-space: normal;
-            flex: 1;
-        }
-
-        .ip-details {
-            padding: 8px 12px;
-            display: none;
-        }
-
-        .ip-details.expanded {
-            display: block;
-        }
-
-        .login-record-row {
-            font-family: monospace;
-            font-size: 13px;
-            padding: 4px 0;
-            border-bottom: 1px dashed #2c2c2c;
-            display: flex;
-        }
-
-        .login-record-time {
-            color: #0fc;
-            width: 80px;
-            flex-shrink: 0;
-        }
-
-        .login-record-player {
-            color: #fff;
-            margin-left: 12px;
-        }
-
-        /* ===== IP 查询区 ===== */
-        .console-log-area,
-        .ip-query-area {
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1a;
-            border-radius: 4px;
-            overflow: hidden;
-            border: 1px solid #2c2c2c;
-        }
-
-        .ip-query-area {
-            flex: 1;
-            min-height: 180px;
-        }
-
-        .console-log-area {
-            flex: 3;
-            min-height: 0;
-        }
-
-        .ip-query-row {
-            display: flex;
-            gap: 8px;
-            padding: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .ip-query-row input {
-            flex: 3;
-            min-width: 150px;
-            padding: 8px 12px;
-            border: 1px solid #3a3a3a;
-            background: #0f0f0f;
-            color: #e0e0e0;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: monospace;
-        }
-
-        .ip-query-row input:focus {
-            outline: 0;
-            border-color: #0fc;
-            box-shadow: 0 0 2px #0fc;
-        }
-
-        .ip-query-row button {
-            flex: 1;
-            padding: 8px 16px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 700;
-            transition: .2s;
-        }
-
-        .ip-query-row button:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
-        .ip-query-result {
-            flex: 1;
-            background: #0f0f0f;
-            border: 1px solid #2c2c2c;
-            border-radius: 4px;
-            padding: 8px;
-            font-family: monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            overflow: auto;
-            margin: 0 10px 10px 10px;
-            color: #ccc;
-        }
-
-        /* ===== 控制台子标题内的控件 ===== */
-        .console-log-area .sub-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .line-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .line-control button,
-        .scroll-btn {
-            padding: 4px 12px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .line-control button:hover,
-        .scroll-btn:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
-        .scroll-buttons {
-            display: flex;
-            gap: 4px;
-            margin-left: auto;
-        }
-
-        /* ===== 统计面板 ===== */
-        .stats-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            gap: 1px;
-            padding: 1px;
-            overflow: auto;
-        }
-
-        .stats-chart-area {
-            background: #1a1a1a;
-            border-radius: 8px;
-            border: 1px solid #2c2c2c;
-            padding: 12px;
-            min-height: 300px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .stats-chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .stats-chart-header span {
-            color: #0fc;
-        }
-
-        .range-selector {
-            display: flex;
-            gap: 8px;
-        }
-
-        .range-btn {
-            padding: 4px 12px;
-            background: #2c2c2c;
-            color: #ccc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .range-btn.active {
-            background: #0fc;
-            color: #0a0a0a;
-            border-color: #0fc;
-        }
-
-        .range-btn:hover:not(.active) {
-            background: #3a3a3a;
-            color: #fff;
-        }
-
-        .performance-charts-row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .performance-charts-row .stats-chart-area {
-            flex: 1;
-            min-width: 280px;
-        }
-
-        .performance-chart-container {
-            min-height: auto;
-        }
-
-        /* ===== 模态框 ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, .8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-card {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-            border: 1px solid #0fc;
-            box-shadow: 0 0 10px rgba(0, 255, 204, .2);
-        }
-
-        .modal-card h3 {
-            color: #0fc;
-            margin-top: 0;
-        }
-
-        .modal-card input {
-            width: 100%;
-            padding: 8px;
-            margin: 15px 0;
-            border: 1px solid #3a3a3a;
-            background: #0f0f0f;
-            color: #e0e0e0;
-            border-radius: 4px;
-        }
-
-        .modal-card input:focus {
-            outline: 0;
-            border-color: #0fc;
-        }
-
-        .modal-card button {
-            padding: 8px 16px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 700;
-        }
-
-        .modal-card button:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
-        /* ===== RCON 浮动窗口 ===== */
-        .rcon-floating-window {
-            position: fixed;
-            width: 450px;
-            max-width: 85vw;
-            height: 400px;
-            background: #1a1a1a;
-            border: 1px solid #2c2c2c;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(255, 255, 255, .5);
-            z-index: 10000;
-            display: none;
-            flex-direction: column;
-            resize: both;
-            overflow: hidden;
-            min-width: 300px;
-            min-height: 200px;
-            opacity: .9;
-        }
-
-        .rcon-floating-window .rcon-header {
-            padding: 8px 12px;
-            background: #252525;
-            font-weight: 600;
-            color: #0fc;
-            border-bottom: 1px solid #3a3a3a;
-            cursor: move;
-            user-select: none;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .rcon-floating-window .rcon-content {
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .rcon-floating-window .command-input-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .rcon-floating-window .command-input-row input {
-            flex: 3;
-            padding: 8px 12px;
-            border: 1px solid #3a3a3a;
-            background: #0f0f0f;
-            color: #e0e0e0;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: monospace;
-        }
-
-        .rcon-floating-window .command-input-row input:focus {
-            outline: 0;
-            border-color: #0fc;
-            box-shadow: 0 0 2px #0fc;
-        }
-
-        .rcon-floating-window .command-input-row button {
-            flex: 1;
-            padding: 8px 16px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .rcon-floating-window .command-input-row button:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
-        .rcon-floating-window .result-content {
-            background: #0f0f0f;
-            border: 1px solid #2c2c2c;
-            border-radius: 4px;
-            padding: 8px;
-            font-family: monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            overflow: auto;
-            flex: 1;
-            color: #ccc;
-        }
-
-        /* ===== 沉浸式仪表盘 ===== */
-        .immersive-dashboard {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-            display: none;
-            flex-direction: row;
-            gap: 2px;
-            padding: 10px;
-            box-sizing: border-box;
-            z-index: 9999;
-        }
-
-        body.immersive-mode {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        body.immersive-mode .console-log-area .sub-header,
-        body.immersive-mode .panel-container,
-        body.immersive-mode .tab-bar,
-        body.immersive-mode .top-bar {
-            display: none !important;
-        }
-
-        body.immersive-mode .rcon-floating-window {
-            display: none;
-        }
-
-        body.immersive-mode .immersive-dashboard {
-            display: flex !important;
-        }
-
-        .floating-buttons {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 10000;
-        }
-
-        .floating-btn {
-            padding: 5px 5px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 700;
-            transition: .2s;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, .5);
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .floating-btn:hover {
-            background: #3a3a3a;
-            color: #fff;
-            border-color: #0fc;
-        }
-
-        .immersive-dashboard .left-panel {
-            flex: 7;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-            min-height: 0;
-        }
-
-        .immersive-dashboard .right-panel {
-            flex: 5;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 0;
-            min-height: 0;
-        }
-
-        .immersive-dashboard .left-panel .panel:first-child {
-            flex: 2;
-        }
-        .immersive-dashboard .left-panel .panel:last-child {
-            flex: 1;
-        }
-        .immersive-dashboard .right-panel .panel:first-child {
-            flex: 2;
-        }
-        .immersive-dashboard .right-panel .panel:last-child {
-            flex: 1;
-        }
-
-        .immersive-dashboard .panel {
-            background: #1a1a1a;
-            border: 1px solid #2c2c2c;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            min-height: 0;
-            min-width: 0;
-        }
-
-        .immersive-dashboard .panel-header {
-            background: #252525;
-            padding: 6px 10px;
-            font-weight: 600;
-            color: #0fc;
-            border-bottom: 1px solid #3a3a3a;
-            flex-shrink: 0;
-        }
-
-        .immersive-dashboard .panel-content {
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            padding: 8px;
-            font-family: monospace;
-            font-size: 14px;
-            color: #ccc;
-        }
-
-        #immersive-stats {
-            padding: 0;
-            height: 100% !important;
-            width: 100%;
-            min-height: 200px;
-        }
-
-        /* ===== Monaco Editor 控制台区域 ===== */
-        #monaco-container {
-            width: 100%;
-            height: 100%;
-            border-left: 1px solid #2c2c2c;
-            background: #1a1a1a;
-        }
-
-        /* Monaco 文本高亮类（动态匹配原 highlight_rules 颜色） */
         .color-ff0000 { color: #ff0000 !important; }
         .color-fbff00 { color: #fbff00 !important; }
         .color-00ffea { color: #00ffea !important; }
@@ -789,225 +124,55 @@
         .color-3bf010 { color: #3bf010 !important; }
         .color-ffffff { color: #ffffff !important; }
 
-        /* ===== 滚动条 ===== */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0fc;
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0fc; }
+        textarea { scrollbar-width: thin; }
 
-        textarea {
-            scrollbar-width: thin;
-        }
-
-        /* ===== 响应式 ===== */
         @media (max-width: 600px) {
-            .tab-button {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-            .ip-query-row input {
-                flex: 1;
-            }
+            .tab-button { padding: 6px 12px; font-size: 12px; }
+            .ip-query-row input { flex: 1; }
         }
-
         @media (min-width: 501px) {
-            .player-ip-container {
-                flex-direction: row;
-            }
-            .player-ip-container .ip-record-area {
-                flex: 7.5;
-            }
-            .player-ip-container .ip-query-area {
-                flex: 2.5;
-            }
+            .player-ip-container { flex-direction: row; }
+            .player-ip-container .ip-record-area { flex: 7.5; }
+            .player-ip-container .ip-query-area { flex: 2.5; }
         }
 
-        /* ===== Grim 面板分割（可配置关键词） ===== */
-        .grim-split-container {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-            height: 100%;
-            width: 100%;
-        }
-
-        .grim-panel {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        .grim-left {
-            flex-shrink: 0;
-            width: 50%;
-        }
-        .grim-right {
-            flex: 1;
-        }
-
-        .grim-divider {
-            width: 6px;
-            flex-shrink: 0;
-            cursor: col-resize;
-            background: #2c2c2c;
-            position: relative;
-            transition: background .15s ease;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-        }
-
-        .grim-divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 2px;
-            height: 32px;
-            background: #666;
-            border-radius: 1px;
-            transition: all .15s ease;
-        }
-
-        .grim-divider.dragging,
-        .grim-divider:hover {
-            background: #00e5ff;
-            box-shadow: 0 0 20px rgba(0, 229, 255, .4);
-        }
-
-        .grim-divider.dragging::before,
-        .grim-divider:hover::before {
-            background: #0a0a0a;
-            height: 44px;
-        }
-
+        .grim-split-container { display: flex; flex: 1; min-height: 0; height: 100%; width: 100%; }
+        .grim-panel { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+        .grim-left { flex-shrink: 0; width: 50%; }
+        .grim-right { flex: 1; }
+        .grim-divider { width: 6px; flex-shrink: 0; cursor: col-resize; background: #2c2c2c; position: relative; transition: background .15s ease; user-select: none; -webkit-user-select: none; touch-action: none; }
+        .grim-divider::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2px; height: 32px; background: #666; border-radius: 1px; transition: all .15s ease; }
+        .grim-divider.dragging, .grim-divider:hover { background: #00e5ff; box-shadow: 0 0 20px rgba(0, 229, 255, .4); }
+        .grim-divider.dragging::before, .grim-divider:hover::before { background: #0a0a0a; height: 44px; }
         @media (max-width: 600px) {
-            .grim-split-container {
-                flex-direction: column;
-            }
-            .grim-left {
-                width: 100% !important;
-                flex: 1;
-            }
-            .grim-right {
-                flex: 1;
-            }
-            .grim-divider {
-                display: none;
-            }
+            .grim-split-container { flex-direction: column; }
+            .grim-left { width: 100% !important; flex: 1; }
+            .grim-right { flex: 1; }
+            .grim-divider { display: none; }
         }
 
-        /* 配置面板 */
-        .config-panel {
-            background: #1a1a1a;
-            border-bottom: 1px solid #2c2c2c;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .config-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .config-row label {
-            min-width: 90px;
-            color: #ccc;
-        }
-        .config-row input {
-            flex: 1;
-            min-width: 200px;
-            padding: 6px 8px;
-            background: #0f0f0f;
-            color: #e0e0e0;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        .config-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-        .config-actions button {
-            padding: 6px 14px;
-            background: #2c2c2c;
-            color: #0fc;
-            border: 1px solid #3a3a3a;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .config-actions button:hover {
-            background: #3a3a3a;
-            color: #fff;
-        }
-        .config-toggle {
-            cursor: pointer;
-            color: #FFD700;
-            text-decoration: underline;
-            font-size: 13px;
-        }
-        .config-toggle:hover {
-            color: #FFA500;
-        }
-        .config-hint {
-            font-size: 12px;
-            color: #aaa;
-            margin-left: 98px;
-        }
+        .config-panel { background: #1a1a1a; border-bottom: 1px solid #2c2c2c; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .config-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .config-row label { min-width: 90px; color: #ccc; }
+        .config-row input { flex: 1; min-width: 200px; padding: 6px 8px; background: #0f0f0f; color: #e0e0e0; border: 1px solid #3a3a3a; border-radius: 4px; font-family: monospace; }
+        .config-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .config-actions button { padding: 6px 14px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .config-actions button:hover { background: #3a3a3a; color: #fff; }
+        .config-toggle { cursor: pointer; color: #FFD700; text-decoration: underline; font-size: 13px; }
+        .config-toggle:hover { color: #FFA500; }
+        .config-hint { font-size: 12px; color: #aaa; margin-left: 98px; }
 
-        /* ===== 全局加载遮罩 ===== */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 10, 10, 0.95);
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #0fc;
-            font-size: 18px;
-            font-weight: 600;
-            font-family: '微软雅黑', sans-serif;
-        }
-        #loading-overlay .loader {
-            border: 4px solid #2c2c2c;
-            border-top: 4px solid #0fc;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 10, 0.95); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #0fc; font-size: 18px; font-weight: 600; font-family: '微软雅黑', sans-serif; }
+        #loading-overlay .loader { border: 4px solid #2c2c2c; border-top: 4px solid #0fc; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <!-- 引入 Monaco Editor 官方 CDN (使用 fastly 加速节点) -->
     <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css" />
     <script>
         var require = { paths: { vs: 'https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } };
@@ -1016,14 +181,13 @@
 </head>
 
 <body>
-    <!-- 加载遮罩 -->
     <div id="loading-overlay">
         <div class="loader"></div>
         <div>正在加载资源 请确保网络通畅...</div>
     </div>
 
-    <!-- ===== 顶部状态栏 ===== -->
     <div class="top-bar">
+        <select id="server-select" title="选择服务器"></select>
         <div class="status-text" id="status"></div>
         <label class="auto-scroll-check">
             <input id="auto-scroll" type="checkbox" checked> 自动滚动
@@ -1033,7 +197,6 @@
         </label>
     </div>
 
-    <!-- ===== 标签栏 ===== -->
     <div class="tab-bar" id="tab-bar">
         <button class="tab-button" data-tab="stats">统计</button>
         <button class="tab-button" data-tab="console">控制台</button>
@@ -1044,10 +207,7 @@
         <button class="tab-button" data-tab="joinquit">退出</button>
     </div>
 
-    <!-- ===== 面板容器 ===== -->
     <div class="panel-container">
-
-        <!-- 控制台 -->
         <div class="tab-content" id="tab-console">
             <div class="console-container" style="display:flex;flex-direction:column;height:100%;gap:12px;flex:1;min-height:0;">
                 <div class="console-log-area">
@@ -1067,7 +227,6 @@
             </div>
         </div>
 
-        <!-- 聊天记录 -->
         <div class="tab-content" id="tab-chat">
             <div class="console-log-area">
                 <div class="sub-header">
@@ -1081,7 +240,6 @@
             </div>
         </div>
 
-        <!-- 退出记录 -->
         <div class="tab-content" id="tab-joinquit">
             <div class="console-log-area">
                 <div class="sub-header">
@@ -1095,7 +253,6 @@
             </div>
         </div>
 
-        <!-- 仅看关键词（反作弊 + Server） - 可配置版 -->
         <div class="tab-content" id="tab-grim">
             <div class="sub-header">
                 <span>仅看关键词</span>
@@ -1130,7 +287,6 @@
             </div>
         </div>
 
-        <!-- IP 登录查询 -->
         <div class="tab-content" id="tab-playerip">
             <div class="player-ip-container">
                 <div class="ip-record-area">
@@ -1156,7 +312,6 @@
             </div>
         </div>
 
-        <!-- 统计 -->
         <div class="tab-content" id="tab-stats">
             <div class="stats-container">
                 <div class="stats-chart-area">
@@ -1199,7 +354,6 @@
             </div>
         </div>
 
-        <!-- 屏幕 -->
         <div class="tab-content" id="tab-screen">
             <div class="console-log-area">
                 <div class="sub-header">
@@ -1212,10 +366,8 @@
                 </div>
             </div>
         </div>
+    </div>
 
-    </div><!-- /panel-container -->
-
-    <!-- ===== 沉浸式仪表盘 ===== -->
     <div class="immersive-dashboard" id="immersive-dashboard">
         <div class="left-panel">
             <div class="panel">
@@ -1239,7 +391,6 @@
         </div>
     </div>
 
-    <!-- ===== RCON 浮动窗口 ===== -->
     <div class="rcon-floating-window" id="rcon-floating">
         <div class="rcon-header" id="rcon-header">RCON 命令</div>
         <div class="rcon-content">
@@ -1251,23 +402,19 @@
         </div>
     </div>
 
-    <!-- ===== 浮动按钮 ===== -->
     <div class="floating-buttons">
         <button class="floating-btn" id="rcon-toggle-btn" title="显示/隐藏 RCON 窗口" style="display:none;">R</button>
         <button class="floating-btn" id="immersive-floating-btn" title="沉浸模式" style="display:none;">[+]</button>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- ===== JavaScript ===== -->
     <script>
         (function() {
             'use strict';
 
-            // ============================================================
-            // 全局状态 w
-            // ============================================================
             const w = {
                 apiPassword: null,
+                currentServer: null,
+                serverList: [],
                 currentTab: 'console',
                 chatLines: [],
                 joinQuitLines: [],
@@ -1286,13 +433,7 @@
                 cpuCharts: [],
                 memChart: null,
                 netChart: null,
-                performanceData: {
-                    cpu: [],
-                    mem: [],
-                    upload: [],
-                    download: [],
-                    cpuPerCore: []
-                },
+                performanceData: { cpu: [], mem: [], upload: [], download: [], cpuPerCore: [] },
                 currentStatsRange: '1d',
                 statsRefreshTimer: null,
                 resizeHandlerAttached: false,
@@ -1303,15 +444,12 @@
                     leftKeywords: ["触发了", "[Server]"],
                     rightKeywords: ["[Server]", "moved too quickly"]
                 },
-                rawLogLines: [], // 用于保存原始日志，以便重新过滤
+                rawLogLines: [],
                 fullTimes: [],
                 fullCounts: [],
                 fullMissingRanges: []
             };
 
-            // ============================================================
-            // 工具函数 S
-            // ============================================================
             const S = {
                 escapeHtml: function(text) {
                     return text.replace(/[&<>]/g, function(m) {
@@ -1321,41 +459,29 @@
                         return m;
                     });
                 },
-
                 getHighlightColor: function(line, rules) {
                     for (const rule of rules) {
-                        if (line.toLowerCase().includes(rule.keyword.toLowerCase())) {
-                            return rule.color;
-                        }
+                        if (line.toLowerCase().includes(rule.keyword.toLowerCase())) return rule.color;
                     }
                     return '';
                 },
-
                 isContainerAtBottom: function(el) {
                     if (!el) return true;
                     return (el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
                 },
-
-                scrollContainerToBottom: function(el) {
-                    if (el) el.scrollTop = el.scrollHeight;
-                },
-
                 smoothScrollToBottomDynamic: function(el, duration) {
                     if (!el) return;
                     if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
                     var startScroll = el.scrollTop;
                     var startTime = performance.now();
-                    var that = this;
-
                     function animate(time) {
                         var progress = Math.min((time - startTime) / duration, 1);
                         var eased = progress * (2 - progress);
                         var targetScroll = el.scrollHeight - el.clientHeight;
                         var newTop = startScroll + (targetScroll - startScroll) * eased;
                         el.scrollTop = Math.min(Math.max(newTop, 0), targetScroll);
-                        if (progress < 1) {
-                            el._scrollAnim = requestAnimationFrame(animate);
-                        } else {
+                        if (progress < 1) el._scrollAnim = requestAnimationFrame(animate);
+                        else {
                             el.scrollTop = targetScroll;
                             delete el._scrollAnim;
                             w.autoScrollEnabled = true;
@@ -1365,21 +491,18 @@
                     }
                     el._scrollAnim = requestAnimationFrame(animate);
                 },
-
                 smoothScrollToTop: function(el, duration) {
                     if (!el) return;
                     if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
                     var startScroll = el.scrollTop;
                     if (startScroll === 0) return;
                     var startTime = performance.now();
-
                     function animate(time) {
                         var progress = Math.min((time - startTime) / duration, 1);
                         var eased = progress * (2 - progress);
                         el.scrollTop = startScroll * (1 - eased);
-                        if (progress < 1) {
-                            el._scrollAnim = requestAnimationFrame(animate);
-                        } else {
+                        if (progress < 1) el._scrollAnim = requestAnimationFrame(animate);
+                        else {
                             delete el._scrollAnim;
                             w.autoScrollEnabled = false;
                             var cb = document.getElementById('auto-scroll');
@@ -1390,15 +513,11 @@
                 }
             };
 
-            // ============================================================
-            // 日志处理器 r
-            // ============================================================
             var r = {
                 extractPlayerName: function(line) {
                     var match = line.match(/([a-zA-Z0-9_]+)\s*\[\/\d+\.\d+\.\d+\.\d+:\d+\]/);
                     return match ? match[1] : '';
                 },
-
                 processLine: function(line) {
                     var raw = line;
                     var isChat = raw.includes('聊') || raw.includes('[Not Secure]') || raw.includes('[Server]') ||
@@ -1422,20 +541,13 @@
                         var player = this.extractPlayerName(raw);
                         var ipMatch = raw.match(/\/(\d+\.\d+\.\d+\.\d+):\d+\]/);
                         if (timeMatch && player && ipMatch) {
-                            w.ipLoginRecords.push({
-                                time: timeMatch[1],
-                                player: player,
-                                ip: ipMatch[1]
-                            });
-                            if (w.currentTab === 'playerip') {
-                                h.scheduleIpPanelRender();
-                            }
+                            w.ipLoginRecords.push({ time: timeMatch[1], player: player, ip: ipMatch[1] });
+                            if (w.currentTab === 'playerip') h.scheduleIpPanelRender();
                         }
                     }
 
                     h.updateImmersiveDashboard();
                 },
-
                 refreshAllDataFromRaw: function(rawText) {
                     w.chatLines = [];
                     w.joinQuitLines = [];
@@ -1444,18 +556,11 @@
                     w.ipLoginRecords = [];
                     var lines = rawText.split(/\r?\n/);
                     w.rawLogLines = lines;
-                    for (var i = 0; i < lines.length; i++) {
-                        this.processLine(lines[i]);
-                    }
-                    if (w.currentTab !== 'console') {
-                        h.updateNonConsoleTab();
-                    }
+                    for (var i = 0; i < lines.length; i++) this.processLine(lines[i]);
+                    if (w.currentTab !== 'console') h.updateNonConsoleTab();
                 }
             };
 
-            // ============================================================
-            // 界面控制 h
-            // ============================================================
             var h = {
                 elements: {},
                 ipPanelRenderTimer: null,
@@ -1484,7 +589,6 @@
                         progressDiv: document.getElementById('log-load-progress'),
                         grimConfigToggle: document.getElementById('grim-config-toggle')
                     };
-
                     this.bindEvents();
                     this.initDraggable();
                     this.initMonaco();
@@ -1492,11 +596,7 @@
                     var self = this;
                     ['chatText', 'joinquitText', 'grimText', 'serverText', 'ipPanel'].forEach(function(id) {
                         var el = self.elements[id];
-                        if (el) {
-                            el.addEventListener('scroll', function() {
-                                self.updateAutoScrollCheck();
-                            });
-                        }
+                        if (el) el.addEventListener('scroll', function() { self.updateAutoScrollCheck(); });
                     });
                 },
 
@@ -1522,10 +622,7 @@
                         self.monacoEditor = monaco.editor.create(container, {
                             model: self.monacoModel,
                             theme: 'vs-dark',
-                            minimap: {
-                                enabled: true, 
-                                renderCharacters: false
-                            },
+                            minimap: { enabled: true, renderCharacters: false },
                             wordWrap: w.autoWrapEnabled ? 'on' : 'off',
                             scrollBeyondLastLine: false,
                             automaticLayout: true,
@@ -1535,29 +632,24 @@
                             lineHeight: 20
                         });
 
-                        self.monacoEditor.onDidScrollChange(function() {
-                            self.updateAutoScrollCheck();
-                        });
-
-                        if (self.monacoModel.getValueLength() > 0) {
-                            self.updateDecorations();
-                        }
+                        self.monacoEditor.onDidScrollChange(function() { self.updateAutoScrollCheck(); });
 
                         if (overlay) overlay.style.display = 'none';
-
                     }, function(err) {
                         console.error('Monaco CDN 加载失败:', err);
-                        if (overlay) {
-                            overlay.innerHTML = '<div style="color: #ff4343; text-align: center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
-                        }
+                        if (overlay) overlay.innerHTML = '<div style="color: #ff4343; text-align: center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
                     });
                 },
+
                 updateDecorations: function() {
                     if (!this.monacoEditor) return;
                     var model = this.monacoEditor.getModel();
                     var rules = w.highlightRules;
                     var newDecorations = [];
-                    var matchedLines = new Set(); // 新增：记录已经匹配过的行，实现“从上到下优先级高”
+                    var matchedLines = new Set();
+                    
+                    // 获取编辑器中所有行的文本内容，避免使用有999条限制的 findMatches
+                    var allLines = model.getLinesContent(); 
 
                     for (var i = 0; i < rules.length; i++) {
                         var rule = rules[i];
@@ -1565,96 +657,59 @@
                         var regexStr = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         var regex = new RegExp(regexStr, "i");
 
-                        // 注意：这里的第四个参数改为了 false（不区分大小写），解决了 warn 匹配不到 WARN 的问题
-                        var matches = model.findMatches(regex.source, false, true, false, null, true);
-                        
-                        for (var j = 0; j < matches.length; j++) {
-                            var lineNum = matches[j].range.startLineNumber;
+                        for (var lineIdx = 0; lineIdx < allLines.length; lineIdx++) {
+                            var lineNum = lineIdx + 1; // Monaco 行号从 1 开始
                             
-                            // 如果当前行已经被更高优先级的规则匹配过，则直接跳过，防止颜色被覆盖
-                            if (!matchedLines.has(lineNum)) {
+                            // 如果该行已经被优先级更高的规则高亮过，则跳过
+                            if (matchedLines.has(lineNum)) continue; 
+
+                            if (regex.test(allLines[lineIdx])) {
                                 matchedLines.add(lineNum);
                                 newDecorations.push({
-                                    range: matches[j].range,
-                                    options: { 
-                                        isWholeLine: true, 
-                                        inlineClassName: 'color-' + rule.color.replace('#', '') 
+                                    range: new monaco.Range(lineNum, 1, lineNum, 1),
+                                    options: {
+                                        isWholeLine: true,
+                                        inlineClassName: 'color-' + rule.color.replace('#', '')
                                     }
                                 });
                             }
                         }
                     }
-
-                    if (this.monacoDecorations) {
-                        this.monacoDecorations.clear();
-                    }
+                    if (this.monacoDecorations) this.monacoDecorations.clear();
                     this.monacoDecorations = this.monacoEditor.createDecorationsCollection(newDecorations);
                 },
                 bindEvents: function() {
                     var self = this;
 
                     this.elements.autoScroll.addEventListener('change', function() { self.onAutoScrollChange(); });
-                    this.elements.autoWrap.addEventListener('change', function() {
-                        self.setAllWrapMode(self.elements.autoWrap.checked);
-                    });
+                    this.elements.autoWrap.addEventListener('change', function() { self.setAllWrapMode(self.elements.autoWrap.checked); });
 
                     document.getElementById('scroll-top-btn').addEventListener('click', function() {
-                        if (self.monacoEditor) {
-                            self.monacoEditor.revealLine(1);
-                        }
+                        if (self.monacoEditor) self.monacoEditor.revealLine(1);
                     });
                     document.getElementById('scroll-bottom-btn').addEventListener('click', function() {
-                        if (self.monacoEditor) {
-                            self.monacoEditor.revealLineInCenter(self.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
-                        }
+                        if (self.monacoEditor) self.monacoEditor.revealLineInCenter(self.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
                     });
+                    document.getElementById('copy-console-btn').addEventListener('click', function() { self.copyConsoleContent(); });
 
-                    document.getElementById('copy-console-btn').addEventListener('click', function() {
-                        self.copyConsoleContent();
-                    });
+                    document.getElementById('send-command-btn').addEventListener('click', function() { t.sendCommand(); });
+                    this.elements.rconCommand.addEventListener('keypress', function(e) { if (e.key === 'Enter') t.sendCommand(); });
+                    this.elements.rconCommand.addEventListener('keydown', function(e) { t.onKeydown(e); });
 
-                    document.getElementById('send-command-btn').addEventListener('click', function() {
-                        t.sendCommand();
-                    });
-                    this.elements.rconCommand.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') t.sendCommand();
-                    });
-                    this.elements.rconCommand.addEventListener('keydown', function(e) {
-                        t.onKeydown(e);
-                    });
-
-                    document.getElementById('query-ip-btn').addEventListener('click', function() {
-                        self.queryIP(self.elements.ipInput.value);
-                    });
-                    this.elements.ipInput.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') self.queryIP(self.elements.ipInput.value);
-                    });
-
+                    document.getElementById('query-ip-btn').addEventListener('click', function() { self.queryIP(self.elements.ipInput.value); });
+                    this.elements.ipInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') self.queryIP(self.elements.ipInput.value); });
                     this.elements.ipPanel.addEventListener('click', function(e) { self.handleIpPanelClick(e); });
 
                     this.elements.immersiveBtn.addEventListener('click', function() { self.toggleImmersiveMode(); });
                     this.elements.rconToggleBtn.addEventListener('click', function() { self.toggleRconWindow(); });
 
-                    document.getElementById('chat-scroll-top') && document.getElementById('chat-scroll-top')
-                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.chatText, 200); });
-                    document.getElementById('chat-scroll-bottom') && document.getElementById('chat-scroll-bottom')
-                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.chatText,
-                            200); });
+                    document.getElementById('chat-scroll-top') && document.getElementById('chat-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.chatText, 200); });
+                    document.getElementById('chat-scroll-bottom') && document.getElementById('chat-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.chatText, 200); });
+                    document.getElementById('joinquit-scroll-top') && document.getElementById('joinquit-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.joinquitText, 200); });
+                    document.getElementById('joinquit-scroll-bottom') && document.getElementById('joinquit-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.joinquitText, 200); });
+                    document.getElementById('ip-scroll-top') && document.getElementById('ip-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.ipPanel, 200); });
+                    document.getElementById('ip-scroll-bottom') && document.getElementById('ip-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel, 200); });
 
-                    document.getElementById('joinquit-scroll-top') && document.getElementById('joinquit-scroll-top')
-                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.joinquitText,
-                            200); });
-                    document.getElementById('joinquit-scroll-bottom') && document.getElementById('joinquit-scroll-bottom')
-                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements
-                            .joinquitText, 200); });
-
-                    document.getElementById('ip-scroll-top') && document.getElementById('ip-scroll-top')
-                        .addEventListener('click', function() { S.smoothScrollToTop(self.elements.ipPanel, 200); });
-                    document.getElementById('ip-scroll-bottom') && document.getElementById('ip-scroll-bottom')
-                        .addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel,
-                            200); });
-
-                    // ===== Grim 关键词配置 =====
                     this.elements.grimConfigToggle.addEventListener('click', function() {
                         var panel = document.getElementById('grim-config-panel');
                         panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
@@ -1671,12 +726,8 @@
                 applyAnticheatConfig: function() {
                     var leftRaw = document.getElementById('grim-left-keywords').value.trim();
                     var rightRaw = document.getElementById('grim-right-keywords').value.trim();
-                    var leftKeywords = leftRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
-                    var rightKeywords = rightRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
-
-                    w.grimConfig.leftKeywords = leftKeywords;
-                    w.grimConfig.rightKeywords = rightKeywords;
-
+                    w.grimConfig.leftKeywords = leftRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
+                    w.grimConfig.rightKeywords = rightRaw.split(',').map(k => k.trim()).filter(k => k.length > 0);
                     this.reclassifyAnticheatLines();
                     document.getElementById('grim-config-panel').style.display = 'none';
                     this.showStatus('反作弊关键词已更新', 2000);
@@ -1696,9 +747,7 @@
                 reclassifyAnticheatLines: function() {
                     var leftKeys = w.grimConfig.leftKeywords;
                     var rightKeys = w.grimConfig.rightKeywords;
-                    var newGrim = [];
-                    var newServer = [];
-
+                    var newGrim = [], newServer = [];
                     var rawLines = w.rawLogLines || [];
                     var BATCH = 5000;
                     var index = 0;
@@ -1712,8 +761,7 @@
                         var end = Math.min(index + BATCH, total);
                         for (var i = index; i < end; i++) {
                             var line = rawLines[i];
-                            var cleaned = line.replace('[Server thread/INFO]: [Not Secure] ', '')
-                                .replace('[Server thread/INFO]: ', '');
+                            var cleaned = line.replace('[Server thread/INFO]: [Not Secure] ', '').replace('[Server thread/INFO]: ', '');
                             if (leftKeys.some(kw => line.toLowerCase().includes(kw.toLowerCase()))) newGrim.push(cleaned);
                             if (rightKeys.some(kw => line.toLowerCase().includes(kw.toLowerCase()))) newServer.push(cleaned);
                         }
@@ -1722,14 +770,13 @@
                         statusEl.innerText = '正在重新分类反作弊日志... ' + index + '/' + total + ' (' + pct + '%)';
                         progressEl.innerText = ' 🔄 重新过滤 ' + index + '/' + total + ' (' + pct + '%)';
 
-                        if (index < total) {
-                            requestAnimationFrame(processBatch);
-                        } else {
+                        if (index < total) requestAnimationFrame(processBatch);
+                        else {
                             w.grimLines = newGrim;
                             w.serverLines = newServer;
                             self.updateNonConsoleTab();
                             progressEl.style.display = 'none';
-                            statusEl.innerText = w.totalLines + ' 行日志已加载';
+                            statusEl.innerText = total + ' 行日志已加载';
                             if (w.currentTab === 'grim' && w.autoScrollEnabled) {
                                 S.smoothScrollToBottomDynamic(self.elements.grimText, 200);
                                 S.smoothScrollToBottomDynamic(self.elements.serverText, 200);
@@ -1742,7 +789,6 @@
                 setAllWrapMode: function(enabled) {
                     var mode = enabled ? 'pre-wrap' : 'pre';
                     var wordBreak = enabled ? 'break-word' : 'normal';
-
                     function apply(el) {
                         if (!el) return;
                         if (el.tagName === 'TEXTAREA') {
@@ -1757,15 +803,11 @@
                             });
                         }
                     }
-
                     apply(this.elements.chatText);
                     apply(this.elements.joinquitText);
                     apply(this.elements.grimText);
                     apply(this.elements.serverText);
-
-                    if (this.monacoEditor) {
-                        this.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
-                    }
+                    if (this.monacoEditor) this.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
                     w.autoWrapEnabled = enabled;
                 },
 
@@ -1773,19 +815,14 @@
                     w.autoScrollEnabled = this.elements.autoScroll.checked;
                     if (!w.autoScrollEnabled) return;
                     var tab = w.currentTab;
-                    if (tab === 'chat') {
-                        S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
-                    } else if (tab === 'joinquit') {
-                        S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
-                    } else if (tab === 'grim') {
+                    if (tab === 'chat') S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
+                    else if (tab === 'joinquit') S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
+                    else if (tab === 'grim') {
                         S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
                         S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
-                    } else if (tab === 'playerip') {
-                        S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
-                    } else if (tab === 'console') {
-                        if (this.monacoEditor) {
-                            this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
-                        }
+                    } else if (tab === 'playerip') S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
+                    else if (tab === 'console' && this.monacoEditor) {
+                        this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
                     }
                 },
 
@@ -1798,23 +835,12 @@
                             var scrollTop = self.monacoEditor.getScrollTop();
                             var scrollHeight = self.monacoEditor.getScrollHeight();
                             var clientHeight = self.monacoEditor.getLayoutInfo().height;
-                            if (scrollHeight - scrollTop - clientHeight > 5) {
-                                allAtBottom = false;
-                            }
+                            if (scrollHeight - scrollTop - clientHeight > 5) allAtBottom = false;
                         }
-                        var containers = [
-                            self.elements.chatText,
-                            self.elements.joinquitText,
-                            self.elements.grimText,
-                            self.elements.serverText,
-                            self.elements.ipPanel
-                        ];
+                        var containers = [self.elements.chatText, self.elements.joinquitText, self.elements.grimText, self.elements.serverText, self.elements.ipPanel];
                         for (var i = 0; i < containers.length; i++) {
                             var el = containers[i];
-                            if (el && !S.isContainerAtBottom(el)) {
-                                allAtBottom = false;
-                                break;
-                            }
+                            if (el && !S.isContainerAtBottom(el)) { allAtBottom = false; break; }
                         }
                         if (self.elements.autoScroll.checked !== allAtBottom) {
                             self.elements.autoScroll.checked = allAtBottom;
@@ -1833,17 +859,7 @@
                         text: '\n' + text,
                         forceMoveMarkers: true
                     }]);
-                    if (w.autoScrollEnabled) {
-                        this.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
-                    }
-                    this.updateImmersiveDashboard();
-                    this.updateDecorations();
-                },
-
-                renderConsoleLog: function(text) {
-                    if (!this.monacoEditor) return;
-                    var model = this.monacoEditor.getModel();
-                    model.setValue(text);
+                    if (w.autoScrollEnabled) this.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
                     this.updateImmersiveDashboard();
                     this.updateDecorations();
                 },
@@ -1874,11 +890,9 @@
                             break;
                     }
                     if (w.autoScrollEnabled) {
-                        if (tab === 'chat') {
-                            S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
-                        } else if (tab === 'joinquit') {
-                            S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
-                        } else if (tab === 'grim') {
+                        if (tab === 'chat') S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
+                        else if (tab === 'joinquit') S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
+                        else if (tab === 'grim') {
                             S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
                             S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
                         }
@@ -1900,14 +914,11 @@
                     }
                 },
 
-                // 简化后的 renderIpPanel：不再按省份分组
                 renderIpPanel: function() {
                     var map = new Map();
                     for (var i = 0; i < w.ipLoginRecords.length; i++) {
                         var rec = w.ipLoginRecords[i];
-                        if (!map.has(rec.ip)) {
-                            map.set(rec.ip, { records: [], playersSet: new Set() });
-                        }
+                        if (!map.has(rec.ip)) map.set(rec.ip, { records: [], playersSet: new Set() });
                         var entry = map.get(rec.ip);
                         entry.records.push({ time: rec.time, player: rec.player });
                         entry.playersSet.add(rec.player);
@@ -1930,13 +941,10 @@
                         html += '<div class="ip-header" data-ip="' + ip + '">';
                         html += '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>';
                         html += '<span class="ip-address ' + cls + '" data-ip="' + ip + '">' + ip + '</span>';
-                        html += '<span class="stats">(' + data.records.length + '次登录, ' + uniquePlayers +
-                            '个玩家: ' + names + ')</span>';
+                        html += '<span class="stats">(' + data.records.length + '次登录, ' + uniquePlayers + '个玩家: ' + names + ')</span>';
                         html += '</div>';
                         html += '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + ip + '">';
-                        var sortedRecs = data.records.slice().sort(function(a, b) {
-                            return a.time.localeCompare(b.time);
-                        });
+                        var sortedRecs = data.records.slice().sort(function(a, b) { return a.time.localeCompare(b.time); });
                         for (var ri = 0; ri < sortedRecs.length; ri++) {
                             var rec2 = sortedRecs[ri];
                             html += '<div class="login-record-row">';
@@ -1946,25 +954,17 @@
                         }
                         html += '</div></div>';
                     }
-
                     this.elements.ipPanel.innerHTML = html;
-                    if (w.autoScrollEnabled && w.currentTab === 'playerip') {
-                        S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
-                    }
+                    if (w.autoScrollEnabled && w.currentTab === 'playerip') S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
                 },
 
                 scheduleIpPanelRender: function() {
                     if (this.ipPanelRenderTimer) clearTimeout(this.ipPanelRenderTimer);
-                    this.ipPanelRenderTimer = setTimeout(function() {
-                        h.ipPanelRenderTimer = null;
-                        h.renderIpPanel();
-                    }, 100);
+                    this.ipPanelRenderTimer = setTimeout(function() { h.ipPanelRenderTimer = null; h.renderIpPanel(); }, 100);
                 },
 
-                // 简化后的 handleIpPanelClick：删除分组头处理
                 handleIpPanelClick: function(e) {
                     var target = e.target;
-
                     var ipAddr = target.closest('.ip-address');
                     if (ipAddr) {
                         var ip = ipAddr.getAttribute('data-ip');
@@ -1975,7 +975,6 @@
                         e.stopPropagation();
                         return;
                     }
-
                     var header = target.closest('.ip-header');
                     if (header) {
                         var ip2 = header.getAttribute('data-ip');
@@ -1998,10 +997,7 @@
                 },
 
                 queryIP: function(ip) {
-                    if (!ip.trim()) {
-                        this.elements.ipResult.innerText = '请输入 IP';
-                        return;
-                    }
+                    if (!ip.trim()) { this.elements.ipResult.innerText = '请输入 IP'; return; }
                     var resultEl = this.elements.ipResult;
                     var queries = [{
                         name: '=========== 结果1 ===========',
@@ -2010,84 +1006,57 @@
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                                 body: 'ip=' + encodeURIComponent(ip)
-                            }).then(function(res) { return res.json(); }).then(function(data) {
+                            }).then(res => res.json()).then(data => {
                                 if (data.code !== 0 || !data.data) throw new Error(data.error || '查询失败');
                                 var d = data.data;
-                                return {
-                                    location: d.location || '未知',
-                                    lat: d.latitude,
-                                    lng: d.longitude,
-                                    street: d.street_history && d.street_history.length ? d.street_history
-                                        .join('、') : '无街道信息'
-                                };
+                                return { location: d.location || '未知', lat: d.latitude, lng: d.longitude,
+                                    street: d.street_history && d.street_history.length ? d.street_history.join('、') : '无街道信息' };
                             });
                         }
                     }, {
                         name: '=========== 结果2 ===========',
                         fetch: function(ip) {
-                            return fetch('http://ip-api.com/json/' + ip +
-                                '?fields=status,country,regionName,city,lat,lon,isp,org'
-                            ).then(function(res) { return res.json(); }).then(function(data) {
-                                if (data.status !== 'success') throw new Error(data.message || '查询失败');
-                                return {
-                                    location: data.country + ' ' + data.regionName + ' ' + data.city,
-                                    lat: data.lat,
-                                    lng: data.lon,
-                                    street: 'ISP: ' + (data.isp || '未知')
-                                };
-                            });
+                            return fetch('http://ip-api.com/json/' + ip + '?fields=status,country,regionName,city,lat,lon,isp,org')
+                                .then(res => res.json()).then(data => {
+                                    if (data.status !== 'success') throw new Error(data.message || '查询失败');
+                                    return { location: data.country + ' ' + data.regionName + ' ' + data.city,
+                                        lat: data.lat, lng: data.lon, street: 'ISP: ' + (data.isp || '未知') };
+                                });
                         }
                     }, {
                         name: '=========== 结果3 ===========',
                         fetch: function(ip) {
-                            return fetch('https://ipapi.co/' + ip + '/json/').then(function(res) { return res
-                                    .json(); }).then(function(data) {
+                            return fetch('https://ipapi.co/' + ip + '/json/').then(res => res.json()).then(data => {
                                 if (data.error) throw new Error(data.reason || '查询失败');
-                                return {
-                                    location: data.country_name + ' ' + data.region + ' ' + data.city,
-                                    lat: data.latitude,
-                                    lng: data.longitude,
-                                    street: 'ASN: ' + data.asn
-                                };
+                                return { location: data.country_name + ' ' + data.region + ' ' + data.city,
+                                    lat: data.latitude, lng: data.longitude, street: 'ASN: ' + data.asn };
                             });
                         }
                     }, {
                         name: '=========== 结果4 ===========',
                         fetch: function(ip) {
-                            return fetch('https://ipinfo.io/' + ip + '/json').then(function(res) { return res
-                                    .json(); }).then(function(data) {
+                            return fetch('https://ipinfo.io/' + ip + '/json').then(res => res.json()).then(data => {
                                 if (data.bogon || data.error) throw new Error(data.error || '查询失败');
                                 var loc = data.loc ? data.loc.split(',') : [];
-                                return {
-                                    location: data.country + ' ' + data.region + ' ' + data.city,
-                                    lat: loc[0] || null,
-                                    lng: loc[1] || null,
-                                    street: '组织: ' + (data.org || '未知')
-                                };
+                                return { location: data.country + ' ' + data.region + ' ' + data.city,
+                                    lat: loc[0] || null, lng: loc[1] || null, street: '组织: ' + (data.org || '未知') };
                             });
                         }
                     }, {
                         name: '=========== 结果5 ===========',
                         fetch: function(ip) {
-                            return fetch('https://ipwho.is/' + ip).then(function(res) { return res.json(); })
-                                .then(function(data) {
-                                    if (!data.success) throw new Error(data.message || '查询失败');
-                                    return {
-                                        location: data.country + ' ' + data.region + ' ' + data.city,
-                                        lat: data.latitude,
-                                        lng: data.longitude,
-                                        street: '代理: ' + (data.proxy ? '是' : '否') + ' | ISP: ' + (data
-                                        .isp || '未知')
-                                    };
-                                });
+                            return fetch('https://ipwho.is/' + ip).then(res => res.json()).then(data => {
+                                if (!data.success) throw new Error(data.message || '查询失败');
+                                return { location: data.country + ' ' + data.region + ' ' + data.city,
+                                    lat: data.latitude, lng: data.longitude,
+                                    street: '代理: ' + (data.proxy ? '是' : '否') + ' | ISP: ' + (data.isp || '未知') };
+                            });
                         }
                     }];
 
                     var html = '';
                     for (var i = 0; i < queries.length; i++) {
-                        html += '<div id="ip-result-' + i +
-                            '" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【' + queries[i]
-                            .name + '】\n查询中...</div>';
+                        html += '<div id="ip-result-' + i + '" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【' + queries[i].name + '】\n查询中...</div>';
                     }
                     resultEl.innerHTML = html;
 
@@ -2095,16 +1064,10 @@
                         (function(index) {
                             queries[index].fetch(ip).then(function(result) {
                                 var el = document.getElementById('ip-result-' + index);
-                                if (el) {
-                                    el.innerText = '\n\n【' + queries[index].name + '】\n位置: ' + result
-                                        .location + '\n经纬度: ' + result.lng + ',' + result.lat +
-                                        '\n详细: ' + result.street;
-                                }
+                                if (el) el.innerText = '\n\n【' + queries[index].name + '】\n位置: ' + result.location + '\n经纬度: ' + result.lng + ',' + result.lat + '\n详细: ' + result.street;
                             }).catch(function(err) {
                                 var el = document.getElementById('ip-result-' + index);
-                                if (el) {
-                                    el.innerText = '\n\n【' + queries[index].name + '】\n失败: ' + err.message;
-                                }
+                                if (el) el.innerText = '\n\n【' + queries[index].name + '】\n失败: ' + err.message;
                             });
                         })(qi);
                     }
@@ -2125,48 +1088,31 @@
                 screenCaptureLoop: function() {
                     var self = this;
                     if (w.currentTab !== 'screen') return;
-                    fetch('/api/screen', {
-                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                    }).then(function(resp) { return resp.json(); }).then(function(data) {
-                        if (data.success) {
-                            var img = document.getElementById('screen-image');
-                            if (img) {
-                                img.src = data.image_base64;
-                                img.style.display = 'block';
+                    fetch('/api/screen', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } })
+                        .then(resp => resp.json()).then(data => {
+                            if (data.success) {
+                                var img = document.getElementById('screen-image');
+                                if (img) { img.src = data.image_base64; img.style.display = 'block'; }
                             }
-                        }
-                    }).catch(function(err) {
-                        console.error('屏幕获取失败:', err);
-                    }).finally(function() {
-                        if (w.currentTab === 'screen') {
-                            w.screenCaptureTimer = setTimeout(function() {
-                                self.screenCaptureLoop();
-                            }, 500);
-                        } else {
-                            w.screenCaptureTimer = null;
-                        }
-                    });
+                        }).catch(err => console.error('屏幕获取失败:', err))
+                        .finally(function() {
+                            if (w.currentTab === 'screen') {
+                                w.screenCaptureTimer = setTimeout(function() { self.screenCaptureLoop(); }, 500);
+                            } else w.screenCaptureTimer = null;
+                        });
                 },
 
                 copyConsoleContent: function() {
-                    if (!this.monacoEditor) {
-                        this.showStatus('无内容可复制', 2000);
-                        return;
-                    }
+                    if (!this.monacoEditor) { this.showStatus('无内容可复制', 2000); return; }
                     var text = this.monacoEditor.getValue();
                     var self = this;
                     if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(function() {
-                            self.showStatus('已复制内容', 2000);
-                        }).catch(function() {
-                            self.fallbackCopy(text, 0);
-                        });
-                    } else {
-                        this.fallbackCopy(text, 0);
-                    }
+                        navigator.clipboard.writeText(text).then(function() { self.showStatus('已复制内容', 2000); })
+                            .catch(function() { self.fallbackCopy(text); });
+                    } else this.fallbackCopy(text);
                 },
 
-                fallbackCopy: function(text, count) {
+                fallbackCopy: function(text) {
                     var ta = document.createElement('textarea');
                     ta.value = text;
                     document.body.appendChild(ta);
@@ -2175,20 +1121,11 @@
                     document.body.removeChild(ta);
                     this.showStatus('已复制内容', 2000);
                 },
-
                 showStatus: function(msg, timeout) {
-                    var old = this.elements.status.innerText;
+                    if (this._statusTimer) {clearTimeout(this._statusTimer);} else {this._statusOld = this.elements.status.innerText;}
                     this.elements.status.innerText = msg;
-                    if (timeout > 0) {
-                        var self = this;
-                        setTimeout(function() {
-                            if (self.elements.status.innerText === msg) {
-                                self.elements.status.innerText = old;
-                            }
-                        }, timeout);
-                    }
+                    if (timeout > 0) {var self = this;this._statusTimer = setTimeout(function() {self.elements.status.innerText = self._statusOld;self._statusTimer = null;}, timeout);}
                 },
-
                 updateImmersiveDashboard: function() {
                     if (!w.immersiveMode) return;
                     var self = this;
@@ -2204,9 +1141,7 @@
                             }
                         }
                         var slice = consoleLines.slice(-500);
-                        var currentTexts = Array.from(this.elements.immersiveConsole.children).map(function(el) {
-                            return el.textContent;
-                        });
+                        var currentTexts = Array.from(this.elements.immersiveConsole.children).map(el => el.textContent);
                         if (JSON.stringify(currentTexts) !== JSON.stringify(slice)) {
                             this.elements.immersiveConsole.innerHTML = '';
                             for (var i = 0; i < slice.length; i++) {
@@ -2215,60 +1150,33 @@
                                 var color = S.getHighlightColor(slice[i], w.highlightRules);
                                 if (color) div.style.color = color;
                                 div.textContent = slice[i];
-                                if (w.autoWrapEnabled) {
-                                    div.style.whiteSpace = 'pre-wrap';
-                                    div.style.wordWrap = 'break-word';
-                                }
+                                if (w.autoWrapEnabled) { div.style.whiteSpace = 'pre-wrap'; div.style.wordWrap = 'break-word'; }
                                 this.elements.immersiveConsole.appendChild(div);
                             }
-                            if (w.autoScrollEnabled) {
-                                setTimeout(function() {
-                                    self.elements.immersiveConsole.scrollTo({
-                                        top: self.elements.immersiveConsole.scrollHeight,
-                                        behavior: 'smooth'
-                                    });
-                                }, 30);
-                            }
-                        } else {
-                            if (w.autoScrollEnabled) {
-                                setTimeout(function() {
-                                    self.elements.immersiveConsole.scrollTo({
-                                        top: self.elements.immersiveConsole.scrollHeight,
-                                        behavior: 'smooth'
-                                    });
-                                }, 30);
-                            }
+                            if (w.autoScrollEnabled) setTimeout(function() {
+                                self.elements.immersiveConsole.scrollTo({ top: self.elements.immersiveConsole.scrollHeight, behavior: 'smooth' });
+                            }, 30);
+                        } else if (w.autoScrollEnabled) {
+                            setTimeout(function() {
+                                self.elements.immersiveConsole.scrollTo({ top: self.elements.immersiveConsole.scrollHeight, behavior: 'smooth' });
+                            }, 30);
                         }
                     }
 
                     if (this.elements.immersiveChat) {
                         var chatText = w.chatLines.slice(-500).join('\n');
-                        if (this.elements.immersiveChat.innerText !== chatText) {
-                            this.elements.immersiveChat.innerText = chatText;
-                        }
-                        if (w.autoScrollEnabled) {
-                            setTimeout(function() {
-                                self.elements.immersiveChat.scrollTo({
-                                    top: self.elements.immersiveChat.scrollHeight,
-                                    behavior: 'smooth'
-                                });
-                            }, 30);
-                        }
+                        if (this.elements.immersiveChat.innerText !== chatText) this.elements.immersiveChat.innerText = chatText;
+                        if (w.autoScrollEnabled) setTimeout(function() {
+                            self.elements.immersiveChat.scrollTo({ top: self.elements.immersiveChat.scrollHeight, behavior: 'smooth' });
+                        }, 30);
                     }
 
                     if (this.elements.immersiveGrim) {
                         var grimText = w.grimLines.slice(-500).join('\n');
-                        if (this.elements.immersiveGrim.innerText !== grimText) {
-                            this.elements.immersiveGrim.innerText = grimText;
-                        }
-                        if (w.autoScrollEnabled) {
-                            setTimeout(function() {
-                                self.elements.immersiveGrim.scrollTo({
-                                    top: self.elements.immersiveGrim.scrollHeight,
-                                    behavior: 'smooth'
-                                });
-                            }, 30);
-                        }
+                        if (this.elements.immersiveGrim.innerText !== grimText) this.elements.immersiveGrim.innerText = grimText;
+                        if (w.autoScrollEnabled) setTimeout(function() {
+                            self.elements.immersiveGrim.scrollTo({ top: self.elements.immersiveGrim.scrollHeight, behavior: 'smooth' });
+                        }, 30);
                     }
                 },
 
@@ -2277,21 +1185,10 @@
                     if (w.immersiveMode) {
                         document.body.classList.add('immersive-mode');
                         this.elements.immersiveBtn.textContent = '[-]';
-                        if (this.elements.rconWindow) {
-                            this.elements.rconWindow.style.display = 'none';
-                        }
-                        if (!w.autoScrollEnabled) {
-                            w.autoScrollEnabled = true;
-                            this.elements.autoScroll.checked = true;
-                        }
-                        if (!w.autoWrapEnabled) {
-                            w.autoWrapEnabled = true;
-                            this.elements.autoWrap.checked = true;
-                            this.setAllWrapMode(true);
-                        }
-                        if (w.currentTab !== 'console') {
-                            l('console');
-                        }
+                        if (this.elements.rconWindow) this.elements.rconWindow.style.display = 'none';
+                        if (!w.autoScrollEnabled) { w.autoScrollEnabled = true; this.elements.autoScroll.checked = true; }
+                        if (!w.autoWrapEnabled) { w.autoWrapEnabled = true; this.elements.autoWrap.checked = true; this.setAllWrapMode(true); }
+                        if (w.currentTab !== 'console') l('console');
                         var self = this;
                         setTimeout(function() {
                             if (!w.immersiveChart && self.elements.immersiveStats) {
@@ -2300,37 +1197,27 @@
                                     tooltip: { trigger: 'axis' },
                                     xAxis: { type: 'category', data: [] },
                                     yAxis: { type: 'value', name: '在线人数' },
-                                    series: [{ type: 'line', data: [], smooth: false,
-                                        lineStyle: { color: '#00ffcc' } }],
-                                    grid: { containLabel: true, left: 40, right: 20, top: 30,
-                                    bottom: 30 }
+                                    series: [{ type: 'line', data: [], smooth: false, lineStyle: { color: '#00ffcc' } }],
+                                    grid: { containLabel: true, left: 40, right: 20, top: 30, bottom: 30 }
                                 });
                             }
                             o.loadOnlineStats(w.currentStatsRange, true);
                         }, 100);
-
                         if (w.immersiveStatsTimer) clearInterval(w.immersiveStatsTimer);
                         w.immersiveStatsTimer = setInterval(function() {
                             if (w.immersiveMode) o.loadOnlineStats(w.currentStatsRange, true);
                         }, 30000);
-
                         this.updateImmersiveDashboard();
                     } else {
                         document.body.classList.remove('immersive-mode');
                         this.elements.immersiveBtn.textContent = '[+]';
-                        if (w.apiPassword && this.elements.rconWindow) {
-                            this.elements.rconWindow.style.display = 'flex';
-                        }
+                        if (w.apiPassword && this.elements.rconWindow) this.elements.rconWindow.style.display = 'flex';
                         w.autoScrollEnabled = this.elements.autoScroll.checked;
                         w.autoWrapEnabled = this.elements.autoWrap.checked;
                         this.setAllWrapMode(w.autoWrapEnabled);
-                        if (w.autoScrollEnabled && this.monacoEditor) {
+                        if (w.autoScrollEnabled && this.monacoEditor)
                             this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
-                        }
-                        if (w.immersiveStatsTimer) {
-                            clearInterval(w.immersiveStatsTimer);
-                            w.immersiveStatsTimer = null;
-                        }
+                        if (w.immersiveStatsTimer) { clearInterval(w.immersiveStatsTimer); w.immersiveStatsTimer = null; }
                         setTimeout(function() {
                             if (w.onlineChart) w.onlineChart.resize();
                             o.resizeAllCharts();
@@ -2350,27 +1237,18 @@
                         win.style.top = top + 'px';
                         win.style.bottom = '';
                         win.style.right = '';
-                    } else {
-                        win.style.display = 'none';
-                    }
+                    } else win.style.display = 'none';
                 },
 
                 initDraggable: function() {
                     var header = document.getElementById('rcon-header');
                     var windowEl = document.getElementById('rcon-floating');
                     if (!header || !windowEl) return;
-
-                    var isDragging = false;
-                    var offsetX = 0,
-                        offsetY = 0;
-                    var startX = 0,
-                        startY = 0;
-
+                    var isDragging = false, offsetX = 0, offsetY = 0;
                     function getPos(e) {
                         var ev = e.touches ? e.touches[0] : e;
                         return { clientX: ev.clientX, clientY: ev.clientY };
                     }
-
                     function onMove(e) {
                         if (!isDragging) return;
                         e.preventDefault();
@@ -2386,7 +1264,6 @@
                         windowEl.style.bottom = '';
                         windowEl.style.right = '';
                     }
-
                     function onUp() {
                         isDragging = false;
                         document.removeEventListener('mousemove', onMove);
@@ -2394,7 +1271,6 @@
                         document.removeEventListener('touchmove', onMove);
                         document.removeEventListener('touchend', onUp);
                     }
-
                     function onDown(e) {
                         if (e.button !== undefined && e.button !== 0) return;
                         e.preventDefault();
@@ -2408,23 +1284,15 @@
                         document.addEventListener('touchmove', onMove, { passive: false });
                         document.addEventListener('touchend', onUp);
                     }
-
                     header.addEventListener('mousedown', onDown);
                     header.addEventListener('touchstart', onDown, { passive: false });
                 }
             };
 
-            // ============================================================
-            // WebSocket 连接 a
-            // ============================================================
             var a = {
                 socket: null,
-
                 init: function() {
-                    if (!w.apiPassword) {
-                        console.warn('WebSocket 未认证，跳过连接');
-                        return;
-                    }
+                    if (!w.apiPassword) { console.warn('WebSocket 未认证，跳过连接'); return; }
                     this.socket = io({
                         query: { token: w.apiPassword },
                         reconnection: true,
@@ -2432,7 +1300,6 @@
                         reconnectionDelay: 1000,
                         transports: ['websocket']
                     });
-
                     var self = this;
                     this.socket.on('connect', function() {
                         console.log('WebSocket 已连接');
@@ -2443,37 +1310,27 @@
                         }
                         if (!window._autoListSent) {
                             window._autoListSent = true;
-                            setTimeout(function() {
-                                t.sendCommand('/list', false);
-                            }, 500);
+                            setTimeout(function() { t.sendCommand('/list', false); }, 500);
                         }
                     });
-
-                    this.socket.on('disconnect', function() {
-                        location.reload();
-                    });
-
+                    this.socket.on('disconnect', function() { location.reload(); });
                     this.socket.on('connect_error', function(err) {
                         console.error('WebSocket 认证失败:', err);
                         h.showStatus('WebSocket 认证失败，请刷新页面重新登录', 5000);
                     });
-
-                    this.socket.on('new_log', function(line) {
-                        h.appendLogLines([line]);
-                        r.processLine(line);
+                    this.socket.on('new_log', function(data) {
+                        // 多服务器：只处理当前选中服务器的消息
+                        if (!data || data.server !== w.currentServer) return;
+                        h.appendLogLines([data.line]);
+                        r.processLine(data.line);
                         if (w.currentTab !== 'console') h.updateNonConsoleTab();
                     });
-
-                    this.socket.on('connected', function(data) {
-                        console.log('服务器确认:', data);
-                    });
-
+                    this.socket.on('connected', function(data) { console.log('服务器确认:', data); });
                     this.socket.on('performance_update', function(data) {
                         w.performanceData.cpu.push(data.cpu);
                         w.performanceData.mem.push(data.memory);
                         w.performanceData.upload.push(data.upload);
                         w.performanceData.download.push(data.download);
-
                         if (data.cpu_per_core && data.cpu_per_core.length) {
                             if (w.cpuCharts.length === 0) {
                                 var container = document.getElementById('cpu-charts-container');
@@ -2489,20 +1346,12 @@
                                         container.appendChild(div);
                                         var chart = echarts.init(div);
                                         chart.setOption({
-                                            title: { text: '核心' + i, left: 'center', top: 0,
-                                                textStyle: { fontSize: 10, color: '#aaa' } },
+                                            title: { text: '核心' + i, left: 'center', top: 0, textStyle: { fontSize: 10, color: '#aaa' } },
                                             tooltip: { trigger: 'axis' },
-                                            grid: { top: 28, bottom: 15, left: 30, right: 10,
-                                                containLabel: true },
-                                            xAxis: { type: 'category', data: [], show: true,
-                                                axisLabel: { fontSize: 8, interval: 5 } },
-                                            yAxis: { type: 'value', min: 0, max: 100, show: true,
-                                                axisLabel: { fontSize: 8 } },
-                                            series: [{ type: 'line', data: [], smooth: false,
-                                                color: '#ff5722',
-                                                lineStyle: { color: '#ff5722' },
-                                                areaStyle: { opacity: 0.2, color: '#ff5722' }
-                                            }]
+                                            grid: { top: 28, bottom: 15, left: 30, right: 10, containLabel: true },
+                                            xAxis: { type: 'category', data: [], show: true, axisLabel: { fontSize: 8, interval: 5 } },
+                                            yAxis: { type: 'value', min: 0, max: 100, show: true, axisLabel: { fontSize: 8 } },
+                                            series: [{ type: 'line', data: [], smooth: false, color: '#ff5722', lineStyle: { color: '#ff5722' }, areaStyle: { opacity: 0.2, color: '#ff5722' } }]
                                         });
                                         w.cpuCharts.push(chart);
                                     }
@@ -2511,90 +1360,52 @@
                             if (!w.performanceData.cpuPerCore || w.performanceData.cpuPerCore.length === 0) {
                                 w.performanceData.cpuPerCore = data.cpu_per_core.map(function() { return []; });
                             }
-                            for (var ci = 0; ci < data.cpu_per_core.length; ci++) {
-                                w.performanceData.cpuPerCore[ci].push(data.cpu_per_core[ci]);
-                            }
+                            for (var ci = 0; ci < data.cpu_per_core.length; ci++) w.performanceData.cpuPerCore[ci].push(data.cpu_per_core[ci]);
                         }
-
                         if (w.performanceData.cpu.length > 60) {
                             w.performanceData.cpu.shift();
                             w.performanceData.mem.shift();
                             w.performanceData.upload.shift();
                             w.performanceData.download.shift();
-                            if (w.performanceData.cpuPerCore) {
-                                for (var j = 0; j < w.performanceData.cpuPerCore.length; j++) {
-                                    w.performanceData.cpuPerCore[j].shift();
-                                }
-                            }
+                            if (w.performanceData.cpuPerCore) for (var j = 0; j < w.performanceData.cpuPerCore.length; j++) w.performanceData.cpuPerCore[j].shift();
                         }
-
                         var xData = w.performanceData.cpu.map(function(_, idx) { return idx.toString(); });
                         if (w.currentTab === 'stats') {
                             if (w.cpuCharts.length && w.performanceData.cpuPerCore) {
                                 for (var k = 0; k < w.cpuCharts.length; k++) {
                                     var coreData = w.performanceData.cpuPerCore[k] || [];
-                                    w.cpuCharts[k].setOption({
-                                        xAxis: { data: xData },
-                                        series: [{ data: coreData.slice() }]
-                                    });
+                                    w.cpuCharts[k].setOption({ xAxis: { data: xData }, series: [{ data: coreData.slice() }] });
                                 }
                             }
-                            if (w.memChart) {
-                                w.memChart.setOption({
-                                    xAxis: { data: xData },
-                                    series: [{ data: w.performanceData.mem.slice() }]
-                                });
-                            }
-                            if (w.netChart) {
-                                w.netChart.setOption({
-                                    xAxis: { data: xData },
-                                    series: [
-                                        { data: w.performanceData.upload.slice() },
-                                        { data: w.performanceData.download.slice() }
-                                    ]
-                                });
-                            }
+                            if (w.memChart) w.memChart.setOption({ xAxis: { data: xData }, series: [{ data: w.performanceData.mem.slice() }] });
+                            if (w.netChart) w.netChart.setOption({
+                                xAxis: { data: xData },
+                                series: [{ data: w.performanceData.upload.slice() }, { data: w.performanceData.download.slice() }]
+                            });
                         }
                     });
                 }
             };
 
-            // ============================================================
-            // RCON 命令 t
-            // ============================================================
             var t = {
                 sendCommand: async function(cmd, recordHistory, clearInput) {
                     if (recordHistory === undefined) recordHistory = true;
                     if (clearInput === undefined) clearInput = true;
-                    if (!w.apiPassword) {
-                        h.elements.rconResult.innerText = '离线模式，RCON不可用';
-                        return false;
-                    }
+                    if (!w.apiPassword) { h.elements.rconResult.innerText = '离线模式，RCON不可用'; return false; }
                     var input = cmd || h.elements.rconCommand.value.trim();
-                    if (!input) {
-                        h.elements.rconResult.innerText = '请输入命令';
-                        return false;
-                    }
+                    if (!input) { h.elements.rconResult.innerText = '请输入命令'; return false; }
                     h.elements.rconResult.innerText = '发送中...';
                     try {
                         var response = await fetch('/api/rcon', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + w.apiPassword
-                            },
-                            body: JSON.stringify({ command: input })
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + w.apiPassword },
+                            body: JSON.stringify({ server: w.currentServer, command: input })
                         });
                         var data = await response.json();
                         if (data.success) {
                             h.elements.rconResult.innerText = data.output || '(无输出)';
-                            if (recordHistory) {
-                                w.cmdHistory.push(input);
-                                w.historyIdx = w.cmdHistory.length;
-                            }
-                            if (clearInput) {
-                                h.elements.rconCommand.value = '';
-                            }
+                            if (recordHistory) { w.cmdHistory.push(input); w.historyIdx = w.cmdHistory.length; }
+                            if (clearInput) h.elements.rconCommand.value = '';
                             return true;
                         } else {
                             h.elements.rconResult.innerText = '错误：' + data.output;
@@ -2605,7 +1416,6 @@
                         return false;
                     }
                 },
-
                 onKeydown: function(e) {
                     if (e.key === 'ArrowUp') {
                         e.preventDefault();
@@ -2629,82 +1439,50 @@
                 }
             };
 
-            // ============================================================
-            // 统计图表 o
-            // ============================================================
             var o = {
                 loadOnlineStats: async function(range, immersive) {
                     immersive = immersive || false;
                     try {
-                        var resp = await fetch('/api/stats/online?range=all', {
-                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                        });
+                        var resp = await fetch('/api/stats/online?range=all', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } });
                         var data = await resp.json();
                         if (!data.success) return;
-
                         var times = data.data.times;
                         var counts = data.data.counts;
                         var missingRanges = data.data.missingRanges;
-
                         w.fullTimes = times;
                         w.fullCounts = counts;
                         w.fullMissingRanges = missingRanges;
-
                         var totalPoints = times.length;
-                        var hasZoom = false;
-                        var startVal = 0;
-                        var endVal = 100;
-                        var effectiveRange = range;
-                        var targetWidth = 0;
+                        var hasZoom = false, startVal = 0, endVal = 100, effectiveRange = range, targetWidth = 0;
 
                         if (range !== 'all' && totalPoints > 1) {
                             var startTime = new Date(times[0]).getTime();
                             var endTime = new Date(times[totalPoints - 1]).getTime();
                             var totalDays = (endTime - startTime) / (1000 * 60 * 60 * 24);
-
                             var windowDays = 1;
                             if (range === '3d') windowDays = 3;
                             else if (range === '7d') windowDays = 7;
                             else if (range === '15d') windowDays = 15;
                             else if (range === '30d') windowDays = 30;
                             else if (range === '1d') windowDays = 1;
-
-                            if (totalDays <= windowDays) {
-                                hasZoom = false;
-                                effectiveRange = 'all';
-                            } else {
+                            if (totalDays <= windowDays) { hasZoom = false; effectiveRange = 'all'; }
+                            else {
                                 hasZoom = true;
                                 var windowPercent = (windowDays / totalDays) * 100;
-                                var zoomEnd = 100;
-                                var zoomStart = Math.max(0, 100 - windowPercent);
-                                startVal = zoomStart;
-                                endVal = zoomEnd;
+                                startVal = Math.max(0, 100 - windowPercent);
+                                endVal = 100;
                                 targetWidth = windowPercent;
                             }
                         }
 
                         var option = {
                             tooltip: { trigger: 'axis' },
-                            xAxis: {
-                                type: 'category',
-                                data: times,
-                                axisLabel: { rotate: 45, interval: 'auto' }
-                            },
-                            yAxis: {
-                                type: 'value',
-                                name: '在线人数',
-                                minInterval: 1,
-                                axisLabel: {
-                                    formatter: function(value) {
-                                        return Number.isInteger(value) ? value : '';
-                                    }
-                                }
-                            },
+                            xAxis: { type: 'category', data: times, axisLabel: { rotate: 45, interval: 'auto' } },
+                            yAxis: { type: 'value', name: '在线人数', minInterval: 1,
+                                axisLabel: { formatter: function(value) { return Number.isInteger(value) ? value : ''; } } },
                             series: [{
                                 type: 'line',
-                                data: counts.map(function(v) {
-                                    return v === null ? undefined : v;
-                                }),
+                                data: counts.map(function(v) { return v === null ? undefined : v; }),
                                 smooth: false,
                                 lineStyle: { color: '#00ffcc' },
                                 areaStyle: { opacity: 0.2, color: '#00ffcc' },
@@ -2714,10 +1492,7 @@
                                     silent: true,
                                     itemStyle: { color: 'rgba(255,30,30,0.5)' },
                                     data: missingRanges.map(function(r) {
-                                        return [
-                                            { xAxis: r.startIdx, yAxis: 'min' },
-                                            { xAxis: r.endIdx, yAxis: 'max' }
-                                        ];
+                                        return [{ xAxis: r.startIdx, yAxis: 'min' }, { xAxis: r.endIdx, yAxis: 'max' }];
                                     })
                                 }
                             }],
@@ -2726,26 +1501,17 @@
 
                         if (hasZoom) {
                             option.dataZoom = [{
-                                type: 'slider',
-                                start: startVal,
-                                end: endVal,
-                                zoomLock: true,
-                                showDetail: true,
-                                bottom: 30,
-                                height: 20,
-                                borderColor: '#2c2c2c',
-                                fillerColor: 'rgba(0,255,204,0.2)',
-                                handleStyle: { color: '#00ffcc' },
-                                textStyle: { color: '#ccc' }
+                                type: 'slider', start: startVal, end: endVal, zoomLock: true,
+                                showDetail: true, bottom: 30, height: 20,
+                                borderColor: '#2c2c2c', fillerColor: 'rgba(0,255,204,0.2)',
+                                handleStyle: { color: '#00ffcc' }, textStyle: { color: '#ccc' }
                             }];
                         }
 
                         var chart;
                         if (immersive) {
                             chart = w.immersiveChart;
-                            if (!chart) {
-                                chart = echarts.init(h.elements.immersiveStats);
-                            }
+                            if (!chart) chart = echarts.init(h.elements.immersiveStats);
                             chart.setOption(option, true);
                             setTimeout(function() { chart.resize(); }, 50);
                             w.immersiveChart = chart;
@@ -2769,46 +1535,28 @@
                             var targetWidthCopy = targetWidth;
                             chart.off('datazoom');
                             chart.on('datazoom', function(params) {
-                                var currentStart = params.start;
-                                var currentEnd = params.end;
-                                var currentWidth = currentEnd - currentStart;
+                                var currentWidth = params.end - params.start;
                                 if (Math.abs(currentWidth - targetWidthCopy) > 0.5) {
-                                    var newStart = 100 - targetWidthCopy;
-                                    newStart = Math.max(0, Math.min(100 - targetWidthCopy, newStart));
-                                    chart.setOption({
-                                        dataZoom: [{
-                                            start: newStart,
-                                            end: 100
-                                        }]
-                                    });
+                                    var newStart = Math.max(0, Math.min(100 - targetWidthCopy, 100 - targetWidthCopy));
+                                    chart.setOption({ dataZoom: [{ start: newStart, end: 100 }] });
                                 }
                             });
                         }
 
-                        document.querySelectorAll('#range-selector .range-btn').forEach(function(btn) {
-                            btn.classList.remove('active');
-                        });
+                        document.querySelectorAll('#range-selector .range-btn').forEach(btn => btn.classList.remove('active'));
                         var activeBtn = document.querySelector('#range-selector .range-btn[data-range="' + effectiveRange + '"]');
                         if (activeBtn) activeBtn.classList.add('active');
                         w.currentStatsRange = effectiveRange;
-
-                    } catch (err) {
-                        console.error('加载统计数据失败:', err);
-                    }
+                    } catch (err) { console.error('加载统计数据失败:', err); }
                 },
 
                 loadOnlineDetail: async function() {
                     var el = document.getElementById('live-online-summary');
                     if (!el) return;
                     try {
-                        var resp = await fetch('/api/online/detail', {
-                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                        });
+                        var resp = await fetch('/api/online/detail', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } });
                         var data = await resp.json();
-                        if (!data.success || !data.data) {
-                            el.textContent = '';
-                            return;
-                        }
+                        if (!data.success || !data.data) { el.textContent = ''; return; }
                         var d = data.data;
                         var totalText = (d.total === null || d.total === undefined) ? '--' : d.total;
                         var html = '<div style="color:#ff0;">当前总在线: ' + totalText + ' 人</div>';
@@ -2820,17 +1568,11 @@
                             }
                         }
                         el.innerHTML = html;
-                    } catch (err) {
-                        el.textContent = '';
-                    }
+                    } catch (err) { el.textContent = ''; }
                 },
 
                 resizeAllCharts: function() {
-                    if (w.cpuCharts) {
-                        for (var i = 0; i < w.cpuCharts.length; i++) {
-                            w.cpuCharts[i].resize();
-                        }
-                    }
+                    if (w.cpuCharts) for (var i = 0; i < w.cpuCharts.length; i++) w.cpuCharts[i].resize();
                     if (w.memChart) w.memChart.resize();
                     if (w.netChart) w.netChart.resize();
                     if (w.onlineChart) w.onlineChart.resize();
@@ -2846,12 +1588,9 @@
                             w.memChart.setOption({
                                 tooltip: { trigger: 'axis' },
                                 grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
-                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30,
-                                        fontSize: 9, margin: 8 } },
+                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
                                 yAxis: { type: 'value', name: '%', min: 0, max: 100 },
-                                series: [{ type: 'line', data: [], smooth: false, color: '#2196f3',
-                                    lineStyle: { color: '#2196f3' }, areaStyle: { opacity: 0.2,
-                                        color: '#2196f3' } }]
+                                series: [{ type: 'line', data: [], smooth: false, color: '#2196f3', lineStyle: { color: '#2196f3' }, areaStyle: { opacity: 0.2, color: '#2196f3' } }]
                             });
                         }
                     };
@@ -2862,25 +1601,18 @@
                             w.netChart.setOption({
                                 tooltip: { trigger: 'axis' },
                                 grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
-                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30,
-                                        fontSize: 9, margin: 8 } },
+                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
                                 yAxis: { type: 'value', name: 'Mbps' },
                                 series: [
-                                    { name: '上传', type: 'line', data: [], color: '#ff9800',
-                                        lineStyle: { color: '#ff9800' }, areaStyle: { opacity: 0.2,
-                                            color: '#ff9800' } },
-                                    { name: '下载', type: 'line', data: [], color: '#4caf50',
-                                        lineStyle: { color: '#4caf50' }, areaStyle: { opacity: 0.2,
-                                            color: '#4caf50' } }
+                                    { name: '上传', type: 'line', data: [], color: '#ff9800', lineStyle: { color: '#ff9800' }, areaStyle: { opacity: 0.2, color: '#ff9800' } },
+                                    { name: '下载', type: 'line', data: [], color: '#4caf50', lineStyle: { color: '#4caf50' }, areaStyle: { opacity: 0.2, color: '#4caf50' } }
                                 ]
                             });
                         }
                     };
                     checkMem();
                     checkNet();
-                    if (!w.memChart || !w.netChart) {
-                        setTimeout(function() { self.initPerformanceCharts(); }, 100);
-                    }
+                    if (!w.memChart || !w.netChart) setTimeout(function() { self.initPerformanceCharts(); }, 100);
                     this.resizeAllCharts();
                 },
 
@@ -2892,19 +1624,14 @@
                             self.loadOnlineStats(w.currentStatsRange);
                             self.loadOnlineDetail();
                         }
-                    },30000);
+                    }, 30000);
                 },
 
                 stopAutoRefresh: function() {
-                    if (w.statsRefreshTimer) {
-                        clearInterval(w.statsRefreshTimer);
-                        w.statsRefreshTimer = null;
-                    }
+                    if (w.statsRefreshTimer) { clearInterval(w.statsRefreshTimer); w.statsRefreshTimer = null; }
                 }
             };
-            // ============================================================
-            // 日志加载器 s（分段加载，基于 Monaco）
-            // ============================================================
+
             var s = {
                 enabled: false,
                 initialized: false,
@@ -2921,9 +1648,7 @@
                     this.stopFlag = false;
                     this.progressDiv = h.elements.progressDiv;
                     await this.resetAndClear();
-                    if (!this.stopFlag && this.loadedUpTo < this.totalLines) {
-                        this.loadNextChunk();
-                    }
+                    if (!this.stopFlag && this.loadedUpTo < this.totalLines) this.loadNextChunk();
                 },
 
                 resetAndClear: async function() {
@@ -2934,7 +1659,7 @@
                     }
                     this.updateProgress(0, 0);
                     try {
-                        var resp = await fetch('/api/log/total_lines', {
+                        var resp = await fetch('/api/log/total_lines?server=' + encodeURIComponent(w.currentServer), {
                             headers: { 'Authorization': 'Bearer ' + w.apiPassword }
                         });
                         var data = await resp.json();
@@ -2959,10 +1684,9 @@
                     var start = this.loadedUpTo;
                     var count = Math.min(this.chunkSize, this.totalLines - start);
                     var self = this;
-
-                    fetch('/api/log/range?start=' + start + '&count=' + count, {
+                    fetch('/api/log/range?server=' + encodeURIComponent(w.currentServer) + '&start=' + start + '&count=' + count, {
                         headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                    }).then(function(resp) { return resp.json(); }).then(function(data) {
+                    }).then(resp => resp.json()).then(function(data) {
                         if (data.lines && data.lines.length) {
                             if (h.monacoEditor) {
                                 var model = h.monacoEditor.getModel();
@@ -2973,21 +1697,15 @@
                                     text: '\n' + text,
                                     forceMoveMarkers: true
                                 }]);
-                                if (w.autoScrollEnabled) {
-                                    h.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
-                                }
+                                if (w.autoScrollEnabled) h.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
                                 h.updateDecorations();
                             }
                             self.loadedUpTo += data.lines.length;
                             self.updateProgress(self.loadedUpTo, self.totalLines);
                         }
                         self.loading = false;
-                        if (!self.stopFlag && self.loadedUpTo < self.totalLines) {
-                            self.loadNextChunk();
-                        } else {
-                            self.updateProgress(self.totalLines, self.totalLines);
-                            self.enabled = false;
-                        }
+                        if (!self.stopFlag && self.loadedUpTo < self.totalLines) self.loadNextChunk();
+                        else { self.updateProgress(self.totalLines, self.totalLines); self.enabled = false; }
                     }).catch(function(err) {
                         console.error('加载日志块失败', err);
                         self.enabled = false;
@@ -2998,14 +1716,9 @@
 
                 updateProgress: function(loaded, total) {
                     if (!this.progressDiv) return;
-                    if (total === 0) {
-                        this.progressDiv.textContent = ' 计算行数...';
-                        this.progressDiv.style.display = '';
-                        return;
-                    }
-                    if (loaded >= total) {
-                        this.progressDiv.style.display = 'none';
-                    } else {
+                    if (total === 0) { this.progressDiv.textContent = ' 计算行数...'; this.progressDiv.style.display = ''; return; }
+                    if (loaded >= total) this.progressDiv.style.display = 'none';
+                    else {
                         this.progressDiv.style.display = '';
                         var pct = ((loaded / total) * 100).toFixed(1);
                         this.progressDiv.textContent = ' 📄 加载日志 ' + loaded + '/' + total + ' (' + pct + '%)';
@@ -3019,37 +1732,23 @@
                 }
             };
 
-            // ============================================================
-            // 标签切换 l
-            // ============================================================
             async function l(tab) {
                 w.currentTab = tab;
                 document.querySelectorAll('.tab-button').forEach(function(btn) {
                     btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
                 });
-                document.querySelectorAll('.tab-content').forEach(function(el) {
-                    el.classList.remove('active');
-                });
+                document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
                 document.getElementById('tab-' + tab).classList.add('active');
 
                 if (tab === 'console') {
                     if (h.monacoEditor) h.monacoEditor.layout();
                     o.stopAutoRefresh();
-                    
-                    // ===== 新增：切换到控制台时自动开启自动滚动 =====
                     w.autoScrollEnabled = true;
-                    if (h.elements.autoScroll) {
-                        h.elements.autoScroll.checked = true;
-                    }
-                    // 如果编辑器有内容，立即滚动到底部看最新日志
+                    if (h.elements.autoScroll) h.elements.autoScroll.checked = true;
                     if (h.monacoEditor) {
                         var lineCount = h.monacoEditor.getModel().getLineCount();
-                        if (lineCount > 0) {
-                            h.monacoEditor.revealLineInCenter(lineCount, monaco.editor.ScrollType.Smooth);
-                        }
+                        if (lineCount > 0) h.monacoEditor.revealLineInCenter(lineCount, monaco.editor.ScrollType.Smooth);
                     }
-                    // ================================================
-                    
                 } else if (tab === 'stats') {
                     var activeBtn = document.querySelector('#range-selector .range-btn.active');
                     var range = activeBtn ? activeBtn.getAttribute('data-range') : '7d';
@@ -3057,9 +1756,7 @@
                     await o.loadOnlineStats(range);
                     o.loadOnlineDetail();
                     o.initPerformanceCharts();
-                    if (w.onlineChart) {
-                        setTimeout(function() { w.onlineChart.resize(); }, 100);
-                    }
+                    if (w.onlineChart) setTimeout(function() { w.onlineChart.resize(); }, 100);
                     o.startAutoRefresh();
                 } else if (tab === 'screen') {
                     o.stopAutoRefresh();
@@ -3070,44 +1767,76 @@
                     o.stopAutoRefresh();
                 }
             }
-            // ============================================================
-            // 登录流程 c
-            // ============================================================
+
+            // 切换服务器
+            async function switchServer(newServer) {
+                if (!newServer || newServer === w.currentServer) return;
+                w.currentServer = newServer;
+
+                // 清空所有缓存数据
+                w.chatLines = [];
+                w.joinQuitLines = [];
+                w.grimLines = [];
+                w.serverLines = [];
+                w.ipLoginRecords = [];
+                w.rawLogLines = [];
+                w.expandedIps = new Set();
+                w.fullTimes = [];
+                w.fullCounts = [];
+                w.fullMissingRanges = [];
+
+                // 清空 UI
+                if (h.elements.chatText) h.elements.chatText.value = '';
+                if (h.elements.joinquitText) h.elements.joinquitText.value = '';
+                if (h.elements.grimText) h.elements.grimText.value = '';
+                if (h.elements.serverText) h.elements.serverText.value = '';
+                if (h.elements.ipPanel) h.elements.ipPanel.innerHTML = '';
+                s.stopFlag = true;
+                s.enabled = false;
+                s.loading = false;
+
+                h.showStatus('正在切换至 ' + newServer + ' ...', 2000);
+
+                try {
+                    var rawResp = await fetch('/api/latest_raw?server=' + encodeURIComponent(newServer), {
+                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
+                    });
+                    var rawText = await rawResp.text();
+                    r.refreshAllDataFromRaw(rawText);
+                    s.start();
+                    if (w.currentTab === 'stats') {
+                        await o.loadOnlineStats(w.currentStatsRange);
+                        o.loadOnlineDetail();
+                    } else if (w.currentTab !== 'console') {
+                        h.updateNonConsoleTab();
+                    }
+                    h.showStatus('已切换至 ' + newServer, 2000);
+                } catch (err) {
+                    console.error('切换服务器失败', err);
+                    h.showStatus('切换失败', 3000);
+                }
+            }
+
             async function c() {
                 var password = await new Promise(function(resolve) {
                     var modal = document.createElement('div');
                     modal.className = 'modal';
-                    modal.innerHTML =
-                        `
-                    <div class="modal-card">
-                        <h3>请输入访问密码</h3>
-                        <input type="password" id="pwd-input" placeholder="密码">
-                        <button id="pwd-submit">确认</button>
-                    </div>
-                `;
+                    modal.innerHTML = '<div class="modal-card"><h3>请输入访问密码</h3><input type="password" id="pwd-input" placeholder="密码"><button id="pwd-submit">确认</button></div>';
                     document.body.appendChild(modal);
                     var input = modal.querySelector('#pwd-input');
                     var btn = modal.querySelector('#pwd-submit');
                     var submit = function() {
                         var val = input.value;
-                        if (val) {
-                            modal.remove();
-                            resolve(val);
-                        } else {
-                            alert('密码不能为空');
-                        }
+                        if (val) { modal.remove(); resolve(val); }
+                        else alert('密码不能为空');
                     };
                     btn.onclick = submit;
-                    input.onkeypress = function(e) {
-                        if (e.key === 'Enter') submit();
-                    };
+                    input.onkeypress = function(e) { if (e.key === 'Enter') submit(); };
                     input.focus();
                 });
 
                 try {
-                    var testResp = await fetch('/api/log/total_lines', {
-                        headers: { 'Authorization': 'Bearer ' + password }
-                    });
+                    var testResp = await fetch('/api/auth', { headers: { 'Authorization': 'Bearer ' + password } });
                     if (testResp.status === 401) {
                         alert('密码错误');
                         return c();
@@ -3117,14 +1846,23 @@
                     h.elements.immersiveBtn.style.display = 'flex';
                     h.elements.rconToggleBtn.style.display = 'flex';
 
-                    var rawResp = await fetch('/api/latest_raw', {
+                    // 加载服务器列表
+                    var sresp = await fetch('/api/servers');
+                    w.serverList = await sresp.json();
+                    var sel = document.getElementById('server-select');
+                    sel.innerHTML = w.serverList.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+                    w.currentServer = w.serverList[0];
+                    sel.value = w.currentServer;
+                    sel.addEventListener('change', function() { switchServer(sel.value); });
+
+                    // 加载当前服务器历史日志
+                    var rawResp = await fetch('/api/latest_raw?server=' + encodeURIComponent(w.currentServer), {
                         headers: { 'Authorization': 'Bearer ' + password }
                     });
                     var rawText = await rawResp.text();
                     r.refreshAllDataFromRaw(rawText);
 
                     a.init();
-
                     await l('stats');
                     h.showStatus('就绪', 2000);
 
@@ -3138,36 +1876,25 @@
                         win.style.bottom = '';
                         win.style.right = '';
                     }
-
                 } catch (err) {
                     alert('网络错误，请检查后端');
                     return c();
                 }
             }
 
-            // ============================================================
-            // Grim 分割条拖动（适配新配置结构）
-            // ============================================================
+            // Grim 分割条拖动
             (function() {
                 var divider = document.getElementById('grim-divider');
                 var leftPanel = document.getElementById('grim-left-panel');
                 var container = divider ? divider.parentElement : null;
                 if (!divider || !leftPanel || !container) return;
-
-                var isDragging = false;
-                var startX = 0;
-                var startLeftWidth = 0;
-
-                function getContainerWidth() {
-                    return container.getBoundingClientRect().width;
-                }
-
+                var isDragging = false, startX = 0, startLeftWidth = 0;
+                function getContainerWidth() { return container.getBoundingClientRect().width; }
                 function setLeftWidth(percent) {
                     var clamped = Math.min(90, Math.max(10, percent));
                     leftPanel.style.width = clamped + '%';
                     return clamped;
                 }
-
                 function startDrag(e) {
                     e.preventDefault();
                     var clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -3177,14 +1904,12 @@
                     startLeftWidth = leftPanel.getBoundingClientRect().width;
                     document.body.style.userSelect = 'none';
                     document.body.style.webkitUserSelect = 'none';
-
                     document.addEventListener('mousemove', onDragMove);
                     document.addEventListener('mouseup', onDragEnd);
                     document.addEventListener('touchmove', onDragMove, { passive: false });
                     document.addEventListener('touchend', onDragEnd);
                     document.addEventListener('touchcancel', onDragEnd);
                 }
-
                 function onDragMove(e) {
                     if (!isDragging) return;
                     e.preventDefault();
@@ -3198,7 +1923,6 @@
                     var percent = (newWidth / available) * 100;
                     setLeftWidth(percent);
                 }
-
                 function onDragEnd() {
                     if (!isDragging) return;
                     isDragging = false;
@@ -3211,46 +1935,32 @@
                     document.removeEventListener('touchend', onDragEnd);
                     document.removeEventListener('touchcancel', onDragEnd);
                 }
-
                 divider.addEventListener('mousedown', startDrag);
                 divider.addEventListener('touchstart', startDrag, { passive: false });
-
-                divider.addEventListener('dblclick', function() {
-                    setLeftWidth(50);
-                });
+                divider.addEventListener('dblclick', function() { setLeftWidth(50); });
             })();
 
-            // ============================================================
             // 主启动流程
-            // ============================================================
             (async function() {
                 try {
                     var hr = await fetch('/api/highlight_rules');
                     var hrData = await hr.json();
                     w.highlightRules = Array.isArray(hrData) ? hrData : [];
-                } catch (e) {
-                    w.highlightRules = [];
-                }
+                } catch (e) { w.highlightRules = []; }
 
                 h.init();
 
                 document.querySelectorAll('.tab-button').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        l(btn.getAttribute('data-tab'));
-                    });
+                    btn.addEventListener('click', function() { l(btn.getAttribute('data-tab')); });
                 });
 
                 document.getElementById('range-selector').addEventListener('click', function(e) {
                     var btn = e.target.closest('.range-btn');
-                    if (btn) {
-                        var range = btn.getAttribute('data-range');
-                        o.loadOnlineStats(range);
-                    }
+                    if (btn) o.loadOnlineStats(btn.getAttribute('data-range'));
                 });
 
                 await c();
             })();
-
         })();
     </script>
 </body>
