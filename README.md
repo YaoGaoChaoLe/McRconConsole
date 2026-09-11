@@ -1,5 +1,4 @@
 ## 主要功能
-
 - **实时日志** – 实时推送 latest.log 日志，高亮日志行、过滤某些日志行。
 - **远程命令** – 通过rcon发送任意mc Server游戏命令。
 - **在线人数统计** – 自动绘制人数曲线图。
@@ -10,10 +9,18 @@
 - **扩展代码** – `custom_features.py` 允许你注入自己的新代码。
 
 ---
+## 通过Releases部署
+### 1.下载最终发行版文件
+- https://github.com/YaoGaoChaoLe/McRconConsole/releases
 
+### 2. 打开 服务器的配置文件 `server.properties`
+- 将默认的`enable-rcon=false` 改成 `enable-rcon=true`
+- 将默认为空的 `rcon.password` 设定一个**强密码**
+### 3. 打开 本项目的`config.yml`，填写正确的配置。
+### 4. 运行 McRconConsole.exe
 
+---
 ## 通过源码部署
-
 ### 1. 环境要求
 - Python 3.8+
 - 互联网连接
@@ -40,18 +47,16 @@ pip install -r requirements.txt --only-binary=gevent
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
 ```
 
-
 ### 4.写好配置文件 & 运行
-1. 确保 本项目的 `config.yml` 已正确配置。
-2. 确保 服务器配置 `server.properties` 已正确配置：
+1. 确保 服务器配置 `server.properties` 已正确配置：
    - 将默认的`enable-rcon=false` 改成 `enable-rcon=true`
    - 将默认为空的 `rcon.password` 设定一个**强密码**
-3. 启动程序：运行 `python main.py`，或者 运行`start 一键启动.bat` 。
-4. 如有需要，自行内网穿透。
+2. 确保 本项目的 `config.yml` 已正确配置。
+3. 启动程序：运行 `python main.py`
 
+---
 ## 补充：扩展代码
 本项目的 `custom_features.py`，每次有新日志行出现，都会调用其中的 `扩展_自定义功能(line)` 函数。你可以在此函数中实现任何自定义逻辑，例如：
-
 - 自动封禁触发敏感词的玩家
 - 根据时间段或在线人数执行 `/transfer` 转移玩家
 - 统计特定事件并记录到外部文件
@@ -59,11 +64,11 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --o
 
 
 ---
+## 另一个项目
+上传你的服务器日志，然后进行日志分析。
+- https://yaogaochaole.github.io/McRconConsole/
 
+---
 [MIT 许可证](LICENSE)。
 如有好的建议或功能需求，请通过 GitHub 反馈。
 本项目代码完全由 deepseek v4 生成，个人定制自用，请自行检查代码。
-
-**另一个项目：** https://yaogaochaole.github.io/McRconConsole/
-  选择本地服务器日志，然后进行日志分析。
----
