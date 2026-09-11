@@ -2911,7 +2911,7 @@
                 totalLines: 0,
                 loadedUpTo: 0,
                 loading: false,
-                chunkSize: 1000,
+                chunkSize: 5000,
                 stopFlag: false,
                 progressDiv: null,
 
@@ -2983,7 +2983,7 @@
                         }
                         self.loading = false;
                         if (!self.stopFlag && self.loadedUpTo < self.totalLines) {
-                            setTimeout(function() { self.loadNextChunk(); }, 50);
+                            self.loadNextChunk();
                         } else {
                             self.updateProgress(self.totalLines, self.totalLines);
                             self.enabled = false;
@@ -3051,7 +3051,6 @@
                     // ================================================
                     
                 } else if (tab === 'stats') {
-                    s.stop();
                     var activeBtn = document.querySelector('#range-selector .range-btn.active');
                     var range = activeBtn ? activeBtn.getAttribute('data-range') : '7d';
                     w.currentStatsRange = range;
@@ -3063,11 +3062,9 @@
                     }
                     o.startAutoRefresh();
                 } else if (tab === 'screen') {
-                    s.stop();
                     o.stopAutoRefresh();
                     h.startScreenCapture();
                 } else {
-                    s.stop();
                     h.stopScreenCapture();
                     h.updateNonConsoleTab();
                     o.stopAutoRefresh();
@@ -3128,7 +3125,7 @@
 
                     a.init();
 
-                    await l('console');
+                    await l('stats');
                     h.showStatus('就绪', 2000);
 
                     if (h.elements.rconWindow) {
