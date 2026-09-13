@@ -966,23 +966,20 @@
                     return m ? m[1] : "";
                 },
                 processLineData(line) {
-                    const shouldFilter = FILTER_KEYWORDS.some(kw => line.toLowerCase().includes(kw
-                        .toLowerCase()));
-
-                    const text = line;
+                    const shouldFilter = FILTER_KEYWORDS.some(kw => line.toLowerCase().includes(kw.toLowerCase()));
 
                     if (!shouldFilter) {
-                        const isChat = text.includes("聊") || text.includes("[Not Secure]") || text.includes(
+                        const isChat = line.includes("聊") || line.includes("[Not Secure]") || line.includes(
                                 "[Server]") ||
-                            text.includes("[Rcon]") || text.includes("[TEAM_ONLY]") || text.includes("[SHOUT]") ||
-                            /<[a-zA-Z0-9_]+>/.test(text);
-                        const isQuit = text.includes("lost connection") || text.includes("left the game") || text
+                            line.includes("[Rcon]") || line.includes("[TEAM_ONLY]") || line.includes("[SHOUT]") ||
+                            /<[a-zA-Z0-9_]+>/.test(line);
+                        const isQuit = line.includes("lost connection") || line.includes("left the game") || line
                             .includes("Disconnecting");
-                        const isLogin = text.includes("logged in");
-                        const isGrim = AppState.anticheatConfig.leftKeywords.some(kw => text.includes(kw));
-                        const isServer = AppState.anticheatConfig.rightKeywords.some(kw => text.includes(kw));
+                        const isLogin = line.includes("logged in");
+                        const isGrim = AppState.anticheatConfig.leftKeywords.some(kw => line.includes(kw));
+                        const isServer = AppState.anticheatConfig.rightKeywords.some(kw => line.includes(kw));
 
-                        let cleaned = text.replace(/\[Server thread\/INFO\]: \[Not Secure\] /, "").replace(
+                        let cleaned = line.replace(/\[Server thread\/INFO\]: \[Not Secure\] /, "").replace(
                             /\[Server thread\/INFO\]: /, "");
                         if (isChat) AppState.chatLines.push(cleaned);
                         if (isQuit) AppState.joinQuitLines.push(cleaned);
@@ -1235,7 +1232,7 @@
                     const processBatch = () => {
                         const end = Math.min(index + BATCH, total);
                         for (let i = index; i < end; i++) {
-                            const line = lines[i];
+                            const line = lines[i].text;
                             const cleaned = line.replace(/\[Server thread\/INFO\]: \[Not Secure\] /, "")
                                 .replace(/\[Server thread\/INFO\]: /, "");
                             if (leftKeys.some(k => line.includes(k))) newGrim.push(cleaned);
@@ -1303,11 +1300,8 @@
                     const model = AppState.monacoEditor.getModel();
                     model.setValue('');
                     const text = AppState.rawDisplayLines
-                        .filter(line => {
-                            if (!AppState.filterEnabled) return true;
-                            const result = DataProcessor.processLineData(line);
-                            return !result.filtered;
-                        })
+                        .filter(o => !AppState.filterEnabled || !o.filtered)
+                        .map(o => o.text)
                         .join('\n');
                     model.setValue(text);
                     this.updateDecorations();
@@ -1613,7 +1607,7 @@
                     for (const raw of batchLines) {
                         const result = DataProcessor.processLineData(raw);
                         displayLineObjects.push(result);
-                        AppState.rawDisplayLines.push(result.text);
+                        AppState.rawDisplayLines.push(result);
                     }
 
                     if (displayLineObjects.length > 0) {
@@ -1630,10 +1624,7 @@
                     } else {
                         progressEl.style.display = 'none';
                         const visibleCount = AppState.filterEnabled ?
-                            AppState.rawDisplayLines.filter(line => {
-                                const res = DataProcessor.processLineData(line);
-                                return !res.filtered;
-                            }).length :
+                            AppState.rawDisplayLines.filter(o => !o.filtered).length :
                             AppState.rawDisplayLines.length;
                         statusEl.innerText =
                             `一共 ${total} 行日志，屏蔽部分后有 ${visibleCount} 行可见`;
