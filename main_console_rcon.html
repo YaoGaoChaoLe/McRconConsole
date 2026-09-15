@@ -1206,7 +1206,7 @@
                         if (w.immersiveStatsTimer) clearInterval(w.immersiveStatsTimer);
                         w.immersiveStatsTimer = setInterval(function() {
                             if (w.immersiveMode) o.loadOnlineStats(w.currentStatsRange, true);
-                        }, 30000);
+                        }, 60000);
                         this.updateImmersiveDashboard();
                     } else {
                         document.body.classList.remove('immersive-mode');
@@ -1624,7 +1624,7 @@
                             self.loadOnlineStats(w.currentStatsRange);
                             self.loadOnlineDetail();
                         }
-                    }, 30000);
+                    }, 60000);
                 },
 
                 stopAutoRefresh: function() {
