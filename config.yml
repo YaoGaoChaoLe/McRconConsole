@@ -1,12 +1,12 @@
 # 这是主配置文件。所有设置在这里修改。
 
 ######################## 初始化配置 ########################
-# 服务监听地址+端口。使用 http://127.0.0.1:5000 访问服务。
-host: "127.0.0.1"
+# 服务监听地址+端口。使用 http://127.0.0.1:5000/main_console_rcon.html 访问服务。
+host: "0.0.0.0"
 port: 5000
 
 # 前端登录密码. 请务必改成强密码。
-admin_password: "REVGJIW83R90EFKJG34TFJKGEPBWEG"
+admin_password: "FZSGW579ZKISOBDMKTN468HJIEOKEGVSE2v579EMJjkIsBBMa"
 
 # 数据库文件名
 db_path: "数据库.db"
@@ -44,7 +44,7 @@ servers:
   - name: "#2 生存服"
     server_properties_path: 'D:\.MC_server\MSL\Server1\server.properties'
     public_server_addresses:
-      - "1145.ovvo.space"
+      - "frp-lab.com:49740"
     crash_recovery_commands:
       - "taskkill /F /T /IM java.exe"
       - "taskkill /F /T /IM frpc_custom.exe"
@@ -67,7 +67,7 @@ servers:
   - name: "#3 竞技服"
     server_properties_path: 'D:\.MC_server\MSL\Server\server.properties'
     public_server_addresses:
-      - "cn-gz-2.qwq.fan:24803"
+      - "frp-lab.com:53577"
     crash_recovery_commands:
       - "taskkill /F /T /IM java.exe"
       - "taskkill /F /T /IM frpc_custom.exe"
@@ -86,8 +86,6 @@ servers:
         服务器似乎爆炸了！
         服务端异常关闭，
         请立即检查！！！！
-
-
 ######################## 崩溃检查 ########################
 alert_keywords: # 当日志行出现以下文本时，会检查 服务器目录文件下 是否新生成crash崩溃日志，判断是否真的崩溃了
   - "shutdown"
@@ -149,3 +147,9 @@ filter_keywords:
   - "failed to"
   - "voicechat"
   - "Named entity "
+  - "issued server command"
+  - "/WARN]: [StoneAC] 安全系统-2"
+  - "[NoChatReports] Forgetting"
+  - "/INFO]: UUID of player"
+  - "[XaeroForceDisabler] Applying settings for"
+  - "[NoChatReports] Setting up player: "

@@ -3,9 +3,8 @@ import re
 import __main__
 
 def 扩展_自定义功能(line, server_name):
-    """ 当有玩家发送违规词语[Meteor on Crack] 那么就直接/ban-ip """
+    """ 当有玩家发送违规词语[Meteor on Crack] 那么就执行/kick """
     if "Meteor on Crack" in line:
-        return 0 # 不启用喵 ovo
 
         rcon_manager = getattr(__main__, 'rcon_manager', None)
         if rcon_manager is None:
@@ -23,5 +22,5 @@ def 扩展_自定义功能(line, server_name):
         if player is None:
             return
 
-        print(f"[CHEAT] 在 [{server_name}] 封禁作弊玩家: {player}")
-        rcon_manager.send_command(server_name, f"ban-ip {player} 因为发送了某些消息，被封禁")
+        print(f"[CHEAT] 在 [{server_name}] 踢出玩家: {player}")
+        rcon_manager.send_command(server_name, f"ban-ip {player} 因为发送了某些消息，被踢出")
