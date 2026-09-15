@@ -25,15 +25,13 @@
         .tab-content { flex: 1; display: none; background: #0f0f0f; flex-direction: column; overflow: hidden; min-height: 0; }
         .tab-content.active { display: flex; }
 
-        .console-log-container { flex: 1; background: #1a1a1a; font-family: Consolas, monospace; font-size: 15px; line-height: 1.5; padding: 8px; overflow: auto; }
         .console-log-line { font-family: inherit; font-size: inherit; line-height: inherit; }
         .log-textarea { flex: 1; width: 100%; border: none; background: #1a1a1a; color: #e0e0e0; resize: none; font-family: Consolas, monospace; font-size: 15px; line-height: 1.5; outline: 0; padding: 8px; min-height: 0; }
 
-        .console-log-area .sub-header, .ip-query-area .sub-header, .ip-record-area .sub-header, .split-half .sub-header, .stats-area .sub-header { padding: 5px 10px; background: #252525; font-weight: 600; border-bottom: 1px solid #3a3a3a; flex-shrink: 0; color: #0fc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .console-log-area .sub-header, .ip-query-area .sub-header, .ip-record-area .sub-header { padding: 5px 10px; background: #252525; font-weight: 600; border-bottom: 1px solid #3a3a3a; flex-shrink: 0; color: #0fc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 
         .player-ip-container { display: flex; flex-direction: column; height: 100%; gap: 12px; flex: 1; min-height: 0; }
         .ip-record-area { flex: 2; min-height: 0; display: flex; flex-direction: column; background: #1a1a1a; border-radius: 4px; overflow: hidden; border: 1px solid #2c2c2c; }
-        .ip-record-area .sub-header { flex-shrink: 0; }
         .ip-panel { flex: 1; overflow: auto; padding: 8px; }
         .ip-card { margin-bottom: 8px; border: 1px solid #2c2c2c; border-radius: 4px; background: #0f0f0f; }
         .ip-header { display: flex; align-items: center; padding: 8px 12px; cursor: pointer; background: #1a1a1a; border-bottom: 1px solid #2c2c2c; user-select: none; }
@@ -56,14 +54,15 @@
         .ip-query-row { display: flex; gap: 8px; padding: 10px; flex-wrap: wrap; align-items: center; }
         .ip-query-row input { flex: 3; min-width: 150px; padding: 8px 12px; border: 1px solid #3a3a3a; background: #0f0f0f; color: #e0e0e0; border-radius: 4px; font-size: 14px; font-family: monospace; }
         .ip-query-row input:focus { outline: 0; border-color: #0fc; box-shadow: 0 0 2px #0fc; }
-        .ip-query-row button { flex: 1; padding: 8px 16px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 700; transition: .2s; }
-        .ip-query-row button:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .ip-query-row button { flex: 1; padding: 8px 16px; font-size: 14px; font-weight: 700; }
         .ip-query-result { flex: 1; background: #0f0f0f; border: 1px solid #2c2c2c; border-radius: 4px; padding: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; overflow: auto; margin: 0 10px 10px 10px; color: #ccc; }
 
-        .console-log-area .sub-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .line-control { display: flex; align-items: center; gap: 8px; }
-        .line-control button, .scroll-btn { padding: 4px 12px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; transition: .2s; }
-        .line-control button:hover, .scroll-btn:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .line-control button, .scroll-btn, .ip-query-row button, .config-actions button, .modal-card button, .range-btn, .floating-btn { background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; }
+        .line-control button, .scroll-btn, .ip-query-row button, .floating-btn { transition: .2s; }
+        .line-control button:hover, .scroll-btn:hover, .ip-query-row button:hover, .config-actions button:hover, .modal-card button:hover, .range-btn:hover:not(.active), .floating-btn:hover { background: #3a3a3a; color: #fff; }
+        .line-control button:hover, .scroll-btn:hover, .ip-query-row button:hover, .modal-card button:hover, .floating-btn:hover { border-color: #0fc; }
+        .line-control button, .scroll-btn, .range-btn { padding: 4px 12px; }
         .scroll-buttons { display: flex; gap: 4px; margin-left: auto; }
 
         .stats-container { display: flex; flex-direction: column; height: 100%; gap: 1px; padding: 1px; overflow: auto; }
@@ -71,9 +70,8 @@
         .stats-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .stats-chart-header span { color: #0fc; }
         .range-selector { display: flex; gap: 8px; }
-        .range-btn { padding: 4px 12px; background: #2c2c2c; color: #ccc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; }
+        .range-btn { color: #ccc; }
         .range-btn.active { background: #0fc; color: #0a0a0a; border-color: #0fc; }
-        .range-btn:hover:not(.active) { background: #3a3a3a; color: #fff; }
         .performance-charts-row { display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
         .performance-charts-row .stats-chart-area { flex: 1; min-width: 280px; }
         .performance-chart-container { min-height: auto; }
@@ -83,8 +81,7 @@
         .modal-card h3 { color: #0fc; margin-top: 0; }
         .modal-card input { width: 100%; padding: 8px; margin: 15px 0; border: 1px solid #3a3a3a; background: #0f0f0f; color: #e0e0e0; border-radius: 4px; }
         .modal-card input:focus { outline: 0; border-color: #0fc; }
-        .modal-card button { padding: 8px 16px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-weight: 700; }
-        .modal-card button:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .modal-card button { padding: 8px 16px; font-weight: 700; }
 
         .rcon-floating-window { position: fixed; width: 450px; max-width: 85vw; height: 400px; background: #1a1a1a; border: 1px solid #2c2c2c; border-radius: 8px; box-shadow: 0 4px 12px rgba(255, 255, 255, .5); z-index: 10000; display: none; flex-direction: column; resize: both; overflow: hidden; min-width: 300px; min-height: 200px; opacity: .9; }
         .rcon-floating-window .rcon-header { padding: 8px 12px; background: #252525; font-weight: 600; color: #0fc; border-bottom: 1px solid #3a3a3a; cursor: move; user-select: none; border-radius: 8px 8px 0 0; }
@@ -102,8 +99,7 @@
         body.immersive-mode .rcon-floating-window { display: none; }
         body.immersive-mode .immersive-dashboard { display: flex !important; }
         .floating-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 10000; }
-        .floating-btn { padding: 5px 5px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 700; transition: .2s; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-        .floating-btn:hover { background: #3a3a3a; color: #fff; border-color: #0fc; }
+        .floating-btn { padding: 5px 5px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .immersive-dashboard .left-panel { flex: 7; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; }
         .immersive-dashboard .right-panel { flex: 5; display: flex; flex-direction: column; gap: 2px; min-width: 0; min-height: 0; }
         .immersive-dashboard .left-panel .panel:first-child { flex: 2; }
@@ -116,13 +112,6 @@
         #immersive-stats { padding: 0; height: 100% !important; width: 100%; min-height: 200px; }
 
         #monaco-container { width: 100%; height: 100%; border-left: 1px solid #2c2c2c; background: #1a1a1a; }
-
-        .color-ff0000 { color: #ff0000 !important; }
-        .color-fbff00 { color: #fbff00 !important; }
-        .color-00ffea { color: #00ffea !important; }
-        .color-666666 { color: #666666 !important; }
-        .color-3bf010 { color: #3bf010 !important; }
-        .color-ffffff { color: #ffffff !important; }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #1a1a1a; }
@@ -160,8 +149,7 @@
         .config-row label { min-width: 90px; color: #ccc; }
         .config-row input { flex: 1; min-width: 200px; padding: 6px 8px; background: #0f0f0f; color: #e0e0e0; border: 1px solid #3a3a3a; border-radius: 4px; font-family: monospace; }
         .config-actions { display: flex; gap: 8px; justify-content: flex-end; }
-        .config-actions button { padding: 6px 14px; background: #2c2c2c; color: #0fc; border: 1px solid #3a3a3a; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        .config-actions button:hover { background: #3a3a3a; color: #fff; }
+        .config-actions button { padding: 6px 14px; font-size: 13px; }
         .config-toggle { cursor: pointer; color: #FFD700; text-decoration: underline; font-size: 13px; }
         .config-toggle:hover { color: #FFA500; }
         .config-hint { font-size: 12px; color: #aaa; margin-left: 98px; }
@@ -411,6 +399,11 @@
         (function() {
             'use strict';
 
+            const GRIM_DEFAULTS = {
+                leftKeywords: ["触发了", "[Server]"],
+                rightKeywords: ["[Server]"]
+            };
+
             const w = {
                 apiPassword: null,
                 currentServer: null,
@@ -439,25 +432,14 @@
                 resizeHandlerAttached: false,
                 immersiveChart: null,
                 immersiveStatsTimer: null,
-                anticheatKeywords: [],
-                grimConfig: {
-                    leftKeywords: ["触发了", "[Server]"],
-                    rightKeywords: ["[Server]", "moved too quickly"]
-                },
-                rawLogLines: [],
-                fullTimes: [],
-                fullCounts: [],
-                fullMissingRanges: []
+                grimConfig: JSON.parse(JSON.stringify(GRIM_DEFAULTS)),
+                rawLogLines: []
             };
 
             const S = {
                 escapeHtml: function(text) {
-                    return text.replace(/[&<>]/g, function(m) {
-                        if (m === '&') return '&amp;';
-                        if (m === '<') return '&lt;';
-                        if (m === '>') return '&gt;';
-                        return m;
-                    });
+                    var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;' };
+                    return text.replace(/[&<>]/g, function(m) { return map[m]; });
                 },
                 getHighlightColor: function(line, rules) {
                     for (const rule of rules) {
@@ -469,47 +451,83 @@
                     if (!el) return true;
                     return (el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
                 },
-                smoothScrollToBottomDynamic: function(el, duration) {
+                smoothScrollTo: function(el, duration, toBottom) {
                     if (!el) return;
                     if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
                     var startScroll = el.scrollTop;
+                    if (!toBottom && startScroll === 0) return;
                     var startTime = performance.now();
                     function animate(time) {
                         var progress = Math.min((time - startTime) / duration, 1);
                         var eased = progress * (2 - progress);
-                        var targetScroll = el.scrollHeight - el.clientHeight;
-                        var newTop = startScroll + (targetScroll - startScroll) * eased;
-                        el.scrollTop = Math.min(Math.max(newTop, 0), targetScroll);
+                        var target = toBottom ? el.scrollHeight - el.clientHeight : 0;
+                        var newTop = startScroll + (target - startScroll) * eased;
+                        el.scrollTop = toBottom ? Math.min(Math.max(newTop, 0), target) : Math.max(newTop, 0);
                         if (progress < 1) el._scrollAnim = requestAnimationFrame(animate);
                         else {
-                            el.scrollTop = targetScroll;
+                            el.scrollTop = target;
                             delete el._scrollAnim;
-                            w.autoScrollEnabled = true;
+                            w.autoScrollEnabled = toBottom;
                             var cb = document.getElementById('auto-scroll');
-                            if (cb) cb.checked = true;
+                            if (cb) cb.checked = toBottom;
                         }
                     }
                     el._scrollAnim = requestAnimationFrame(animate);
                 },
-                smoothScrollToTop: function(el, duration) {
-                    if (!el) return;
-                    if (el._scrollAnim) cancelAnimationFrame(el._scrollAnim);
-                    var startScroll = el.scrollTop;
-                    if (startScroll === 0) return;
-                    var startTime = performance.now();
-                    function animate(time) {
-                        var progress = Math.min((time - startTime) / duration, 1);
-                        var eased = progress * (2 - progress);
-                        el.scrollTop = startScroll * (1 - eased);
-                        if (progress < 1) el._scrollAnim = requestAnimationFrame(animate);
-                        else {
-                            delete el._scrollAnim;
-                            w.autoScrollEnabled = false;
-                            var cb = document.getElementById('auto-scroll');
-                            if (cb) cb.checked = false;
-                        }
+                smoothScrollToBottomDynamic: function(el, duration) { S.smoothScrollTo(el, duration, true); },
+                smoothScrollToTop: function(el, duration) { S.smoothScrollTo(el, duration, false); },
+                appendMonacoLines: function(editor, lines, autoScroll) {
+                    if (!editor || !lines.length) return;
+                    var model = editor.getModel();
+                    var lastLine = model.getLineCount();
+                    model.pushEditOperations([], [{
+                        range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
+                        text: '\n' + lines.join('\n'),
+                        forceMoveMarkers: true
+                    }]);
+                    if (autoScroll) editor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
+                },
+                apiFetch: function(url, options, token) {
+                    options = options || {};
+                    options.headers = Object.assign({
+                        'Authorization': 'Bearer ' + (token || w.apiPassword)
+                    }, options.headers || {});
+                    return fetch(url, options);
+                },
+                bindDrag: function(handle, onStart, onMove, onEnd) {
+                    var dragging = false;
+                    function getPos(e) {
+                        var ev = e.touches ? e.touches[0] : e;
+                        return { x: ev.clientX, y: ev.clientY };
                     }
-                    el._scrollAnim = requestAnimationFrame(animate);
+                    function move(e) {
+                        if (!dragging) return;
+                        e.preventDefault();
+                        onMove(getPos(e));
+                    }
+                    function end() {
+                        if (!dragging) return;
+                        dragging = false;
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', end);
+                        document.removeEventListener('touchmove', move);
+                        document.removeEventListener('touchend', end);
+                        document.removeEventListener('touchcancel', end);
+                        if (onEnd) onEnd();
+                    }
+                    function start(e) {
+                        if (e.button !== undefined && e.button !== 0) return;
+                        e.preventDefault();
+                        dragging = true;
+                        onStart(getPos(e));
+                        document.addEventListener('mousemove', move);
+                        document.addEventListener('mouseup', end);
+                        document.addEventListener('touchmove', move, { passive: false });
+                        document.addEventListener('touchend', end);
+                        document.addEventListener('touchcancel', end);
+                    }
+                    handle.addEventListener('mousedown', start);
+                    handle.addEventListener('touchstart', start, { passive: false });
                 }
             };
 
@@ -566,29 +584,18 @@
                 ipPanelRenderTimer: null,
 
                 init: function() {
-                    this.elements = {
-                        status: document.getElementById('status'),
-                        autoScroll: document.getElementById('auto-scroll'),
-                        autoWrap: document.getElementById('auto-wrap'),
-                        chatText: document.getElementById('chat-text'),
-                        joinquitText: document.getElementById('joinquit-text'),
-                        grimText: document.getElementById('grim-text'),
-                        serverText: document.getElementById('server-text'),
-                        ipPanel: document.getElementById('ip-panel'),
-                        ipInput: document.getElementById('ip-input'),
-                        ipResult: document.getElementById('ip-query-result'),
-                        rconCommand: document.getElementById('rcon-command'),
-                        rconResult: document.getElementById('rcon-result'),
-                        immersiveBtn: document.getElementById('immersive-floating-btn'),
-                        rconToggleBtn: document.getElementById('rcon-toggle-btn'),
-                        rconWindow: document.getElementById('rcon-floating'),
-                        immersiveConsole: document.getElementById('immersive-console'),
-                        immersiveChat: document.getElementById('immersive-chat'),
-                        immersiveGrim: document.getElementById('immersive-grim'),
-                        immersiveStats: document.getElementById('immersive-stats'),
-                        progressDiv: document.getElementById('log-load-progress'),
-                        grimConfigToggle: document.getElementById('grim-config-toggle')
+                    this.elements = {};
+                    var elementMap = {
+                        status: 'status', autoScroll: 'auto-scroll', autoWrap: 'auto-wrap',
+                        chatText: 'chat-text', joinquitText: 'joinquit-text', grimText: 'grim-text', serverText: 'server-text',
+                        ipPanel: 'ip-panel', ipInput: 'ip-input', ipResult: 'ip-query-result',
+                        rconCommand: 'rcon-command', rconResult: 'rcon-result',
+                        immersiveBtn: 'immersive-floating-btn', rconToggleBtn: 'rcon-toggle-btn', rconWindow: 'rcon-floating',
+                        immersiveConsole: 'immersive-console', immersiveChat: 'immersive-chat',
+                        immersiveGrim: 'immersive-grim', immersiveStats: 'immersive-stats',
+                        progressDiv: 'log-load-progress', grimConfigToggle: 'grim-config-toggle'
                     };
+                    for (var key in elementMap) this.elements[key] = document.getElementById(elementMap[key]);
                     this.bindEvents();
                     this.initDraggable();
                     this.initMonaco();
@@ -610,12 +617,9 @@
                         if (!container) return;
 
                         var style = document.createElement('style');
-                        var css = '';
-                        w.highlightRules.forEach(function(rule) {
-                            var color = rule.color.replace('#', '');
-                            css += '.color-' + color + ' { color: ' + rule.color + ' !important; }';
-                        });
-                        style.innerHTML = css;
+                        style.innerHTML = w.highlightRules.map(function(rule) {
+                            return '.color-' + rule.color.replace('#', '') + ' { color: ' + rule.color + ' !important; }';
+                        }).join('');
                         document.head.appendChild(style);
 
                         self.monacoModel = monaco.editor.createModel('', 'plaintext');
@@ -646,32 +650,26 @@
                     var model = this.monacoEditor.getModel();
                     var rules = w.highlightRules;
                     var newDecorations = [];
-                    var matchedLines = new Set();
-                    
-                    // 获取编辑器中所有行的文本内容，避免使用有999条限制的 findMatches
-                    var allLines = model.getLinesContent(); 
+                    var allLines = model.getLinesContent();
+                    var ruleRegex = rules.map(function(rule) {
+                        return {
+                            regex: new RegExp(rule.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+                            color: rule.color
+                        };
+                    });
 
-                    for (var i = 0; i < rules.length; i++) {
-                        var rule = rules[i];
-                        var keyword = rule.keyword;
-                        var regexStr = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        var regex = new RegExp(regexStr, "i");
-
-                        for (var lineIdx = 0; lineIdx < allLines.length; lineIdx++) {
-                            var lineNum = lineIdx + 1; // Monaco 行号从 1 开始
-                            
-                            // 如果该行已经被优先级更高的规则高亮过，则跳过
-                            if (matchedLines.has(lineNum)) continue; 
-
-                            if (regex.test(allLines[lineIdx])) {
-                                matchedLines.add(lineNum);
+                    for (var lineIdx = 0; lineIdx < allLines.length; lineIdx++) {
+                        var lineText = allLines[lineIdx];
+                        for (var i = 0; i < ruleRegex.length; i++) {
+                            if (ruleRegex[i].regex.test(lineText)) {
                                 newDecorations.push({
-                                    range: new monaco.Range(lineNum, 1, lineNum, 1),
+                                    range: new monaco.Range(lineIdx + 1, 1, lineIdx + 1, 1),
                                     options: {
                                         isWholeLine: true,
-                                        inlineClassName: 'color-' + rule.color.replace('#', '')
+                                        inlineClassName: 'color-' + ruleRegex[i].color.replace('#', '')
                                     }
                                 });
+                                break;
                             }
                         }
                     }
@@ -680,47 +678,58 @@
                 },
                 bindEvents: function() {
                     var self = this;
+                    var byId = function(id) { return document.getElementById(id); };
+                    var el = this.elements;
 
-                    this.elements.autoScroll.addEventListener('change', function() { self.onAutoScrollChange(); });
-                    this.elements.autoWrap.addEventListener('change', function() { self.setAllWrapMode(self.elements.autoWrap.checked); });
+                    el.autoScroll.addEventListener('change', function() { self.onAutoScrollChange(); });
+                    el.autoWrap.addEventListener('change', function() { self.setAllWrapMode(el.autoWrap.checked); });
 
-                    document.getElementById('scroll-top-btn').addEventListener('click', function() {
+                    byId('scroll-top-btn').addEventListener('click', function() {
                         if (self.monacoEditor) self.monacoEditor.revealLine(1);
                     });
-                    document.getElementById('scroll-bottom-btn').addEventListener('click', function() {
+                    byId('scroll-bottom-btn').addEventListener('click', function() {
                         if (self.monacoEditor) self.monacoEditor.revealLineInCenter(self.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
                     });
-                    document.getElementById('copy-console-btn').addEventListener('click', function() { self.copyConsoleContent(); });
+                    byId('copy-console-btn').addEventListener('click', function() { self.copyConsoleContent(); });
 
-                    document.getElementById('send-command-btn').addEventListener('click', function() { t.sendCommand(); });
-                    this.elements.rconCommand.addEventListener('keypress', function(e) { if (e.key === 'Enter') t.sendCommand(); });
-                    this.elements.rconCommand.addEventListener('keydown', function(e) { t.onKeydown(e); });
+                    byId('send-command-btn').addEventListener('click', function() { t.sendCommand(); });
+                    el.rconCommand.addEventListener('keypress', function(e) { if (e.key === 'Enter') t.sendCommand(); });
+                    el.rconCommand.addEventListener('keydown', function(e) { t.onKeydown(e); });
 
-                    document.getElementById('query-ip-btn').addEventListener('click', function() { self.queryIP(self.elements.ipInput.value); });
-                    this.elements.ipInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') self.queryIP(self.elements.ipInput.value); });
-                    this.elements.ipPanel.addEventListener('click', function(e) { self.handleIpPanelClick(e); });
+                    byId('query-ip-btn').addEventListener('click', function() { self.queryIP(el.ipInput.value); });
+                    el.ipInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') self.queryIP(el.ipInput.value); });
+                    el.ipPanel.addEventListener('click', function(e) { self.handleIpPanelClick(e); });
 
-                    this.elements.immersiveBtn.addEventListener('click', function() { self.toggleImmersiveMode(); });
-                    this.elements.rconToggleBtn.addEventListener('click', function() { self.toggleRconWindow(); });
+                    el.immersiveBtn.addEventListener('click', function() { self.toggleImmersiveMode(); });
+                    el.rconToggleBtn.addEventListener('click', function() { self.toggleRconWindow(); });
 
-                    document.getElementById('chat-scroll-top') && document.getElementById('chat-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.chatText, 200); });
-                    document.getElementById('chat-scroll-bottom') && document.getElementById('chat-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.chatText, 200); });
-                    document.getElementById('joinquit-scroll-top') && document.getElementById('joinquit-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.joinquitText, 200); });
-                    document.getElementById('joinquit-scroll-bottom') && document.getElementById('joinquit-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.joinquitText, 200); });
-                    document.getElementById('ip-scroll-top') && document.getElementById('ip-scroll-top').addEventListener('click', function() { S.smoothScrollToTop(self.elements.ipPanel, 200); });
-                    document.getElementById('ip-scroll-bottom') && document.getElementById('ip-scroll-bottom').addEventListener('click', function() { S.smoothScrollToBottomDynamic(self.elements.ipPanel, 200); });
+                    [
+                        ['chat-scroll-top', el.chatText, 'top'], ['chat-scroll-bottom', el.chatText, 'bottom'],
+                        ['joinquit-scroll-top', el.joinquitText, 'top'], ['joinquit-scroll-bottom', el.joinquitText, 'bottom'],
+                        ['ip-scroll-top', el.ipPanel, 'top'], ['ip-scroll-bottom', el.ipPanel, 'bottom']
+                    ].forEach(function(item) {
+                        var btn = byId(item[0]);
+                        if (btn) btn.addEventListener('click', function() {
+                            if (item[2] === 'top') S.smoothScrollToTop(item[1], 200);
+                            else S.smoothScrollToBottomDynamic(item[1], 200);
+                        });
+                    });
 
-                    this.elements.grimConfigToggle.addEventListener('click', function() {
-                        var panel = document.getElementById('grim-config-panel');
+                    el.grimConfigToggle.addEventListener('click', function() {
+                        var panel = byId('grim-config-panel');
                         panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
                     });
-                    document.getElementById('grim-apply-config').addEventListener('click', function() { self.applyAnticheatConfig(); });
-                    document.getElementById('grim-reset-config').addEventListener('click', function() { self.resetAnticheatConfig(); });
-                    document.getElementById('grim-cancel-config').addEventListener('click', function() {
-                        document.getElementById('grim-config-panel').style.display = 'none';
-                        document.getElementById('grim-left-keywords').value = w.grimConfig.leftKeywords.join(',');
-                        document.getElementById('grim-right-keywords').value = w.grimConfig.rightKeywords.join(',');
+                    byId('grim-apply-config').addEventListener('click', function() { self.applyAnticheatConfig(); });
+                    byId('grim-reset-config').addEventListener('click', function() { self.resetAnticheatConfig(); });
+                    byId('grim-cancel-config').addEventListener('click', function() {
+                        byId('grim-config-panel').style.display = 'none';
+                        self.fillGrimInputs();
                     });
+                },
+
+                fillGrimInputs: function() {
+                    document.getElementById('grim-left-keywords').value = w.grimConfig.leftKeywords.join(',');
+                    document.getElementById('grim-right-keywords').value = w.grimConfig.rightKeywords.join(',');
                 },
 
                 applyAnticheatConfig: function() {
@@ -734,12 +743,8 @@
                 },
 
                 resetAnticheatConfig: function() {
-                    w.grimConfig = {
-                        leftKeywords: ["触发了", "[Server]"],
-                        rightKeywords: ["[Server]", "moved too quickly"]
-                    };
-                    document.getElementById('grim-left-keywords').value = w.grimConfig.leftKeywords.join(',');
-                    document.getElementById('grim-right-keywords').value = w.grimConfig.rightKeywords.join(',');
+                    w.grimConfig = JSON.parse(JSON.stringify(GRIM_DEFAULTS));
+                    this.fillGrimInputs();
                     this.reclassifyAnticheatLines();
                     this.showStatus('已重置为默认关键词', 2000);
                 },
@@ -791,22 +796,17 @@
                     var wordBreak = enabled ? 'break-word' : 'normal';
                     function apply(el) {
                         if (!el) return;
-                        if (el.tagName === 'TEXTAREA') {
-                            el.style.whiteSpace = mode;
-                            el.style.wordWrap = wordBreak;
-                        } else {
-                            el.style.whiteSpace = mode;
-                            el.style.wordWrap = wordBreak;
+                        el.style.whiteSpace = mode;
+                        el.style.wordWrap = wordBreak;
+                        if (el.tagName !== 'TEXTAREA') {
                             Array.from(el.querySelectorAll('.console-log-line')).forEach(function(line) {
                                 line.style.whiteSpace = mode;
                                 line.style.wordWrap = wordBreak;
                             });
                         }
                     }
-                    apply(this.elements.chatText);
-                    apply(this.elements.joinquitText);
-                    apply(this.elements.grimText);
-                    apply(this.elements.serverText);
+                    var self = this;
+                    ['chatText', 'joinquitText', 'grimText', 'serverText'].forEach(function(k) { apply(self.elements[k]); });
                     if (this.monacoEditor) this.monacoEditor.updateOptions({ wordWrap: enabled ? 'on' : 'off' });
                     w.autoWrapEnabled = enabled;
                 },
@@ -814,36 +814,27 @@
                 onAutoScrollChange: function() {
                     w.autoScrollEnabled = this.elements.autoScroll.checked;
                     if (!w.autoScrollEnabled) return;
-                    var tab = w.currentTab;
-                    if (tab === 'chat') S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
-                    else if (tab === 'joinquit') S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
-                    else if (tab === 'grim') {
-                        S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
-                        S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
-                    } else if (tab === 'playerip') S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
-                    else if (tab === 'console' && this.monacoEditor) {
-                        this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                    if (w.currentTab === 'console') {
+                        if (this.monacoEditor) this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+                        return;
                     }
+                    var el = this.elements;
+                    var map = { chat: [el.chatText], joinquit: [el.joinquitText], grim: [el.grimText, el.serverText], playerip: [el.ipPanel] };
+                    (map[w.currentTab] || []).forEach(function(e) { S.smoothScrollToBottomDynamic(e, 200); });
                 },
 
                 updateAutoScrollCheck: function() {
                     var self = this;
-                    if (this._scrollCheckTimer) clearTimeout(this._scrollCheckTimer);
+                    clearTimeout(this._scrollCheckTimer);
                     this._scrollCheckTimer = setTimeout(function() {
-                        var allAtBottom = true;
-                        if (self.monacoEditor) {
-                            var scrollTop = self.monacoEditor.getScrollTop();
-                            var scrollHeight = self.monacoEditor.getScrollHeight();
-                            var clientHeight = self.monacoEditor.getLayoutInfo().height;
-                            if (scrollHeight - scrollTop - clientHeight > 5) allAtBottom = false;
-                        }
-                        var containers = [self.elements.chatText, self.elements.joinquitText, self.elements.grimText, self.elements.serverText, self.elements.ipPanel];
-                        for (var i = 0; i < containers.length; i++) {
-                            var el = containers[i];
-                            if (el && !S.isContainerAtBottom(el)) { allAtBottom = false; break; }
-                        }
-                        if (self.elements.autoScroll.checked !== allAtBottom) {
-                            self.elements.autoScroll.checked = allAtBottom;
+                        var m = self.monacoEditor;
+                        var allAtBottom = !m || (m.getScrollHeight() - m.getScrollTop() - m.getLayoutInfo().height) <= 5;
+                        var el = self.elements;
+                        [el.chatText, el.joinquitText, el.grimText, el.serverText, el.ipPanel].some(function(e) {
+                            if (e && !S.isContainerAtBottom(e)) { allAtBottom = false; return true; }
+                        });
+                        if (el.autoScroll.checked !== allAtBottom) {
+                            el.autoScroll.checked = allAtBottom;
                             w.autoScrollEnabled = allAtBottom;
                         }
                     }, 100);
@@ -851,51 +842,34 @@
 
                 appendLogLines: function(lines) {
                     if (!this.monacoEditor || !lines.length) return;
-                    var model = this.monacoEditor.getModel();
-                    var lastLine = model.getLineCount();
-                    var text = lines.join('\n');
-                    model.pushEditOperations([], [{
-                        range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
-                        text: '\n' + text,
-                        forceMoveMarkers: true
-                    }]);
-                    if (w.autoScrollEnabled) this.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
-                    this.updateImmersiveDashboard();
+                    S.appendMonacoLines(this.monacoEditor, lines, w.autoScrollEnabled);
                     this.updateDecorations();
                 },
 
                 updateNonConsoleTab: function() {
                     var tab = w.currentTab;
                     if (tab === 'console') return;
-                    switch (tab) {
-                        case 'chat':
-                            this.updateTextareaWithSelection(this.elements.chatText, w.chatLines.join('\n'));
-                            break;
-                        case 'joinquit':
-                            var sorted = w.joinQuitLines.slice().sort(function(a, b) {
-                                var t1 = (a.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
-                                var t2 = (b.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
-                                return t1.localeCompare(t2);
-                            });
-                            this.updateTextareaWithSelection(this.elements.joinquitText, sorted.join('\n'));
-                            break;
-                        case 'grim':
-                            this.updateTextareaWithSelection(this.elements.grimText, w.grimLines.join('\n'));
-                            this.updateTextareaWithSelection(this.elements.serverText, w.serverLines.join('\n'));
-                            break;
-                        case 'playerip':
-                            this.renderIpPanel();
-                            return;
-                        default:
-                            break;
+                    if (tab === 'playerip') {
+                        this.renderIpPanel();
+                        return;
                     }
-                    if (w.autoScrollEnabled) {
-                        if (tab === 'chat') S.smoothScrollToBottomDynamic(this.elements.chatText, 200);
-                        else if (tab === 'joinquit') S.smoothScrollToBottomDynamic(this.elements.joinquitText, 200);
-                        else if (tab === 'grim') {
-                            S.smoothScrollToBottomDynamic(this.elements.grimText, 200);
-                            S.smoothScrollToBottomDynamic(this.elements.serverText, 200);
-                        }
+                    var el = this.elements;
+                    var sortByTime = function(lines) {
+                        return lines.slice().sort(function(a, b) {
+                            var t1 = (a.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
+                            var t2 = (b.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1] || '';
+                            return t1.localeCompare(t2);
+                        });
+                    };
+                    var plan = {
+                        chat: [{ el: el.chatText, lines: w.chatLines }],
+                        joinquit: [{ el: el.joinquitText, lines: sortByTime(w.joinQuitLines) }],
+                        grim: [{ el: el.grimText, lines: w.grimLines }, { el: el.serverText, lines: w.serverLines }]
+                    }[tab];
+                    if (!plan) return;
+                    for (var i = 0; i < plan.length; i++) {
+                        this.updateTextareaWithSelection(plan[i].el, plan[i].lines.join('\n'));
+                        if (w.autoScrollEnabled) S.smoothScrollToBottomDynamic(plan[i].el, 200);
                     }
                     this.updateImmersiveDashboard();
                 },
@@ -929,7 +903,7 @@
                         return;
                     }
 
-                    var html = '';
+                    var parts = [];
                     for (var pair of map.entries()) {
                         var ip = pair[0];
                         var data = pair[1];
@@ -937,24 +911,22 @@
                         var cls = uniquePlayers > 1 ? 'multi-player' : 'single-player';
                         var names = Array.from(data.playersSet).sort().join(' // ');
                         var ipExpanded = w.expandedIps.has(ip);
-                        html += '<div class="ip-card" data-ip="' + ip + '">';
-                        html += '<div class="ip-header" data-ip="' + ip + '">';
-                        html += '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>';
-                        html += '<span class="ip-address ' + cls + '" data-ip="' + ip + '">' + ip + '</span>';
-                        html += '<span class="stats">(' + data.records.length + '次登录, ' + uniquePlayers + '个玩家: ' + names + ')</span>';
-                        html += '</div>';
-                        html += '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + ip + '">';
+                        parts.push(
+                            '<div class="ip-card" data-ip="' + ip + '">',
+                            '<div class="ip-header" data-ip="' + ip + '">',
+                            '<span class="toggle-icon">' + (ipExpanded ? '▼' : '▶') + '</span>',
+                            '<span class="ip-address ' + cls + '" data-ip="' + ip + '">' + ip + '</span>',
+                            '<span class="stats">(' + data.records.length + '次登录, ' + uniquePlayers + '个玩家: ' + names + ')</span>',
+                            '</div>',
+                            '<div class="ip-details ' + (ipExpanded ? 'expanded' : '') + '" data-ip="' + ip + '">'
+                        );
                         var sortedRecs = data.records.slice().sort(function(a, b) { return a.time.localeCompare(b.time); });
-                        for (var ri = 0; ri < sortedRecs.length; ri++) {
-                            var rec2 = sortedRecs[ri];
-                            html += '<div class="login-record-row">';
-                            html += '<span class="login-record-time">' + rec2.time + '</span>';
-                            html += '<span class="login-record-player">' + S.escapeHtml(rec2.player) + '</span>';
-                            html += '</div>';
-                        }
-                        html += '</div></div>';
+                        parts.push(sortedRecs.map(function(rec2) {
+                            return '<div class="login-record-row"><span class="login-record-time">' + rec2.time + '</span><span class="login-record-player">' + S.escapeHtml(rec2.player) + '</span></div>';
+                        }).join(''));
+                        parts.push('</div></div>');
                     }
-                    this.elements.ipPanel.innerHTML = html;
+                    this.elements.ipPanel.innerHTML = parts.join('');
                     if (w.autoScrollEnabled && w.currentTab === 'playerip') S.smoothScrollToBottomDynamic(this.elements.ipPanel, 200);
                 },
 
@@ -999,78 +971,61 @@
                 queryIP: function(ip) {
                     if (!ip.trim()) { this.elements.ipResult.innerText = '请输入 IP'; return; }
                     var resultEl = this.elements.ipResult;
-                    var queries = [{
-                        name: '=========== 结果1 ===========',
-                        fetch: function(ip) {
-                            return fetch('https://api.ip77.net/ip2/v4/', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: 'ip=' + encodeURIComponent(ip)
-                            }).then(res => res.json()).then(data => {
-                                if (data.code !== 0 || !data.data) throw new Error(data.error || '查询失败');
-                                var d = data.data;
-                                return { location: d.location || '未知', lat: d.latitude, lng: d.longitude,
-                                    street: d.street_history && d.street_history.length ? d.street_history.join('、') : '无街道信息' };
-                            });
-                        }
-                    }, {
-                        name: '=========== 结果2 ===========',
-                        fetch: function(ip) {
-                            return fetch('http://ip-api.com/json/' + ip + '?fields=status,country,regionName,city,lat,lon,isp,org')
-                                .then(res => res.json()).then(data => {
-                                    if (data.status !== 'success') throw new Error(data.message || '查询失败');
-                                    return { location: data.country + ' ' + data.regionName + ' ' + data.city,
-                                        lat: data.lat, lng: data.lon, street: 'ISP: ' + (data.isp || '未知') };
-                                });
-                        }
-                    }, {
-                        name: '=========== 结果3 ===========',
-                        fetch: function(ip) {
-                            return fetch('https://ipapi.co/' + ip + '/json/').then(res => res.json()).then(data => {
-                                if (data.error) throw new Error(data.reason || '查询失败');
-                                return { location: data.country_name + ' ' + data.region + ' ' + data.city,
-                                    lat: data.latitude, lng: data.longitude, street: 'ASN: ' + data.asn };
-                            });
-                        }
-                    }, {
-                        name: '=========== 结果4 ===========',
-                        fetch: function(ip) {
-                            return fetch('https://ipinfo.io/' + ip + '/json').then(res => res.json()).then(data => {
-                                if (data.bogon || data.error) throw new Error(data.error || '查询失败');
-                                var loc = data.loc ? data.loc.split(',') : [];
-                                return { location: data.country + ' ' + data.region + ' ' + data.city,
-                                    lat: loc[0] || null, lng: loc[1] || null, street: '组织: ' + (data.org || '未知') };
-                            });
-                        }
-                    }, {
-                        name: '=========== 结果5 ===========',
-                        fetch: function(ip) {
-                            return fetch('https://ipwho.is/' + ip).then(res => res.json()).then(data => {
-                                if (!data.success) throw new Error(data.message || '查询失败');
-                                return { location: data.country + ' ' + data.region + ' ' + data.city,
-                                    lat: data.latitude, lng: data.longitude,
-                                    street: '代理: ' + (data.proxy ? '是' : '否') + ' | ISP: ' + (data.isp || '未知') };
-                            });
-                        }
-                    }];
+                    var ipLoc = function(c, r, city) { return c + ' ' + r + ' ' + city; };
+                    var sources = [
+                        { name: '结果1', url: 'https://api.ip77.net/ip2/v4/',
+                          options: function(ip) { return { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'ip=' + encodeURIComponent(ip) }; },
+                          parse: function(d) {
+                              if (d.code !== 0 || !d.data) throw new Error(d.error || '查询失败');
+                              var x = d.data;
+                              return { location: x.location || '未知', lat: x.latitude, lng: x.longitude,
+                                  street: x.street_history && x.street_history.length ? x.street_history.join('、') : '无街道信息' };
+                          } },
+                        { name: '结果2',
+                          url: function(ip) { return 'http://ip-api.com/json/' + ip + '?fields=status,country,regionName,city,lat,lon,isp,org'; },
+                          parse: function(d) {
+                              if (d.status !== 'success') throw new Error(d.message || '查询失败');
+                              return { location: ipLoc(d.country, d.regionName, d.city), lat: d.lat, lng: d.lon, street: 'ISP: ' + (d.isp || '未知') };
+                          } },
+                        { name: '结果3',
+                          url: function(ip) { return 'https://ipapi.co/' + ip + '/json/'; },
+                          parse: function(d) {
+                              if (d.error) throw new Error(d.reason || '查询失败');
+                              return { location: ipLoc(d.country_name, d.region, d.city), lat: d.latitude, lng: d.longitude, street: 'ASN: ' + d.asn };
+                          } },
+                        { name: '结果4',
+                          url: function(ip) { return 'https://ipinfo.io/' + ip + '/json'; },
+                          parse: function(d) {
+                              if (d.bogon || d.error) throw new Error(d.error || '查询失败');
+                              var loc = d.loc ? d.loc.split(',') : [];
+                              return { location: ipLoc(d.country, d.region, d.city), lat: loc[0] || null, lng: loc[1] || null, street: '组织: ' + (d.org || '未知') };
+                          } },
+                        { name: '结果5',
+                          url: function(ip) { return 'https://ipwho.is/' + ip; },
+                          parse: function(d) {
+                              if (!d.success) throw new Error(d.message || '查询失败');
+                              return { location: ipLoc(d.country, d.region, d.city), lat: d.latitude, lng: d.longitude,
+                                  street: '代理: ' + (d.proxy ? '是' : '否') + ' | ISP: ' + (d.isp || '未知') };
+                          } }
+                    ];
 
-                    var html = '';
-                    for (var i = 0; i < queries.length; i++) {
-                        html += '<div id="ip-result-' + i + '" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【' + queries[i].name + '】\n查询中...</div>';
-                    }
-                    resultEl.innerHTML = html;
+                    var prefix = '=========== ';
+                    var suffix = ' ===========';
+                    resultEl.innerHTML = sources.map(function(s, i) {
+                        return '<div id="ip-result-' + i + '" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【' + prefix + s.name + suffix + '】\n查询中...</div>';
+                    }).join('');
 
-                    for (var qi = 0; qi < queries.length; qi++) {
-                        (function(index) {
-                            queries[index].fetch(ip).then(function(result) {
-                                var el = document.getElementById('ip-result-' + index);
-                                if (el) el.innerText = '\n\n【' + queries[index].name + '】\n位置: ' + result.location + '\n经纬度: ' + result.lng + ',' + result.lat + '\n详细: ' + result.street;
+                    sources.forEach(function(s, i) {
+                        var el = document.getElementById('ip-result-' + i);
+                        fetch(typeof s.url === 'function' ? s.url(ip) : s.url, s.options ? s.options(ip) : undefined)
+                            .then(function(res) { return res.json(); })
+                            .then(function(data) {
+                                var r = s.parse(data);
+                                if (el) el.innerText = '\n\n【' + prefix + s.name + suffix + '】\n位置: ' + r.location + '\n经纬度: ' + r.lng + ',' + r.lat + '\n详细: ' + r.street;
                             }).catch(function(err) {
-                                var el = document.getElementById('ip-result-' + index);
-                                if (el) el.innerText = '\n\n【' + queries[index].name + '】\n失败: ' + err.message;
+                                if (el) el.innerText = '\n\n【' + prefix + s.name + suffix + '】\n失败: ' + err.message;
                             });
-                        })(qi);
-                    }
+                    });
                 },
 
                 startScreenCapture: function() {
@@ -1088,7 +1043,7 @@
                 screenCaptureLoop: function() {
                     var self = this;
                     if (w.currentTab !== 'screen') return;
-                    fetch('/api/screen', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } })
+                    S.apiFetch('/api/screen')
                         .then(resp => resp.json()).then(data => {
                             if (data.success) {
                                 var img = document.getElementById('screen-image');
@@ -1096,9 +1051,7 @@
                             }
                         }).catch(err => console.error('屏幕获取失败:', err))
                         .finally(function() {
-                            if (w.currentTab === 'screen') {
-                                w.screenCaptureTimer = setTimeout(function() { self.screenCaptureLoop(); }, 500);
-                            } else w.screenCaptureTimer = null;
+                            w.screenCaptureTimer = w.currentTab === 'screen' ? setTimeout(function() { self.screenCaptureLoop(); }, 500) : null;
                         });
                 },
 
@@ -1126,73 +1079,67 @@
                     this.elements.status.innerText = msg;
                     if (timeout > 0) {var self = this;this._statusTimer = setTimeout(function() {self.elements.status.innerText = self._statusOld;self._statusTimer = null;}, timeout);}
                 },
+                scrollImmersivePanel: function(el) {
+                    if (!w.autoScrollEnabled || !el) return;
+                    setTimeout(function() {
+                        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+                    }, 30);
+                },
+                renderImmersiveTextPanel: function(el, text) {
+                    if (!el) return;
+                    if (el.innerText !== text) el.innerText = text;
+                    this.scrollImmersivePanel(el);
+                },
+                renderImmersiveConsolePanel: function() {
+                    var el = this.elements.immersiveConsole;
+                    if (!el) return;
+                    var lines = [];
+                    if (this.monacoEditor) {
+                        var model = this.monacoEditor.getModel();
+                        var lastLine = model.getLineCount();
+                        var startLine = Math.max(1, lastLine - 500);
+                        for (var lineNum = startLine; lineNum <= lastLine; lineNum++) {
+                            lines.push(model.getLineContent(lineNum));
+                        }
+                    }
+                    var currentTexts = Array.from(el.children).map(function(child) { return child.textContent; });
+                    if (JSON.stringify(currentTexts) === JSON.stringify(lines)) {
+                        this.scrollImmersivePanel(el);
+                        return;
+                    }
+                    el.innerHTML = '';
+                    for (var i = 0; i < lines.length; i++) {
+                        var div = document.createElement('div');
+                        div.className = 'console-log-line';
+                        var color = S.getHighlightColor(lines[i], w.highlightRules);
+                        if (color) div.style.color = color;
+                        div.textContent = lines[i];
+                        if (w.autoWrapEnabled) { div.style.whiteSpace = 'pre-wrap'; div.style.wordWrap = 'break-word'; }
+                        el.appendChild(div);
+                    }
+                    this.scrollImmersivePanel(el);
+                },
                 updateImmersiveDashboard: function() {
                     if (!w.immersiveMode) return;
-                    var self = this;
-
-                    if (this.elements.immersiveConsole) {
-                        var consoleLines = [];
-                        if (this.monacoEditor) {
-                            var model = this.monacoEditor.getModel();
-                            var lastLine = model.getLineCount();
-                            var startLine = Math.max(1, lastLine - 500);
-                            for (var lineNum = startLine; lineNum <= lastLine; lineNum++) {
-                                consoleLines.push(model.getLineContent(lineNum));
-                            }
-                        }
-                        var slice = consoleLines.slice(-500);
-                        var currentTexts = Array.from(this.elements.immersiveConsole.children).map(el => el.textContent);
-                        if (JSON.stringify(currentTexts) !== JSON.stringify(slice)) {
-                            this.elements.immersiveConsole.innerHTML = '';
-                            for (var i = 0; i < slice.length; i++) {
-                                var div = document.createElement('div');
-                                div.className = 'console-log-line';
-                                var color = S.getHighlightColor(slice[i], w.highlightRules);
-                                if (color) div.style.color = color;
-                                div.textContent = slice[i];
-                                if (w.autoWrapEnabled) { div.style.whiteSpace = 'pre-wrap'; div.style.wordWrap = 'break-word'; }
-                                this.elements.immersiveConsole.appendChild(div);
-                            }
-                            if (w.autoScrollEnabled) setTimeout(function() {
-                                self.elements.immersiveConsole.scrollTo({ top: self.elements.immersiveConsole.scrollHeight, behavior: 'smooth' });
-                            }, 30);
-                        } else if (w.autoScrollEnabled) {
-                            setTimeout(function() {
-                                self.elements.immersiveConsole.scrollTo({ top: self.elements.immersiveConsole.scrollHeight, behavior: 'smooth' });
-                            }, 30);
-                        }
-                    }
-
-                    if (this.elements.immersiveChat) {
-                        var chatText = w.chatLines.slice(-500).join('\n');
-                        if (this.elements.immersiveChat.innerText !== chatText) this.elements.immersiveChat.innerText = chatText;
-                        if (w.autoScrollEnabled) setTimeout(function() {
-                            self.elements.immersiveChat.scrollTo({ top: self.elements.immersiveChat.scrollHeight, behavior: 'smooth' });
-                        }, 30);
-                    }
-
-                    if (this.elements.immersiveGrim) {
-                        var grimText = w.grimLines.slice(-500).join('\n');
-                        if (this.elements.immersiveGrim.innerText !== grimText) this.elements.immersiveGrim.innerText = grimText;
-                        if (w.autoScrollEnabled) setTimeout(function() {
-                            self.elements.immersiveGrim.scrollTo({ top: self.elements.immersiveGrim.scrollHeight, behavior: 'smooth' });
-                        }, 30);
-                    }
+                    this.renderImmersiveConsolePanel();
+                    this.renderImmersiveTextPanel(this.elements.immersiveChat, w.chatLines.slice(-500).join('\n'));
+                    this.renderImmersiveTextPanel(this.elements.immersiveGrim, w.grimLines.slice(-500).join('\n'));
                 },
 
                 toggleImmersiveMode: function() {
                     w.immersiveMode = !w.immersiveMode;
+                    var el = this.elements;
                     if (w.immersiveMode) {
                         document.body.classList.add('immersive-mode');
-                        this.elements.immersiveBtn.textContent = '[-]';
-                        if (this.elements.rconWindow) this.elements.rconWindow.style.display = 'none';
-                        if (!w.autoScrollEnabled) { w.autoScrollEnabled = true; this.elements.autoScroll.checked = true; }
-                        if (!w.autoWrapEnabled) { w.autoWrapEnabled = true; this.elements.autoWrap.checked = true; this.setAllWrapMode(true); }
+                        el.immersiveBtn.textContent = '[-]';
+                        if (el.rconWindow) el.rconWindow.style.display = 'none';
+                        if (!w.autoScrollEnabled) { w.autoScrollEnabled = true; el.autoScroll.checked = true; }
+                        if (!w.autoWrapEnabled) { w.autoWrapEnabled = true; el.autoWrap.checked = true; this.setAllWrapMode(true); }
                         if (w.currentTab !== 'console') l('console');
                         var self = this;
                         setTimeout(function() {
-                            if (!w.immersiveChart && self.elements.immersiveStats) {
-                                w.immersiveChart = echarts.init(self.elements.immersiveStats);
+                            if (!w.immersiveChart && el.immersiveStats) {
+                                w.immersiveChart = echarts.init(el.immersiveStats);
                                 w.immersiveChart.setOption({
                                     tooltip: { trigger: 'axis' },
                                     xAxis: { type: 'category', data: [] },
@@ -1203,89 +1150,61 @@
                             }
                             o.loadOnlineStats(w.currentStatsRange, true);
                         }, 100);
-                        if (w.immersiveStatsTimer) clearInterval(w.immersiveStatsTimer);
+                        clearInterval(w.immersiveStatsTimer);
                         w.immersiveStatsTimer = setInterval(function() {
                             if (w.immersiveMode) o.loadOnlineStats(w.currentStatsRange, true);
                         }, 60000);
                         this.updateImmersiveDashboard();
                     } else {
                         document.body.classList.remove('immersive-mode');
-                        this.elements.immersiveBtn.textContent = '[+]';
-                        if (w.apiPassword && this.elements.rconWindow) this.elements.rconWindow.style.display = 'flex';
-                        w.autoScrollEnabled = this.elements.autoScroll.checked;
-                        w.autoWrapEnabled = this.elements.autoWrap.checked;
+                        el.immersiveBtn.textContent = '[+]';
+                        if (w.apiPassword && el.rconWindow) el.rconWindow.style.display = 'flex';
+                        w.autoScrollEnabled = el.autoScroll.checked;
+                        w.autoWrapEnabled = el.autoWrap.checked;
                         this.setAllWrapMode(w.autoWrapEnabled);
                         if (w.autoScrollEnabled && this.monacoEditor)
                             this.monacoEditor.revealLineInCenter(this.monacoEditor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
-                        if (w.immersiveStatsTimer) { clearInterval(w.immersiveStatsTimer); w.immersiveStatsTimer = null; }
+                        clearInterval(w.immersiveStatsTimer);
+                        w.immersiveStatsTimer = null;
                         setTimeout(function() {
-                            if (w.onlineChart) w.onlineChart.resize();
                             o.resizeAllCharts();
                             if (h.monacoEditor) h.monacoEditor.layout();
                         }, 50);
                     }
                 },
 
+                centerRconWindow: function() {
+                    var win = this.elements.rconWindow;
+                    if (!win) return;
+                    win.style.display = 'flex';
+                    win.style.left = ((window.innerWidth - win.offsetWidth) / 2) + 'px';
+                    win.style.top = ((window.innerHeight - win.offsetHeight) / 2) + 'px';
+                    win.style.bottom = '';
+                    win.style.right = '';
+                },
+
                 toggleRconWindow: function() {
                     var win = this.elements.rconWindow;
                     if (!win) return;
-                    if (win.style.display === 'none') {
-                        win.style.display = 'flex';
-                        var left = (window.innerWidth - win.offsetWidth) / 2;
-                        var top = (window.innerHeight - win.offsetHeight) / 2;
-                        win.style.left = left + 'px';
-                        win.style.top = top + 'px';
-                        win.style.bottom = '';
-                        win.style.right = '';
-                    } else win.style.display = 'none';
+                    if (win.style.display === 'none') this.centerRconWindow();
+                    else win.style.display = 'none';
                 },
 
                 initDraggable: function() {
                     var header = document.getElementById('rcon-header');
                     var windowEl = document.getElementById('rcon-floating');
                     if (!header || !windowEl) return;
-                    var isDragging = false, offsetX = 0, offsetY = 0;
-                    function getPos(e) {
-                        var ev = e.touches ? e.touches[0] : e;
-                        return { clientX: ev.clientX, clientY: ev.clientY };
-                    }
-                    function onMove(e) {
-                        if (!isDragging) return;
-                        e.preventDefault();
-                        var pos = getPos(e);
-                        var dx = pos.clientX - offsetX;
-                        var dy = pos.clientY - offsetY;
-                        var maxX = window.innerWidth - windowEl.offsetWidth;
-                        var maxY = window.innerHeight - windowEl.offsetHeight;
-                        dx = Math.min(Math.max(dx, 0), maxX);
-                        dy = Math.min(Math.max(dy, 0), maxY);
-                        windowEl.style.left = dx + 'px';
-                        windowEl.style.top = dy + 'px';
+                    var offsetX = 0, offsetY = 0;
+                    S.bindDrag(header, function(p) {
+                        var rect = windowEl.getBoundingClientRect();
+                        offsetX = p.x - rect.left;
+                        offsetY = p.y - rect.top;
+                    }, function(p) {
+                        windowEl.style.left = Math.min(Math.max(p.x - offsetX, 0), window.innerWidth - windowEl.offsetWidth) + 'px';
+                        windowEl.style.top = Math.min(Math.max(p.y - offsetY, 0), window.innerHeight - windowEl.offsetHeight) + 'px';
                         windowEl.style.bottom = '';
                         windowEl.style.right = '';
-                    }
-                    function onUp() {
-                        isDragging = false;
-                        document.removeEventListener('mousemove', onMove);
-                        document.removeEventListener('mouseup', onUp);
-                        document.removeEventListener('touchmove', onMove);
-                        document.removeEventListener('touchend', onUp);
-                    }
-                    function onDown(e) {
-                        if (e.button !== undefined && e.button !== 0) return;
-                        e.preventDefault();
-                        var rect = windowEl.getBoundingClientRect();
-                        var pos = getPos(e);
-                        offsetX = pos.clientX - rect.left;
-                        offsetY = pos.clientY - rect.top;
-                        isDragging = true;
-                        document.addEventListener('mousemove', onMove);
-                        document.addEventListener('mouseup', onUp);
-                        document.addEventListener('touchmove', onMove, { passive: false });
-                        document.addEventListener('touchend', onUp);
-                    }
-                    header.addEventListener('mousedown', onDown);
-                    header.addEventListener('touchstart', onDown, { passive: false });
+                    });
                 }
             };
 
@@ -1332,57 +1251,14 @@
                         w.performanceData.upload.push(data.upload);
                         w.performanceData.download.push(data.download);
                         if (data.cpu_per_core && data.cpu_per_core.length) {
-                            if (w.cpuCharts.length === 0) {
-                                var container = document.getElementById('cpu-charts-container');
-                                if (container) {
-                                    container.innerHTML = '';
-                                    var coreCount = data.cpu_per_core.length;
-                                    for (var i = 0; i < coreCount; i++) {
-                                        var div = document.createElement('div');
-                                        div.id = 'cpu-core-' + i;
-                                        div.style.width = '200px';
-                                        div.style.height = '150px';
-                                        div.style.flex = '0 0 auto';
-                                        container.appendChild(div);
-                                        var chart = echarts.init(div);
-                                        chart.setOption({
-                                            title: { text: '核心' + i, left: 'center', top: 0, textStyle: { fontSize: 10, color: '#aaa' } },
-                                            tooltip: { trigger: 'axis' },
-                                            grid: { top: 28, bottom: 15, left: 30, right: 10, containLabel: true },
-                                            xAxis: { type: 'category', data: [], show: true, axisLabel: { fontSize: 8, interval: 5 } },
-                                            yAxis: { type: 'value', min: 0, max: 100, show: true, axisLabel: { fontSize: 8 } },
-                                            series: [{ type: 'line', data: [], smooth: false, color: '#ff5722', lineStyle: { color: '#ff5722' }, areaStyle: { opacity: 0.2, color: '#ff5722' } }]
-                                        });
-                                        w.cpuCharts.push(chart);
-                                    }
-                                }
-                            }
+                            o.ensureCpuCoreCharts(data.cpu_per_core.length);
                             if (!w.performanceData.cpuPerCore || w.performanceData.cpuPerCore.length === 0) {
                                 w.performanceData.cpuPerCore = data.cpu_per_core.map(function() { return []; });
                             }
-                            for (var ci = 0; ci < data.cpu_per_core.length; ci++) w.performanceData.cpuPerCore[ci].push(data.cpu_per_core[ci]);
+                            for (var i = 0; i < data.cpu_per_core.length; i++) w.performanceData.cpuPerCore[i].push(data.cpu_per_core[i]);
                         }
-                        if (w.performanceData.cpu.length > 60) {
-                            w.performanceData.cpu.shift();
-                            w.performanceData.mem.shift();
-                            w.performanceData.upload.shift();
-                            w.performanceData.download.shift();
-                            if (w.performanceData.cpuPerCore) for (var j = 0; j < w.performanceData.cpuPerCore.length; j++) w.performanceData.cpuPerCore[j].shift();
-                        }
-                        var xData = w.performanceData.cpu.map(function(_, idx) { return idx.toString(); });
-                        if (w.currentTab === 'stats') {
-                            if (w.cpuCharts.length && w.performanceData.cpuPerCore) {
-                                for (var k = 0; k < w.cpuCharts.length; k++) {
-                                    var coreData = w.performanceData.cpuPerCore[k] || [];
-                                    w.cpuCharts[k].setOption({ xAxis: { data: xData }, series: [{ data: coreData.slice() }] });
-                                }
-                            }
-                            if (w.memChart) w.memChart.setOption({ xAxis: { data: xData }, series: [{ data: w.performanceData.mem.slice() }] });
-                            if (w.netChart) w.netChart.setOption({
-                                xAxis: { data: xData },
-                                series: [{ data: w.performanceData.upload.slice() }, { data: w.performanceData.download.slice() }]
-                            });
-                        }
+                        o.trimPerformanceData();
+                        o.refreshPerformanceCharts();
                     });
                 }
             };
@@ -1396,9 +1272,9 @@
                     if (!input) { h.elements.rconResult.innerText = '请输入命令'; return false; }
                     h.elements.rconResult.innerText = '发送中...';
                     try {
-                        var response = await fetch('/api/rcon', {
+                        var response = await S.apiFetch('/api/rcon', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + w.apiPassword },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ server: w.currentServer, command: input })
                         });
                         var data = await response.json();
@@ -1440,18 +1316,61 @@
             };
 
             var o = {
+                ensureCpuCoreCharts: function(coreCount) {
+                    if (w.cpuCharts.length) return;
+                    var container = document.getElementById('cpu-charts-container');
+                    if (!container) return;
+                    container.innerHTML = '';
+                    for (var i = 0; i < coreCount; i++) {
+                        var div = document.createElement('div');
+                        div.id = 'cpu-core-' + i;
+                        div.style.width = '200px';
+                        div.style.height = '150px';
+                        div.style.flex = '0 0 auto';
+                        container.appendChild(div);
+                        var chart = echarts.init(div);
+                        chart.setOption({
+                            title: { text: '核心' + i, left: 'center', top: 0, textStyle: { fontSize: 10, color: '#aaa' } },
+                            tooltip: { trigger: 'axis' },
+                            grid: { top: 28, bottom: 15, left: 30, right: 10, containLabel: true },
+                            xAxis: { type: 'category', data: [], show: true, axisLabel: { fontSize: 8, interval: 5 } },
+                            yAxis: { type: 'value', min: 0, max: 100, show: true, axisLabel: { fontSize: 8 } },
+                            series: [{ type: 'line', data: [], smooth: false, color: '#ff5722', lineStyle: { color: '#ff5722' }, areaStyle: { opacity: 0.2, color: '#ff5722' } }]
+                        });
+                        w.cpuCharts.push(chart);
+                    }
+                },
+                trimPerformanceData: function() {
+                    if (w.performanceData.cpu.length <= 60) return;
+                    w.performanceData.cpu.shift();
+                    w.performanceData.mem.shift();
+                    w.performanceData.upload.shift();
+                    w.performanceData.download.shift();
+                    if (w.performanceData.cpuPerCore) {
+                        for (var i = 0; i < w.performanceData.cpuPerCore.length; i++) w.performanceData.cpuPerCore[i].shift();
+                    }
+                },
+                refreshPerformanceCharts: function() {
+                    if (w.currentTab !== 'stats') return;
+                    var xData = w.performanceData.cpu.map(function(_, idx) { return idx.toString(); });
+                    w.cpuCharts.forEach(function(chart, k) {
+                        chart.setOption({ xAxis: { data: xData }, series: [{ data: ((w.performanceData.cpuPerCore || [])[k] || []).slice() }] });
+                    });
+                    if (w.memChart) w.memChart.setOption({ xAxis: { data: xData }, series: [{ data: w.performanceData.mem.slice() }] });
+                    if (w.netChart) w.netChart.setOption({
+                        xAxis: { data: xData },
+                        series: [{ data: w.performanceData.upload.slice() }, { data: w.performanceData.download.slice() }]
+                    });
+                },
                 loadOnlineStats: async function(range, immersive) {
                     immersive = immersive || false;
                     try {
-                        var resp = await fetch('/api/stats/online?range=all', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } });
+                        var resp = await S.apiFetch('/api/stats/online?range=all');
                         var data = await resp.json();
                         if (!data.success) return;
                         var times = data.data.times;
                         var counts = data.data.counts;
                         var missingRanges = data.data.missingRanges;
-                        w.fullTimes = times;
-                        w.fullCounts = counts;
-                        w.fullMissingRanges = missingRanges;
                         var totalPoints = times.length;
                         var hasZoom = false, startVal = 0, endVal = 100, effectiveRange = range, targetWidth = 0;
 
@@ -1459,12 +1378,7 @@
                             var startTime = new Date(times[0]).getTime();
                             var endTime = new Date(times[totalPoints - 1]).getTime();
                             var totalDays = (endTime - startTime) / (1000 * 60 * 60 * 24);
-                            var windowDays = 1;
-                            if (range === '3d') windowDays = 3;
-                            else if (range === '7d') windowDays = 7;
-                            else if (range === '15d') windowDays = 15;
-                            else if (range === '30d') windowDays = 30;
-                            else if (range === '1d') windowDays = 1;
+                            var windowDays = { '1d': 1, '3d': 3, '7d': 7, '15d': 15, '30d': 30 }[range] || 1;
                             if (totalDays <= windowDays) { hasZoom = false; effectiveRange = 'all'; }
                             else {
                                 hasZoom = true;
@@ -1508,16 +1422,12 @@
                             }];
                         }
 
-                        var chart;
-                        if (immersive) {
-                            chart = w.immersiveChart;
-                            if (!chart) chart = echarts.init(h.elements.immersiveStats);
-                            chart.setOption(option, true);
-                            setTimeout(function() { chart.resize(); }, 50);
-                            w.immersiveChart = chart;
-                        } else {
-                            if (!w.onlineChart) {
-                                w.onlineChart = echarts.init(document.getElementById('online-chart'));
+                        var chart = immersive ? w.immersiveChart : w.onlineChart;
+                        if (!chart) {
+                            chart = echarts.init(immersive ? h.elements.immersiveStats : document.getElementById('online-chart'));
+                            if (immersive) w.immersiveChart = chart;
+                            else {
+                                w.onlineChart = chart;
                                 if (!w.resizeHandlerAttached) {
                                     window.addEventListener('resize', function() {
                                         if (w.onlineChart) w.onlineChart.resize();
@@ -1526,18 +1436,18 @@
                                     w.resizeHandlerAttached = true;
                                 }
                             }
-                            chart = w.onlineChart;
-                            chart.setOption(option, true);
-                            chart.resize();
                         }
+                        chart.setOption(option, true);
+                        if (immersive) setTimeout(function() { chart.resize(); }, 50);
+                        else chart.resize();
 
-                        if (hasZoom && effectiveRange !== 'all') {
+                        if (hasZoom) {
                             var targetWidthCopy = targetWidth;
                             chart.off('datazoom');
                             chart.on('datazoom', function(params) {
                                 var currentWidth = params.end - params.start;
                                 if (Math.abs(currentWidth - targetWidthCopy) > 0.5) {
-                                    var newStart = Math.max(0, Math.min(100 - targetWidthCopy, 100 - targetWidthCopy));
+                                    var newStart = Math.max(0, 100 - targetWidthCopy);
                                     chart.setOption({ dataZoom: [{ start: newStart, end: 100 }] });
                                 }
                             });
@@ -1554,64 +1464,50 @@
                     var el = document.getElementById('live-online-summary');
                     if (!el) return;
                     try {
-                        var resp = await fetch('/api/online/detail', { headers: { 'Authorization': 'Bearer ' + w.apiPassword } });
+                        var resp = await S.apiFetch('/api/online/detail');
                         var data = await resp.json();
                         if (!data.success || !data.data) { el.textContent = ''; return; }
                         var d = data.data;
                         var totalText = (d.total === null || d.total === undefined) ? '--' : d.total;
-                        var html = '<div style="color:#ff0;">当前总在线: ' + totalText + ' 人</div>';
-                        if (d.servers && d.servers.length) {
-                            for (var i = 0; i < d.servers.length; i++) {
-                                var sv = d.servers[i];
+                        el.innerHTML = '<div style="color:#ff0;">当前总在线: ' + totalText + ' 人</div>' +
+                            (d.servers || []).map(function(sv) {
                                 var onlineText = (sv.online === null || sv.online === undefined) ? '--' : sv.online;
-                                html += '<div style="color:#fff;">- ' + S.escapeHtml(sv.address) + ': ' + onlineText + ' 人</div>';
-                            }
-                        }
-                        el.innerHTML = html;
+                                return '<div style="color:#fff;">- ' + S.escapeHtml(sv.address) + ': ' + onlineText + ' 人</div>';
+                            }).join('');
                     } catch (err) { el.textContent = ''; }
                 },
 
                 resizeAllCharts: function() {
-                    if (w.cpuCharts) for (var i = 0; i < w.cpuCharts.length; i++) w.cpuCharts[i].resize();
-                    if (w.memChart) w.memChart.resize();
-                    if (w.netChart) w.netChart.resize();
-                    if (w.onlineChart) w.onlineChart.resize();
-                    if (w.immersiveChart) w.immersiveChart.resize();
+                    w.cpuCharts.forEach(function(c) { c.resize(); });
+                    [w.memChart, w.netChart, w.onlineChart, w.immersiveChart].forEach(function(c) { if (c) c.resize(); });
                 },
 
                 initPerformanceCharts: function() {
                     var self = this;
-                    var checkMem = function() {
-                        var el = document.getElementById('mem-chart');
-                        if (el && el.offsetHeight > 0 && !w.memChart) {
-                            w.memChart = echarts.init(el);
-                            w.memChart.setOption({
-                                tooltip: { trigger: 'axis' },
-                                grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
-                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
-                                yAxis: { type: 'value', name: '%', min: 0, max: 100 },
-                                series: [{ type: 'line', data: [], smooth: false, color: '#2196f3', lineStyle: { color: '#2196f3' }, areaStyle: { opacity: 0.2, color: '#2196f3' } }]
-                            });
+                    function ensureChart(id, refName, option) {
+                        var el = document.getElementById(id);
+                        if (el && el.offsetHeight > 0 && !w[refName]) {
+                            w[refName] = echarts.init(el);
+                            w[refName].setOption(option);
                         }
-                    };
-                    var checkNet = function() {
-                        var el = document.getElementById('net-chart');
-                        if (el && el.offsetHeight > 0 && !w.netChart) {
-                            w.netChart = echarts.init(el);
-                            w.netChart.setOption({
-                                tooltip: { trigger: 'axis' },
-                                grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
-                                xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
-                                yAxis: { type: 'value', name: 'Mbps' },
-                                series: [
-                                    { name: '上传', type: 'line', data: [], color: '#ff9800', lineStyle: { color: '#ff9800' }, areaStyle: { opacity: 0.2, color: '#ff9800' } },
-                                    { name: '下载', type: 'line', data: [], color: '#4caf50', lineStyle: { color: '#4caf50' }, areaStyle: { opacity: 0.2, color: '#4caf50' } }
-                                ]
-                            });
-                        }
-                    };
-                    checkMem();
-                    checkNet();
+                    }
+                    ensureChart('mem-chart', 'memChart', {
+                        tooltip: { trigger: 'axis' },
+                        grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
+                        xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
+                        yAxis: { type: 'value', name: '%', min: 0, max: 100 },
+                        series: [{ type: 'line', data: [], smooth: false, color: '#2196f3', lineStyle: { color: '#2196f3' }, areaStyle: { opacity: 0.2, color: '#2196f3' } }]
+                    });
+                    ensureChart('net-chart', 'netChart', {
+                        tooltip: { trigger: 'axis' },
+                        grid: { top: 28, bottom: 3, left: '1%', right: '5%', containLabel: true },
+                        xAxis: { type: 'category', data: [], axisLabel: { interval: 5, rotate: 30, fontSize: 9, margin: 8 } },
+                        yAxis: { type: 'value', name: 'Mbps' },
+                        series: [
+                            { name: '上传', type: 'line', data: [], color: '#ff9800', lineStyle: { color: '#ff9800' }, areaStyle: { opacity: 0.2, color: '#ff9800' } },
+                            { name: '下载', type: 'line', data: [], color: '#4caf50', lineStyle: { color: '#4caf50' }, areaStyle: { opacity: 0.2, color: '#4caf50' } }
+                        ]
+                    });
                     if (!w.memChart || !w.netChart) setTimeout(function() { self.initPerformanceCharts(); }, 100);
                     this.resizeAllCharts();
                 },
@@ -1634,18 +1530,17 @@
 
             var s = {
                 enabled: false,
-                initialized: false,
                 totalLines: 0,
                 loadedUpTo: 0,
                 loading: false,
-                chunkSize: 5000,
                 stopFlag: false,
                 progressDiv: null,
 
                 start: async function() {
-                    if (this.initialized || this.enabled) return;
+                    if (this.enabled) return;
                     this.enabled = true;
                     this.stopFlag = false;
+                    window._historyLoadStarted = true;
                     this.progressDiv = h.elements.progressDiv;
                     await this.resetAndClear();
                     if (!this.stopFlag && this.loadedUpTo < this.totalLines) this.loadNextChunk();
@@ -1659,9 +1554,7 @@
                     }
                     this.updateProgress(0, 0);
                     try {
-                        var resp = await fetch('/api/log/total_lines?server=' + encodeURIComponent(w.currentServer), {
-                            headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                        });
+                        var resp = await S.apiFetch('/api/log/total_lines?server=' + encodeURIComponent(w.currentServer));
                         var data = await resp.json();
                         this.totalLines = data.total;
                         this.updateProgress(0, this.totalLines);
@@ -1682,22 +1575,13 @@
                     }
                     this.loading = true;
                     var start = this.loadedUpTo;
-                    var count = Math.min(this.chunkSize, this.totalLines - start);
+                    var count = Math.min(5000, this.totalLines - start);
                     var self = this;
-                    fetch('/api/log/range?server=' + encodeURIComponent(w.currentServer) + '&start=' + start + '&count=' + count, {
-                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                    }).then(resp => resp.json()).then(function(data) {
+                    S.apiFetch('/api/log/range?server=' + encodeURIComponent(w.currentServer) + '&start=' + start + '&count=' + count)
+                    .then(resp => resp.json()).then(function(data) {
                         if (data.lines && data.lines.length) {
                             if (h.monacoEditor) {
-                                var model = h.monacoEditor.getModel();
-                                var lastLine = model.getLineCount();
-                                var text = data.lines.join('\n');
-                                model.pushEditOperations([], [{
-                                    range: new monaco.Range(lastLine, model.getLineMaxColumn(lastLine), lastLine, model.getLineMaxColumn(lastLine)),
-                                    text: '\n' + text,
-                                    forceMoveMarkers: true
-                                }]);
-                                if (w.autoScrollEnabled) h.monacoEditor.revealLineInCenter(model.getLineCount(), monaco.editor.ScrollType.Smooth);
+                                S.appendMonacoLines(h.monacoEditor, data.lines, w.autoScrollEnabled);
                                 h.updateDecorations();
                             }
                             self.loadedUpTo += data.lines.length;
@@ -1723,12 +1607,6 @@
                         var pct = ((loaded / total) * 100).toFixed(1);
                         this.progressDiv.textContent = ' 📄 加载日志 ' + loaded + '/' + total + ' (' + pct + '%)';
                     }
-                },
-
-                stop: function() {
-                    this.stopFlag = true;
-                    this.enabled = false;
-                    if (this.progressDiv) this.progressDiv.textContent = '';
                 }
             };
 
@@ -1758,13 +1636,36 @@
                     o.initPerformanceCharts();
                     if (w.onlineChart) setTimeout(function() { w.onlineChart.resize(); }, 100);
                     o.startAutoRefresh();
-                } else if (tab === 'screen') {
-                    o.stopAutoRefresh();
-                    h.startScreenCapture();
                 } else {
                     h.stopScreenCapture();
-                    h.updateNonConsoleTab();
                     o.stopAutoRefresh();
+                    if (tab === 'screen') h.startScreenCapture();
+                    else h.updateNonConsoleTab();
+                }
+            }
+
+            function resetClientState() {
+                w.chatLines = []; w.joinQuitLines = []; w.grimLines = []; w.serverLines = [];
+                w.ipLoginRecords = []; w.rawLogLines = []; w.expandedIps = new Set();
+                ['chatText', 'joinquitText', 'grimText', 'serverText'].forEach(function(k) {
+                    if (h.elements[k]) h.elements[k].value = '';
+                });
+                if (h.elements.ipPanel) h.elements.ipPanel.innerHTML = '';
+                s.stopFlag = true;
+                s.enabled = false;
+                s.loading = false;
+            }
+
+            async function loadServerData(serverName, token) {
+                var rawResp = await S.apiFetch('/api/latest_raw?server=' + encodeURIComponent(serverName), {}, token);
+                var rawText = await rawResp.text();
+                r.refreshAllDataFromRaw(rawText);
+                s.start();
+                if (w.currentTab === 'stats') {
+                    await o.loadOnlineStats(w.currentStatsRange);
+                    o.loadOnlineDetail();
+                } else if (w.currentTab !== 'console') {
+                    h.updateNonConsoleTab();
                 }
             }
 
@@ -1772,44 +1673,10 @@
             async function switchServer(newServer) {
                 if (!newServer || newServer === w.currentServer) return;
                 w.currentServer = newServer;
-
-                // 清空所有缓存数据
-                w.chatLines = [];
-                w.joinQuitLines = [];
-                w.grimLines = [];
-                w.serverLines = [];
-                w.ipLoginRecords = [];
-                w.rawLogLines = [];
-                w.expandedIps = new Set();
-                w.fullTimes = [];
-                w.fullCounts = [];
-                w.fullMissingRanges = [];
-
-                // 清空 UI
-                if (h.elements.chatText) h.elements.chatText.value = '';
-                if (h.elements.joinquitText) h.elements.joinquitText.value = '';
-                if (h.elements.grimText) h.elements.grimText.value = '';
-                if (h.elements.serverText) h.elements.serverText.value = '';
-                if (h.elements.ipPanel) h.elements.ipPanel.innerHTML = '';
-                s.stopFlag = true;
-                s.enabled = false;
-                s.loading = false;
-
+                resetClientState();
                 h.showStatus('正在切换至 ' + newServer + ' ...', 2000);
-
                 try {
-                    var rawResp = await fetch('/api/latest_raw?server=' + encodeURIComponent(newServer), {
-                        headers: { 'Authorization': 'Bearer ' + w.apiPassword }
-                    });
-                    var rawText = await rawResp.text();
-                    r.refreshAllDataFromRaw(rawText);
-                    s.start();
-                    if (w.currentTab === 'stats') {
-                        await o.loadOnlineStats(w.currentStatsRange);
-                        o.loadOnlineDetail();
-                    } else if (w.currentTab !== 'console') {
-                        h.updateNonConsoleTab();
-                    }
+                    await loadServerData(newServer);
                     h.showStatus('已切换至 ' + newServer, 2000);
                 } catch (err) {
                     console.error('切换服务器失败', err);
@@ -1817,27 +1684,36 @@
                 }
             }
 
-            async function c() {
-                var password = await new Promise(function(resolve) {
+            function promptPassword() {
+                return new Promise(function(resolve) {
                     var modal = document.createElement('div');
                     modal.className = 'modal';
                     modal.innerHTML = '<div class="modal-card"><h3>请输入访问密码</h3><input type="password" id="pwd-input" placeholder="密码"><button id="pwd-submit">确认</button></div>';
                     document.body.appendChild(modal);
                     var input = modal.querySelector('#pwd-input');
-                    var btn = modal.querySelector('#pwd-submit');
                     var submit = function() {
-                        var val = input.value;
-                        if (val) { modal.remove(); resolve(val); }
+                        if (input.value) { modal.remove(); resolve(input.value); }
                         else alert('密码不能为空');
                     };
-                    btn.onclick = submit;
+                    modal.querySelector('#pwd-submit').onclick = submit;
                     input.onkeypress = function(e) { if (e.key === 'Enter') submit(); };
                     input.focus();
                 });
+            }
 
+            async function initServerSelect() {
+                w.serverList = await (await fetch('/api/servers')).json();
+                var sel = document.getElementById('server-select');
+                sel.innerHTML = w.serverList.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+                w.currentServer = w.serverList[0];
+                sel.value = w.currentServer;
+                sel.addEventListener('change', function() { switchServer(sel.value); });
+            }
+
+            async function c() {
+                var password = await promptPassword();
                 try {
-                    var testResp = await fetch('/api/auth', { headers: { 'Authorization': 'Bearer ' + password } });
-                    if (testResp.status === 401) {
+                    if ((await S.apiFetch('/api/auth', {}, password)).status === 401) {
                         alert('密码错误');
                         return c();
                     }
@@ -1845,37 +1721,12 @@
                     h.showStatus('验证成功，加载数据...', 2000);
                     h.elements.immersiveBtn.style.display = 'flex';
                     h.elements.rconToggleBtn.style.display = 'flex';
-
-                    // 加载服务器列表
-                    var sresp = await fetch('/api/servers');
-                    w.serverList = await sresp.json();
-                    var sel = document.getElementById('server-select');
-                    sel.innerHTML = w.serverList.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
-                    w.currentServer = w.serverList[0];
-                    sel.value = w.currentServer;
-                    sel.addEventListener('change', function() { switchServer(sel.value); });
-
-                    // 加载当前服务器历史日志
-                    var rawResp = await fetch('/api/latest_raw?server=' + encodeURIComponent(w.currentServer), {
-                        headers: { 'Authorization': 'Bearer ' + password }
-                    });
-                    var rawText = await rawResp.text();
-                    r.refreshAllDataFromRaw(rawText);
-
+                    await initServerSelect();
+                    await loadServerData(w.currentServer, password);
                     a.init();
                     await l('stats');
                     h.showStatus('就绪', 2000);
-
-                    if (h.elements.rconWindow) {
-                        var win = h.elements.rconWindow;
-                        win.style.display = 'flex';
-                        var left = (window.innerWidth - win.offsetWidth) / 2;
-                        var top = (window.innerHeight - win.offsetHeight) / 2;
-                        win.style.left = left + 'px';
-                        win.style.top = top + 'px';
-                        win.style.bottom = '';
-                        win.style.right = '';
-                    }
+                    h.centerRconWindow();
                 } catch (err) {
                     alert('网络错误，请检查后端');
                     return c();
@@ -1888,55 +1739,26 @@
                 var leftPanel = document.getElementById('grim-left-panel');
                 var container = divider ? divider.parentElement : null;
                 if (!divider || !leftPanel || !container) return;
-                var isDragging = false, startX = 0, startLeftWidth = 0;
-                function getContainerWidth() { return container.getBoundingClientRect().width; }
+                var startX = 0, startLeftWidth = 0;
                 function setLeftWidth(percent) {
-                    var clamped = Math.min(90, Math.max(10, percent));
-                    leftPanel.style.width = clamped + '%';
-                    return clamped;
+                    leftPanel.style.width = Math.min(90, Math.max(10, percent)) + '%';
                 }
-                function startDrag(e) {
-                    e.preventDefault();
-                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    isDragging = true;
-                    divider.classList.add('dragging');
-                    startX = clientX;
+                S.bindDrag(divider, function(p) {
+                    startX = p.x;
                     startLeftWidth = leftPanel.getBoundingClientRect().width;
+                    divider.classList.add('dragging');
                     document.body.style.userSelect = 'none';
                     document.body.style.webkitUserSelect = 'none';
-                    document.addEventListener('mousemove', onDragMove);
-                    document.addEventListener('mouseup', onDragEnd);
-                    document.addEventListener('touchmove', onDragMove, { passive: false });
-                    document.addEventListener('touchend', onDragEnd);
-                    document.addEventListener('touchcancel', onDragEnd);
-                }
-                function onDragMove(e) {
-                    if (!isDragging) return;
-                    e.preventDefault();
-                    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                    var deltaX = clientX - startX;
-                    var containerWidth = getContainerWidth();
+                }, function(p) {
+                    var containerWidth = container.getBoundingClientRect().width;
                     if (containerWidth <= 0) return;
-                    var dividerWidth = divider.offsetWidth || 6;
-                    var available = containerWidth - dividerWidth;
-                    var newWidth = startLeftWidth + deltaX;
-                    var percent = (newWidth / available) * 100;
-                    setLeftWidth(percent);
-                }
-                function onDragEnd() {
-                    if (!isDragging) return;
-                    isDragging = false;
+                    var available = containerWidth - (divider.offsetWidth || 6);
+                    setLeftWidth(((startLeftWidth + p.x - startX) / available) * 100);
+                }, function() {
                     divider.classList.remove('dragging');
                     document.body.style.userSelect = '';
                     document.body.style.webkitUserSelect = '';
-                    document.removeEventListener('mousemove', onDragMove);
-                    document.removeEventListener('mouseup', onDragEnd);
-                    document.removeEventListener('touchmove', onDragMove);
-                    document.removeEventListener('touchend', onDragEnd);
-                    document.removeEventListener('touchcancel', onDragEnd);
-                }
-                divider.addEventListener('mousedown', startDrag);
-                divider.addEventListener('touchstart', startDrag, { passive: false });
+                });
                 divider.addEventListener('dblclick', function() { setLeftWidth(50); });
             })();
 
@@ -1950,8 +1772,9 @@
 
                 h.init();
 
-                document.querySelectorAll('.tab-button').forEach(function(btn) {
-                    btn.addEventListener('click', function() { l(btn.getAttribute('data-tab')); });
+                document.getElementById('tab-bar').addEventListener('click', function(e) {
+                    var btn = e.target.closest('.tab-button');
+                    if (btn) l(btn.getAttribute('data-tab'));
                 });
 
                 document.getElementById('range-selector').addEventListener('click', function(e) {
