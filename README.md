@@ -4,7 +4,9 @@
 
 - https://yaogaochaole.github.io/McRconConsole/
 - 选择你的服务器日志文件`latest.log`，即可分析日志。
-
+---
+---
+---
 # 主要项目——McRconConsole 实时在线控制台
 
 ## McRconConsole - 主要功能：
