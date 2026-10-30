@@ -171,7 +171,7 @@ body{margin:0;padding:10px;background:#0a0a0a;height:100vh;display:flex;flex-dir
   <div id="tab-playerip" class="tab-content">
     <div class="player-ip-container">
       <div class="ip-record-area">
-        <div class="sub-header"><span>玩家登录IP记录</span><div class="scroll-buttons"><button id="ip-scroll-top" class="scroll-btn">↑</button><button id="ip-scroll-bottom" class="scroll-btn">↓</button></div></div>
+        <div class="sub-header"><span>玩家登录IP记录<span id="ip-summary" style="color:#aaa;font-weight:400;font-size:13px;margin-left:10px"></span></span><div class="scroll-buttons"><button id="ip-scroll-top" class="scroll-btn">↑</button><button id="ip-scroll-bottom" class="scroll-btn">↓</button></div></div>
         <div id="ip-panel" class="ip-panel"></div>
       </div>
       <div class="ip-query-area">
@@ -489,7 +489,7 @@ const UI = {
       e.r.push({time, player}); e.p.add(player);
     }
     if (!map.size) {
-      E.ipPanel.innerHTML = '<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>';
+      E.ipPanel.innerHTML = '<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>'; document.getElementById('ip-summary').textContent = '0个玩家，0个IP地址';
       return;
     }
     const parts = [];
@@ -500,7 +500,7 @@ const UI = {
         .map(r => `<div class="login-record-row"><span class="login-record-time">${r.time}</span><span class="login-record-player">${esc(r.player)}</span></div>`).join('');
       parts.push(`<div class="ip-card" data-ip="${ip}"><div class="ip-header" data-ip="${ip}"><span class="toggle-icon">${ex ? '▼' : '▶'}</span><span class="ip-address ${d.p.size > 1 ? 'multi-player' : 'single-player'}" data-ip="${ip}">${ip}</span><span class="stats">(${d.r.length}次登录, ${d.p.size}个玩家: ${players})</span></div><div class="ip-details ${ex ? 'expanded' : ''}" data-ip="${ip}">${rows}</div></div>`);
     }
-    E.ipPanel.innerHTML = parts.join('');
+    E.ipPanel.innerHTML = parts.join(''); document.getElementById('ip-summary').textContent = [...map.values()].reduce((s,d)=>s+d.p.size,0)+'个玩家，'+map.size+'个IP地址';
     if (S.autoScroll && S.currentTab === 'playerip') scrollTo(E.ipPanel, true);
   },
 
