@@ -1,1 +1,768 @@
-<!doctypehtml><html lang=zh><meta charset=UTF-8><meta content="width=device-width,initial-scale=1,viewport-fit=cover"name=viewport><title>YaoGaoChaoLe_服务器日志分析</title><style>*{box-sizing:border-box;font-family:'微软雅黑','Microsoft YaHei','Segoe UI',Roboto,sans-serif}body{margin:0;padding:10px;background:#0a0a0a;height:100vh;display:flex;flex-direction:column;color:#e0e0e0}.top-bar{display:flex;align-items:center;justify-content:space-between;background:#1e1e1e;padding:8px 12px;border-radius:6px;margin-bottom:10px;box-shadow:0 2px 4px rgba(0,0,0,.5);gap:12px;flex-wrap:wrap;min-height:48px;border:1px solid #2c2c2c}.status-text{font-size:14px;color:#0fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:120px}.auto-scroll-check,.auto-wrap-check,.filter-errors-check{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;color:#ccc}.auto-scroll-check input,.auto-wrap-check input,.filter-errors-check input{accent-color:#00ffcc}.tab-bar{display:flex;flex-wrap:wrap;gap:2px;background:#1a1a1a;padding:5px 5px 0 5px;border-radius:6px 6px 0 0}.tab-button{padding:8px 16px;background:#2c2c2c;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-size:14px;transition:.2s;color:#ddd;font-weight:500;border-bottom:2px solid transparent}.tab-button:hover{background:#3a3a3a;color:#fff}.tab-button.active{background:#0f0f0f;border-bottom-color:#0fc;font-weight:600;color:#0fc}.panel-container{flex:1;background:#0f0f0f;border-radius:0 6px 6px 6px;box-shadow:0 2px 4px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column;border:1px solid #2c2c2c;border-top:none}.tab-content{flex:1;display:none;background:#0f0f0f;flex-direction:column;overflow:hidden;min-height:0}.tab-content.active{display:flex}.log-textarea{flex:1;width:100%;border:none;background:#1a1a1a;color:#e0e0e0;resize:none;font-family:Consolas,monospace;font-size:13px;line-height:1.5;outline:0;padding:8px;min-height:0}#monaco-container{width:100%;height:100%;border-left:1px solid #2c2c2c;background:#1a1a1a}.color-ff0000{color:red!important}.color-fbff00{color:#fbff00!important}.color-00ffea{color:#00ffea!important}.color-666666{color:#666!important}.color-3bf010{color:#3bf010!important}.color-ffffff{color:#fff!important}.config-panel{background:#1a1a1a;border-bottom:1px solid #2c2c2c;padding:12px;display:flex;flex-direction:column;gap:10px}.config-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.config-row label{min-width:90px;color:#ccc}.config-row input{flex:1;min-width:200px;padding:6px 8px;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px;font-family:monospace}.config-actions{display:flex;gap:8px;justify-content:flex-end}.config-actions button{padding:6px 14px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;font-size:13px}.config-actions button:hover{background:#3a3a3a;color:#fff}.config-toggle{cursor:pointer;color:gold;text-decoration:underline;font-size:13px}.config-toggle:hover{color:orange}.config-hint{font-size:12px;color:#aaa;margin-left:98px}.player-ip-container{display:flex;flex-direction:column;height:100%;gap:12px;flex:1;min-height:0}.ip-record-area{flex:2;min-height:0;display:flex;flex-direction:column;background:#1a1a1a;border-radius:4px;overflow:hidden;border:1px solid #2c2c2c}.ip-panel{flex:1;overflow:auto;padding:8px}.ip-card{margin-bottom:8px;border:1px solid #2c2c2c;border-radius:4px;background:#0f0f0f}.ip-header{display:flex;align-items:center;padding:8px 12px;cursor:pointer;background:#1a1a1a;border-bottom:1px solid #2c2c2c;user-select:none}.ip-header:hover{background:#252525}.ip-header .toggle-icon{font-size:16px;margin-right:8px;color:#fff}.ip-header .ip-address{font-weight:700;cursor:pointer;text-decoration:underline;margin-right:12px}.ip-header .ip-address.single-player{color:#fff}.ip-header .ip-address.multi-player{color:#ff0}.ip-header .ip-address:hover{color:#fff}.ip-header .stats{color:#aaa;font-size:13px;word-break:break-all;white-space:normal;flex:1}.ip-details{padding:8px 12px;display:none}.ip-details.expanded{display:block}.login-record-row{font-family:monospace;font-size:13px;padding:4px 0;border-bottom:1px dashed #2c2c2c;display:flex}.login-record-time{color:#0fc;width:80px;flex-shrink:0}.login-record-player{color:#fff;margin-left:12px}.ip-query-area{flex:1;min-height:180px;display:flex;flex-direction:column;background:#1a1a1a;border-radius:4px;border:1px solid #2c2c2c;overflow:hidden}.ip-query-row{display:flex;gap:8px;padding:10px;flex-wrap:wrap;align-items:center}.ip-query-row input{flex:3;min-width:150px;padding:8px 12px;border:1px solid #3a3a3a;background:#0f0f0f;color:#e0e0e0;border-radius:4px;font-size:14px;font-family:monospace}.ip-query-row input:focus{outline:0;border-color:#0fc;box-shadow:0 0 2px #0fc}.ip-query-row button{flex:1;padding:8px 16px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;font-size:14px;font-weight:700;transition:.2s}.ip-query-row button:hover{background:#3a3a3a;color:#fff;border-color:#0fc}.ip-query-result{flex:1;background:#0f0f0f;border:1px solid #2c2c2c;border-radius:4px;padding:8px;font-family:monospace;font-size:13px;white-space:pre-wrap;overflow:auto;margin:0 10px 10px 10px;color:#ccc}@media (min-width:501px){.player-ip-container{flex-direction:row}.ip-record-area{flex:7.5}.ip-query-area{flex:2.5}}@media (max-width:500px){.player-ip-container{flex-direction:column}.ip-query-area{min-height:200px}}#upload-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999}.upload-card{background:#1e1e1e;padding:30px;border-radius:12px;max-width:600px;width:90%;border:1px solid #0fc;box-shadow:0 0 30px rgba(0,255,204,.15)}.upload-card h2{color:#0fc;text-align:center;margin-top:0}.upload-card input[type=file]{width:100%;padding:10px;margin:15px 0;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px}.upload-card textarea{width:100%;height:120px;padding:8px;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px;font-family:monospace;font-size:13px;resize:vertical}.upload-card .submit-btn{display:block;width:100%;padding:12px;background:#2c2c2c;color:#0fc;border:none;border-radius:6px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;margin-top:12px}.upload-card .submit-btn:hover{background:#3a3a3a;color:#fff;border-color:#0fc}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:#1a1a1a}::-webkit-scrollbar-thumb{background:#ffffff9f;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#ffffffd4}@media (max-width:600px){.tab-button{padding:6px 12px;font-size:12px}}.grim-split-container{display:flex;flex:1;min-height:0;height:100%;width:100%}.grim-panel{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}.grim-left{flex-shrink:0;width:50%}.grim-right{flex:1}.grim-divider{width:6px;flex-shrink:0;cursor:col-resize;background:#2c2c2c;position:relative;transition:background .15s ease;user-select:none;-webkit-user-select:none;touch-action:none}.grim-divider::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;background:#666;border-radius:1px;transition:all .15s ease}.grim-divider.dragging,.grim-divider:hover{background:#00e5ff;box-shadow:0 0 20px rgba(0,229,255,.4)}.grim-divider.dragging::before,.grim-divider:hover::before{background:#0a0a0a;height:44px}@media (max-width:600px){.grim-split-container{flex-direction:column}.grim-left{width:100%!important;flex:1}.grim-right{flex:1}.grim-divider{display:none}}.sub-header{padding:5px 10px;background:#252525;font-weight:600;border-bottom:1px solid #3a3a3a;flex-shrink:0;color:#0fc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.line-control{display:flex;align-items:center;gap:8px}.line-control button,.scroll-btn{padding:4px 12px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;transition:.2s}.line-control button:hover,.scroll-btn:hover{background:#3a3a3a;color:#fff;border-color:#0fc}.scroll-buttons{display:flex;gap:4px;margin-left:auto}#loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,10,.95);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#0fc;font-size:18px;font-weight:600;font-family:'微软雅黑',sans-serif}#loading-overlay .loader{border:4px solid #2c2c2c;border-top:4px solid #0fc;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin-bottom:15px}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}</style><script src=https://cdn.socket.io/4.7.2/socket.io.min.js></script><script src=https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js></script><link data-name=vs/editor/editor.main href=https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css rel=stylesheet><script>var require={paths:{vs:"https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs"}}</script><script src=https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js></script><div id=loading-overlay><div class=loader></div><div>正在加载资源 请确保网络通畅...</div></div><div id=upload-overlay><div class=upload-card><h2>离线日志分析器</h2><p style=color:#ccc;text-align:center>选择 latest.log 文件<br>或粘贴日志内容</p><input id=file-input type=file accept=.log,.txt> <textarea id=text-input placeholder=或直接粘贴日志内容...></textarea> <button class=submit-btn id=submit-log-btn>分析</button></div></div><div class=top-bar><div class=status-text id=status>离线模式 - 等待加载</div><label class=auto-scroll-check><input id=auto-scroll type=checkbox checked> 自动滚动</label> <label class=auto-wrap-check><input id=auto-wrap type=checkbox> 自动换行</label></div><div class=tab-bar id=tab-bar><button class="tab-button active"data-tab=chat>聊天记录</button> <button class=tab-button data-tab=console>控制台</button> <button class=tab-button data-tab=joinquit>断开连接</button> <button class=tab-button data-tab=grim>仅看关键词</button> <button class=tab-button data-tab=playerip>登录查询</button></div><div class=panel-container><div class="tab-content active"id=tab-chat><div class=sub-header><span>聊天记录</span><div class=scroll-buttons><button class=scroll-btn id=chat-scroll-top>↑</button><button class=scroll-btn id=chat-scroll-bottom>↓</button></div></div><textarea id=chat-text class=log-textarea readonly wrap=off></textarea></div><div class=tab-content id=tab-console><div style=display:flex;flex-direction:column;height:100%;flex:1;min-height:0><div class=sub-header><span>控制台日志</span><div class=line-control><button id=copy-console-btn>复制</button><div class=scroll-buttons><button class=scroll-btn id=scroll-top-btn title=顶部>↑</button><button class=scroll-btn id=scroll-bottom-btn title=底部>↓</button></div><div id=log-load-progress style=font-size:12px;color:#aaa;white-space:nowrap></div><label class=filter-errors-check><input id=filter-errors type=checkbox checked> 屏蔽报错</label></div></div><div id=monaco-container style=width:100%;height:100%;position:relative></div></div></div><div class=tab-content id=tab-joinquit><div class=sub-header><span>断开连接</span><div class=scroll-buttons><button class=scroll-btn id=joinquit-scroll-top>↑</button><button class=scroll-btn id=joinquit-scroll-bottom>↓</button></div></div><textarea id=joinquit-text class=log-textarea readonly wrap=off></textarea></div><div class=tab-content id=tab-grim><div class=sub-header><span>仅看关键词</span><span id=grim-config-toggle class=config-toggle>⚙ 配置关键词</span></div><div class=config-panel id=grim-config-panel style=display:none><div class=config-row><label>关键词1：</label><input id=grim-left-keywords placeholder="多个关键词用半角逗号分隔，如: warn,error"></div><div class=config-row><label>关键词2：</label><input id=grim-right-keywords placeholder="多个关键词用半角逗号分隔，如: [Server],warn,error"></div><div class=config-hint>💡 多个关键词用 半角逗号(英文输入法下的逗号) 分隔。但不要以逗号结尾</div><div class=config-actions><button id=grim-apply-config>应用</button><button id=grim-reset-config>重置默认</button><button id=grim-cancel-config>取消</button></div></div><div class=grim-split-container><div class="grim-panel grim-left"id=grim-left-panel><div class=sub-header style="border-radius:0;border-bottom:1px solid #3a3a3a">包含 关键词1 的日志</div><textarea id=grim-text class=log-textarea readonly wrap=off></textarea></div><div class=grim-divider id=grim-divider title=拖动调整左右宽度></div><div class="grim-panel grim-right"><div class=sub-header style="border-radius:0;border-bottom:1px solid #3a3a3a">包含 关键词2 的日志</div><textarea id=server-text class=log-textarea readonly wrap=off></textarea></div></div></div><div class=tab-content id=tab-playerip><div class=player-ip-container><div class=ip-record-area><div class=sub-header><span>玩家登录IP记录<span id=ip-summary style=color:#aaa;font-weight:400;font-size:13px;margin-left:10px></span></span><div class=scroll-buttons><button class=scroll-btn id=ip-scroll-top>↑</button><button class=scroll-btn id=ip-scroll-bottom>↓</button></div></div><div class=ip-panel id=ip-panel></div></div><div class=ip-query-area><div class=sub-header>IP归属地查询</div><div class=ip-query-row><input id=ip-input placeholder="输入 IPv4 地址，例如 117.159.10.44"><button id=query-ip-btn>查询</button></div><div class=ip-query-result id=ip-query-result>等待查询</div></div></div></div></div><script>!function(){"use strict";const u=["failed to","PacketEvents caught an unhandled exception while calling your listener","\tat ","\t... ","java.lang.","io.netty.","ERROR","java.lang","at java","at knot","io.netty","java.util","Caused by","Failed to decode value","generated an exception while executing"].map(e=>e.toLowerCase()),o=[{keyword:"Server empty for",color:"#ff0000"},{keyword:"error",color:"#ff0000"},{keyword:"warn",color:"#fbff00"},{keyword:"java.lang",color:"#fbff00"},{keyword:"IP limit exceeded",color:"#00ffea"},{keyword:"触发了",color:"#00ffea"},{keyword:"反作弊",color:"#00ffea"},{keyword:"Grim",color:"#00ffea"},{keyword:"meteor",color:"#00ffea"},{keyword:"liquid",color:"#00ffea"},{keyword:"wurst",color:"#00ffea"},{keyword:"Successfully filled",color:"#666666"},{keyword:"Changed the block at",color:"#666666"},{keyword:"lost connection",color:"#666666"},{keyword:"left the game",color:"#666666"},{keyword:"[voicechat]",color:"#666666"},{keyword:"Disconnecting",color:"#666666"},{keyword:"Thread RCON",color:"#666666"},{keyword:"logged in with entity",color:"#3BF010"}],e={leftKeywords:["触发了","[Server]"],rightKeywords:["[Server]"]},t=1e4,n={chat:"chatText",joinquit:"joinquitText",grim:"grimText",playerip:"ipPanel"},s={"chat-scroll-top":["chatText",0],"chat-scroll-bottom":["chatText",1],"joinquit-scroll-top":["joinquitText",0],"joinquit-scroll-bottom":["joinquitText",1],"ip-scroll-top":["ipPanel",0],"ip-scroll-bottom":["ipPanel",1]},m={currentTab:"console",chatLines:[],joinQuitLines:[],grimLines:[],serverLines:[],rawLines:[],ipRecords:[],expandedIps:new Set,autoScroll:!0,autoWrap:!1,filter:!0,anticheat:Object.assign({},e),total:0,processing:!1,editor:null,decorations:null},l=e=>!e||e.scrollHeight-e.scrollTop-e.clientHeight<=5,p=e=>e.replace(/\[Server thread\/INFO\]: (\[Not Secure\] )?/,"");function d(n,r,i=200){if(n){n._anim&&cancelAnimationFrame(n._anim);const a=n.scrollTop;if(r||0!==a){const s=performance.now(),l=e=>{var t=Math.min((e-s)/i,1),o=t*(2-t),e=r?n.scrollHeight-n.clientHeight:0;n.scrollTop=Math.max(0,Math.min(a+(e-a)*o,e)),t<1?n._anim=requestAnimationFrame(l):(delete n._anim,r||(m.autoScroll=!1,g.autoScroll.checked=!1))};n._anim=requestAnimationFrame(l)}}}function r(o,n,r,i){let a=0;!function e(){var t=Math.min(a+n,o);r(a,t),a=t,a<o?setTimeout(e,0):i()}()}const i=[{n:"结果1",f:async e=>{const t=await fetch("https://api.ip77.net/ip2/v4/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:`ip=${encodeURIComponent(e)}`});e=await t.json();if(0!==e.code||!e.data)throw new Error(e.error||"查询失败");const o=e.data;return{loc:o.location||"未知",lng:o.longitude,lat:o.latitude,d:o.street_history?.length?o.street_history.join("、"):"无街道信息"}}},{n:"结果2",f:async e=>{e=await(await fetch(`http://ip-api.com/json/${e}?fields=status,country,regionName,city,lat,lon,isp,org`)).json();if("success"!==e.status)throw new Error(e.message||"查询失败");return{loc:`${e.country} ${e.regionName} ${e.city}`,lng:e.lon,lat:e.lat,d:`ISP: ${e.isp||"未知"}`}}},{n:"结果3",f:async e=>{e=await(await fetch(`https://ipapi.co/${e}/json/`)).json();if(e.error)throw new Error(e.reason||"查询失败");return{loc:`${e.country_name} ${e.region} ${e.city}`,lng:e.longitude,lat:e.latitude,d:`ASN: ${e.asn}`}}},{n:"结果4",f:async e=>{const t=await(await fetch(`https://ipinfo.io/${e}/json`)).json();if(t.bogon||t.error)throw new Error(t.error||"查询失败");var[o,e]=(t.loc||",").split(",");return{loc:`${t.country} ${t.region} ${t.city}`,lng:e,lat:o,d:`组织: ${t.org||"未知"}`}}},{n:"结果5",f:async e=>{e=await(await fetch(`https://ipwho.is/${e}`)).json();if(!e.success)throw new Error(e.message||"查询失败");return{loc:`${e.country} ${e.region} ${e.city}`,lng:e.longitude,lat:e.latitude,d:`代理: ${e.proxy?"是":"否"} | ISP: ${e.isp||"未知"}`}}}];let g={};const h={init(){g={status:document.getElementById("status"),autoScroll:document.getElementById("auto-scroll"),autoWrap:document.getElementById("auto-wrap"),filterErrors:document.getElementById("filter-errors"),chatText:document.getElementById("chat-text"),joinquitText:document.getElementById("joinquit-text"),grimText:document.getElementById("grim-text"),serverText:document.getElementById("server-text"),ipPanel:document.getElementById("ip-panel"),ipInput:document.getElementById("ip-input"),ipResult:document.getElementById("ip-query-result"),progress:document.getElementById("log-load-progress"),grimLeft:document.getElementById("grim-left-keywords"),grimRight:document.getElementById("grim-right-keywords"),grimPanel:document.getElementById("grim-config-panel"),grimToggle:document.getElementById("grim-config-toggle")},this.bindEvents(),this.setWrap(m.autoWrap),this.loadConfig(),this.initMonaco()},initMonaco(){const t=document.getElementById("loading-overlay");require(["vs/editor/editor.main"],()=>{document.head.insertAdjacentHTML("beforeend","<style>"+o.map(e=>`.color-${e.color.slice(1)}{color:${e.color}!important}`).join("")+"</style>"),m.editor=monaco.editor.create(document.getElementById("monaco-container"),{value:"",language:"plaintext",theme:"vs-dark",minimap:{enabled:!0,renderCharacters:!1},wordWrap:m.autoWrap?"on":"off",scrollBeyondLastLine:!1,automaticLayout:!0,readOnly:!0,lineNumbers:!0,fontSize:13,lineHeight:20}),m.editor.onDidScrollChange(()=>this.syncAutoScroll()),t.style.display="none"},e=>{console.error("Monaco CDN 加载失败:",e),t.innerHTML='<div style="color:#ff4343;text-align:center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>'})},revealEnd(){m.editor&&m.editor.revealLineInCenter(m.editor.getModel().getLineCount(),monaco.editor.ScrollType.Smooth)},refreshDecorations(){if(m.editor){const e=m.editor.getModel(),t=e.getLinesContent(),n=o.map(e=>({re:new RegExp(e.keyword.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),cls:"color-"+e.color.slice(1)})),r=[];t.forEach((t,e)=>{var o=n.find(e=>e.re.test(t));o&&r.push({range:new monaco.Range(e+1,1,e+1,1),options:{isWholeLine:!0,inlineClassName:o.cls}})}),m.decorations&&m.decorations.clear(),m.decorations=m.editor.createDecorationsCollection(r)}},appendConsole(e){if(e&&e.length&&m.editor){const t=m.filter?e.filter(e=>!e.filtered):e;if(t.length){const o=m.editor.getModel(),n=o.getLineCount();e=o.getLineMaxColumn(n);o.pushEditOperations([],[{range:new monaco.Range(n,e,n,e),text:"\n"+t.map(e=>e.text).join("\n"),forceMoveMarkers:!0}]),m.autoScroll&&this.revealEnd(),this.refreshDecorations()}}},reloadConsole(){m.editor&&m.rawLines&&(m.editor.getModel().setValue(m.rawLines.filter(e=>!m.filter||!e.filtered).map(e=>e.text).join("\n")),this.refreshDecorations(),m.autoScroll&&this.revealEnd())},setTA(e,t){var o,n;e&&(o=e.selectionStart,n=e.selectionEnd,(e.value=t).length>=n?(e.selectionStart=o,e.selectionEnd=n):t.length>=o&&(e.selectionStart=e.selectionEnd=o))},refreshOthers(){this.setTA(g.chatText,m.chatLines.join("\n")),this.setTA(g.joinquitText,[...m.joinQuitLines].sort((e,t)=>{const o=(e.match(/\[(\d{2}:\d{2}:\d{2})\]/)||[])[1];t=(t.match(/\[(\d{2}:\d{2}:\d{2})\]/)||[])[1];return o&&t?o.localeCompare(t):0}).join("\n")),this.setTA(g.grimText,m.grimLines.join("\n")),this.setTA(g.serverText,m.serverLines.join("\n")),"playerip"===m.currentTab&&this.renderIp()},scrollBottomOf(e){var t;"console"!==e?((t=g[n[e]])&&d(t,!0),"grim"===e&&d(g.serverText,!0)):this.revealEnd()},syncAutoScroll(){clearTimeout(this._syncTimer),this._syncTimer=setTimeout(()=>{let e=!0;if(m.editor){const t=m.editor;5<t.getScrollHeight()-t.getScrollTop()-t.getLayoutInfo().height&&(e=!1)}if(e)for(const o of["chatText","joinquitText","grimText","serverText","ipPanel"])if(g[o]&&!l(g[o])){e=!1;break}g.autoScroll.checked!==e&&(g.autoScroll.checked=e,m.autoScroll=e)},100)},setWrap(e){const t=e?"pre-wrap":"pre",o=e?"break-word":"normal";["chatText","joinquitText","grimText","serverText"].forEach(e=>{g[e]&&(g[e].style.whiteSpace=t,g[e].style.wordWrap=o)}),m.editor&&m.editor.updateOptions({wordWrap:e?"on":"off"}),m.autoWrap=e},loadConfig(){try{var e=JSON.parse(localStorage.getItem("anticheatConfig"));e?.leftKeywords&&e?.rightKeywords&&(m.anticheat=e)}catch(e){}g.grimLeft.value=m.anticheat.leftKeywords.join(","),g.grimRight.value=m.anticheat.rightKeywords.join(",")},setConfig(e,t){m.anticheat=e,localStorage.setItem("anticheatConfig",JSON.stringify(e)),g.grimLeft.value=e.leftKeywords.join(","),g.grimRight.value=e.rightKeywords.join(","),this.reclassify(),g.grimPanel.style.display="none",this.showStatus(t,2e3)},applyConfig(){var e=e=>g[e].value.trim().split(",").map(e=>e.trim()).filter(Boolean);this.setConfig({leftKeywords:e("grimLeft"),rightKeywords:e("grimRight")},"反作弊关键词已更新")},resetConfig(){this.setConfig(Object.assign({},e),"已重置为默认关键词")},reclassify(){const{leftKeywords:i,rightKeywords:a}=m.anticheat,s=m.rawLines,e=s.length,l=[],c=[];g.progress.style.display="block",r(e,5e3,(t,o)=>{for(let e=t;e<o;e++){const n=s[e].text,r=p(n);i.some(e=>n.includes(e))&&l.push(r),a.some(e=>n.includes(e))&&c.push(r)}t=e?Math.round(o/e*100):100;g.status.innerText=`正在重新分类反作弊日志... ${o}/${e} (${t}%)`,g.progress.innerText=` 🔄 重新过滤 ${o}/${e} (${t}%)`},()=>{m.grimLines=l,m.serverLines=c,this.refreshOthers(),g.progress.style.display="none",g.status.innerText=`${m.total} 行日志已加载`,"grim"===m.currentTab&&m.autoScroll&&(d(g.grimText,!0),d(g.serverText,!0))})},renderIp(){const t=new Map;for(var{ip:o,time:n,player:r}of m.ipRecords){let e=t.get(o);e||t.set(o,e={r:[],p:new Set}),e.r.push({time:n,player:r}),e.p.add(r)}if(!t.size)return g.ipPanel.innerHTML='<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>',void(document.getElementById("ip-summary").textContent="0个玩家，0个IP地址");const e=[];for(var[i,a]of t){var s=[...a.p].sort().join(" // "),l=m.expandedIps.has(i),c=[...a.r].sort((e,t)=>e.time.localeCompare(t.time)).map(e=>`<div class="login-record-row"><span class="login-record-time">${e.time}</span><span class="login-record-player">${(e=>e.replace(/[&<>]/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;"})[e]))(e.player)}</span></div>`).join("");e.push(`<div class="ip-card" data-ip="${i}"><div class="ip-header" data-ip="${i}"><span class="toggle-icon">${l?"▼":"▶"}</span><span class="ip-address ${1<a.p.size?"multi-player":"single-player"}" data-ip="${i}">${i}</span><span class="stats">(${a.r.length}次登录, ${a.p.size}个玩家: ${s})</span></div><div class="ip-details ${l?"expanded":""}" data-ip="${i}">${c}</div></div>`)}g.ipPanel.innerHTML=e.join(""),document.getElementById("ip-summary").textContent=[...t.values()].reduce((e,t)=>e+t.p.size,0)+"个玩家，"+t.size+"个IP地址",m.autoScroll&&"playerip"===m.currentTab&&d(g.ipPanel,!0)},onIpClick(e){var t=e.target.closest(".ip-address");if(t){const n=t.dataset.ip;return n&&(g.ipInput.value=n,this.queryIp(n)),void e.stopPropagation()}const o=e.target.closest(".ip-header");if(o){const n=o.dataset.ip;if(n){const r=g.ipPanel.querySelector(`.ip-details[data-ip="${n}"]`),i=o.querySelector(".toggle-icon");r&&(r.classList.contains("expanded")?(r.classList.remove("expanded"),i&&(i.textContent="▶"),m.expandedIps.delete(n)):(r.classList.add("expanded"),i&&(i.textContent="▼"),m.expandedIps.add(n)))}}},queryIp(e){(e=(e||"").trim())?(g.ipResult.innerHTML=i.map((e,t)=>`<div id="ip-r${t}" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【${e.n}】\n查询中...</div>`).join(""),i.forEach((o,n)=>o.f(e).then(e=>{const t=document.getElementById("ip-r"+n);t&&(t.innerText=`\n\n【${o.n}】\n位置: ${e.loc}\n经纬度: ${e.lng},${e.lat}\n详细: ${e.d}`)}).catch(e=>{const t=document.getElementById("ip-r"+n);t&&(t.innerText=`\n\n【${o.n}】\n失败: ${e.message}`)}))):g.ipResult.innerText="请输入 IP"},async copyConsole(){if(!m.editor)return this.showStatus("无内容可复制",2e3);var t=m.editor.getValue();try{await navigator.clipboard.writeText(t)}catch(e){const o=document.createElement("textarea");o.value=t,document.body.appendChild(o),o.select(),document.execCommand("copy"),document.body.removeChild(o)}this.showStatus("已复制内容",2e3)},showStatus(e,t){const o=g.status,n=o.innerText;o.innerText=e,0<t&&setTimeout(()=>{o.innerText===e&&(o.innerText=n)},t)},switchTab(t){m.currentTab=t,document.querySelectorAll(".tab-button").forEach(e=>e.classList.toggle("active",e.dataset.tab===t)),document.querySelectorAll(".tab-content").forEach(e=>e.classList.remove("active")),document.getElementById("tab-"+t).classList.add("active"),"console"===t?m.editor&&m.editor.layout():"playerip"===t?this.renderIp():"grim"===t?(this.setTA(g.grimText,m.grimLines.join("\n")),this.setTA(g.serverText,m.serverLines.join("\n"))):this.refreshOthers(),m.autoScroll&&this.scrollBottomOf(t)},bindEvents(){const t=this;g.autoScroll.onchange=()=>{m.autoScroll=g.autoScroll.checked,m.autoScroll&&t.scrollBottomOf(m.currentTab)},g.autoWrap.onchange=()=>t.setWrap(g.autoWrap.checked),g.filterErrors.onchange=()=>{m.filter=g.filterErrors.checked,t.reloadConsole(),t.showStatus(`屏蔽报错: ${m.filter?"开启":"关闭"}`,2e3)},document.getElementById("scroll-top-btn").onclick=()=>{m.editor&&m.editor.revealLine(1)},document.getElementById("scroll-bottom-btn").onclick=()=>t.revealEnd(),document.getElementById("copy-console-btn").onclick=()=>t.copyConsole();for(const e in s){const[o,n]=s[e],r=document.getElementById(e);r&&(r.onclick=()=>d(g[o],!!n))}document.getElementById("query-ip-btn").onclick=()=>t.queryIp(g.ipInput.value),g.ipInput.onkeypress=e=>{"Enter"===e.key&&t.queryIp(g.ipInput.value)},g.ipPanel.onclick=e=>t.onIpClick(e);for(const i of["chatText","joinquitText","grimText","serverText","ipPanel"]){const a=g[i];a&&(a.onscroll=()=>{var e=l(a);g.autoScroll.checked!==e&&(g.autoScroll.checked=e,m.autoScroll=e)})}document.querySelectorAll(".tab-button").forEach(e=>{e.onclick=()=>t.switchTab(e.dataset.tab)}),g.grimToggle.onclick=()=>{g.grimPanel.style.display="none"===g.grimPanel.style.display?"flex":"none"},document.getElementById("grim-apply-config").onclick=()=>t.applyConfig(),document.getElementById("grim-reset-config").onclick=()=>t.resetConfig(),document.getElementById("grim-cancel-config").onclick=()=>{g.grimPanel.style.display="none",g.grimLeft.value=m.anticheat.leftKeywords.join(","),g.grimRight.value=m.anticheat.rightKeywords.join(",")}}};function a(e){if(!m.processing){m.processing=!0,document.getElementById("upload-overlay").style.display="none",m.chatLines=[],m.joinQuitLines=[],m.grimLines=[],m.serverLines=[],m.rawLines=[],m.ipRecords=[],m.editor&&(m.editor.getModel().setValue(""),m.decorations&&m.decorations.clear());const l=e.split(/\r?\n/),c=l.length;m.total=c;const d=g.progress;d.style.display="block",r(c,t,(t,o)=>{const n=[];for(let e=t;e<o;e++){const a=l[e],s=a.toLowerCase();var r,i=u.some(e=>s.includes(e));n.push({text:a,filtered:i}),m.rawLines.push({text:a,filtered:i}),i||(r=p(a),(/聊|\[Not Secure\]|\[Server\]|\[Rcon\]|\[TEAM_ONLY\]|\[SHOUT\]/.test(a)||/<[a-zA-Z0-9_]+>/.test(a))&&m.chatLines.push(r),/lost connection|left the game|Disconnecting/.test(a)&&m.joinQuitLines.push(r),m.anticheat.leftKeywords.some(e=>a.includes(e))&&m.grimLines.push(r),m.anticheat.rightKeywords.some(e=>a.includes(e))&&m.serverLines.push(r),a.includes("logged in")&&(i=a.match(/\[(\d{2}:\d{2}:\d{2})\]/),r=a.match(/([a-zA-Z0-9_]+)\s*\[\/(\d+\.\d+\.\d+\.\d+):\d+\]/),i&&r&&m.ipRecords.push({time:i[1],player:r[1],ip:r[2]})))}n.length&&h.appendConsole(n);t=c?Math.round(o/c*100):100;g.status.innerText=`加载中... ${o}/${c} (${t}%)`,d.innerText=`加载日志 ${o}/${c} (${t}%)`},()=>{d.style.display="none";var e=(m.filter?m.rawLines.filter(e=>!e.filtered):m.rawLines).length;g.status.innerText=`一共 ${c} 行日志，屏蔽部分后有 ${e} 行可见`,m.processing=!1,h.refreshOthers(),h.refreshDecorations(),m.autoScroll&&h.revealEnd()})}}function c(e){if(e){const t=new FileReader;t.onload=e=>a(e.target.result),t.onerror=()=>alert("读取文件失败"),t.readAsText(e,"UTF-8")}}!function(){const i=document.getElementById("grim-divider"),t=document.getElementById("grim-left-panel"),a=i?.parentElement;if(i&&t&&a){let o=!1,n=0,r=0;const s=e=>t.style.width=Math.min(90,Math.max(10,e))+"%",l=e=>(e.touches?e.touches[0]:e).clientX,c=e=>{var t;o&&(e.preventDefault(),0<(t=a.getBoundingClientRect().width-i.offsetWidth)&&s((r+l(e)-n)/t*100))},d=()=>{o&&(o=!1,i.classList.remove("dragging"),document.body.style.userSelect=document.body.style.webkitUserSelect="",document.removeEventListener("mousemove",c),document.removeEventListener("mouseup",d),document.removeEventListener("touchmove",c),document.removeEventListener("touchend",d),document.removeEventListener("touchcancel",d))};var e=e=>{e.preventDefault(),o=!0,i.classList.add("dragging"),n=l(e),r=t.getBoundingClientRect().width,document.body.style.userSelect=document.body.style.webkitUserSelect="none",document.addEventListener("mousemove",c),document.addEventListener("mouseup",d),document.addEventListener("touchmove",c,{passive:!1}),document.addEventListener("touchend",d),document.addEventListener("touchcancel",d)};i.addEventListener("mousedown",e),i.addEventListener("touchstart",e,{passive:!1}),i.addEventListener("dblclick",()=>s(50))}}(),document.addEventListener("DOMContentLoaded",()=>{h.init();const e=document.getElementById("file-input"),t=document.getElementById("text-input");e.addEventListener("change",()=>{m.processing||c(e.files[0])}),document.getElementById("submit-log-btn").addEventListener("click",()=>{if(!m.processing){const e=t.value;e.trim()?a(e):alert("请粘贴日志内容或选择文件")}}),document.body.addEventListener("dragover",e=>e.preventDefault()),document.body.addEventListener("drop",e=>{e.preventDefault(),e.dataTransfer.files.length&&c(e.dataTransfer.files[0])}),g.progress.style.display="none"})}()</script>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>YaoGaoChaoLe_服务器日志分析</title>
+<style>
+*{box-sizing:border-box;font-family:'微软雅黑','Microsoft YaHei','Segoe UI',Roboto,sans-serif}
+body{margin:0;padding:10px;background:#0a0a0a;height:100vh;display:flex;flex-direction:column;color:#e0e0e0}
+.top-bar{display:flex;align-items:center;justify-content:space-between;background:#1e1e1e;padding:8px 12px;border-radius:6px;margin-bottom:10px;box-shadow:0 2px 4px rgba(0,0,0,.5);gap:12px;flex-wrap:wrap;min-height:48px;border:1px solid #2c2c2c}
+.status-text{font-size:14px;color:#0fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:120px}
+.auto-scroll-check,.auto-wrap-check,.filter-errors-check{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;color:#ccc}
+.auto-scroll-check input,.auto-wrap-check input,.filter-errors-check input{accent-color:#00ffcc}
+.tab-bar{display:flex;flex-wrap:wrap;gap:2px;background:#1a1a1a;padding:5px 5px 0 5px;border-radius:6px 6px 0 0}
+.tab-button{padding:8px 16px;background:#2c2c2c;border:none;border-radius:6px 6px 0 0;cursor:pointer;font-size:14px;transition:.2s;color:#ddd;font-weight:500;border-bottom:2px solid transparent}
+.tab-button:hover{background:#3a3a3a;color:#fff}
+.tab-button.active{background:#0f0f0f;border-bottom-color:#0fc;font-weight:600;color:#0fc}
+.panel-container{flex:1;background:#0f0f0f;border-radius:0 6px 6px 6px;box-shadow:0 2px 4px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column;border:1px solid #2c2c2c;border-top:none}
+.tab-content{flex:1;display:none;background:#0f0f0f;flex-direction:column;overflow:hidden;min-height:0}
+.tab-content.active{display:flex}
+.log-textarea{flex:1;width:100%;border:none;background:#1a1a1a;color:#e0e0e0;resize:none;font-family:Consolas,monospace;font-size:13px;line-height:1.5;outline:0;padding:8px;min-height:0}
+#monaco-container{width:100%;height:100%;border-left:1px solid #2c2c2c;background:#1a1a1a}
+.color-ff0000{color:#ff0000!important}
+.color-fbff00{color:#fbff00!important}
+.color-00ffea{color:#00ffea!important}
+.color-666666{color:#666!important}
+.color-3bf010{color:#3bf010!important}
+.color-ffffff{color:#fff!important}
+.config-panel{background:#1a1a1a;border-bottom:1px solid #2c2c2c;padding:12px;display:flex;flex-direction:column;gap:10px}
+.config-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.config-row label{min-width:90px;color:#ccc}
+.config-row input{flex:1;min-width:200px;padding:6px 8px;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px;font-family:monospace}
+.config-actions{display:flex;gap:8px;justify-content:flex-end}
+.config-actions button{padding:6px 14px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;font-size:13px}
+.config-actions button:hover{background:#3a3a3a;color:#fff}
+.config-toggle{cursor:pointer;color:#FFD700;text-decoration:underline;font-size:13px}
+.config-toggle:hover{color:#FFA500}
+.config-hint{font-size:12px;color:#aaa;margin-left:98px}
+.player-ip-container{display:flex;flex-direction:column;height:100%;gap:12px;flex:1;min-height:0}
+.ip-record-area{flex:2;min-height:0;display:flex;flex-direction:column;background:#1a1a1a;border-radius:4px;overflow:hidden;border:1px solid #2c2c2c}
+.ip-panel{flex:1;overflow:auto;padding:8px}
+.ip-card{margin-bottom:8px;border:1px solid #2c2c2c;border-radius:4px;background:#0f0f0f}
+.ip-header{display:flex;align-items:center;padding:8px 12px;cursor:pointer;background:#1a1a1a;border-bottom:1px solid #2c2c2c;user-select:none}
+.ip-header:hover{background:#252525}
+.ip-header .toggle-icon{font-size:16px;margin-right:8px;color:#fff}
+.ip-header .ip-address{font-weight:700;cursor:pointer;text-decoration:underline;margin-right:12px}
+.ip-header .ip-address.single-player{color:#fff}
+.ip-header .ip-address.multi-player{color:#ff0}
+.ip-header .ip-address:hover{color:#fff}
+.ip-header .stats{color:#aaa;font-size:13px;word-break:break-all;white-space:normal;flex:1}
+.ip-details{padding:8px 12px;display:none}
+.ip-details.expanded{display:block}
+.login-record-row{font-family:monospace;font-size:13px;padding:4px 0;border-bottom:1px dashed #2c2c2c;display:flex}
+.login-record-time{color:#0fc;width:80px;flex-shrink:0}
+.login-record-player{color:#fff;margin-left:12px}
+.ip-query-area{flex:1;min-height:180px;display:flex;flex-direction:column;background:#1a1a1a;border-radius:4px;border:1px solid #2c2c2c;overflow:hidden}
+.ip-query-row{display:flex;gap:8px;padding:10px;flex-wrap:wrap;align-items:center}
+.ip-query-row input{flex:3;min-width:150px;padding:8px 12px;border:1px solid #3a3a3a;background:#0f0f0f;color:#e0e0e0;border-radius:4px;font-size:14px;font-family:monospace}
+.ip-query-row input:focus{outline:0;border-color:#0fc;box-shadow:0 0 2px #0fc}
+.ip-query-row button{flex:1;padding:8px 16px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;font-size:14px;font-weight:700;transition:.2s}
+.ip-query-row button:hover{background:#3a3a3a;color:#fff;border-color:#0fc}
+.ip-query-result{flex:1;background:#0f0f0f;border:1px solid #2c2c2c;border-radius:4px;padding:8px;font-family:monospace;font-size:13px;white-space:pre-wrap;overflow:auto;margin:0 10px 10px 10px;color:#ccc}
+@media (min-width:501px){.player-ip-container{flex-direction:row}.ip-record-area{flex:7.5}.ip-query-area{flex:2.5}}
+@media (max-width:500px){.player-ip-container{flex-direction:column}.ip-query-area{min-height:200px}}
+#upload-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999}
+.upload-card{background:#1e1e1e;padding:30px;border-radius:12px;max-width:600px;width:90%;border:1px solid #0fc;box-shadow:0 0 30px rgba(0,255,204,.15)}
+.upload-card h2{color:#0fc;text-align:center;margin-top:0}
+.upload-card input[type="file"]{width:100%;padding:10px;margin:15px 0;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px}
+.upload-card textarea{width:100%;height:120px;padding:8px;background:#0f0f0f;color:#e0e0e0;border:1px solid #3a3a3a;border-radius:4px;font-family:monospace;font-size:13px;resize:vertical}
+.upload-card .submit-btn{display:block;width:100%;padding:12px;background:#2c2c2c;color:#0fc;border:none;border-radius:6px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;margin-top:12px}
+.upload-card .submit-btn:hover{background:#3a3a3a;color:#fff;border-color:#0fc}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:#1a1a1a}
+::-webkit-scrollbar-thumb{background:#ffffff9f;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#ffffffd4}
+@media (max-width:600px){.tab-button{padding:6px 12px;font-size:12px}}
+.grim-split-container{display:flex;flex:1;min-height:0;height:100%;width:100%}
+.grim-panel{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.grim-left{flex-shrink:0;width:50%}
+.grim-right{flex:1}
+.grim-divider{width:6px;flex-shrink:0;cursor:col-resize;background:#2c2c2c;position:relative;transition:background .15s ease;user-select:none;-webkit-user-select:none;touch-action:none}
+.grim-divider::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:32px;background:#666;border-radius:1px;transition:all .15s ease}
+.grim-divider:hover,.grim-divider.dragging{background:#00e5ff;box-shadow:0 0 20px rgba(0,229,255,.4)}
+.grim-divider:hover::before,.grim-divider.dragging::before{background:#0a0a0a;height:44px}
+@media (max-width:600px){.grim-split-container{flex-direction:column}.grim-left{width:100%!important;flex:1}.grim-right{flex:1}.grim-divider{display:none}}
+.sub-header{padding:5px 10px;background:#252525;font-weight:600;border-bottom:1px solid #3a3a3a;flex-shrink:0;color:#0fc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.line-control{display:flex;align-items:center;gap:8px}
+.line-control button,.scroll-btn{padding:4px 12px;background:#2c2c2c;color:#0fc;border:1px solid #3a3a3a;border-radius:4px;cursor:pointer;transition:.2s}
+.line-control button:hover,.scroll-btn:hover{background:#3a3a3a;color:#fff;border-color:#0fc}
+.scroll-buttons{display:flex;gap:4px;margin-left:auto}
+#loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,10,10,.95);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#0fc;font-size:18px;font-weight:600;font-family:'微软雅黑',sans-serif}
+#loading-overlay .loader{border:4px solid #2c2c2c;border-top:4px solid #0fc;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin-bottom:15px}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+</style>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<link rel="stylesheet" data-name="vs/editor/editor.main" href="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css"/>
+<script>var require={paths:{vs:'https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs'}};</script>
+<script src="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+</head>
+<body>
+<div id="loading-overlay"><div class="loader"></div><div>正在加载资源 请确保网络通畅...</div></div>
+
+<div id="upload-overlay">
+  <div class="upload-card">
+    <h2>离线日志分析器</h2>
+    <p style="color:#ccc;text-align:center;">选择 latest.log 文件<br>或粘贴日志内容</p>
+    <input type="file" id="file-input" accept=".log,.txt">
+    <textarea id="text-input" placeholder="或直接粘贴日志内容..."></textarea>
+    <button class="submit-btn" id="submit-log-btn">分析</button>
+  </div>
+</div>
+
+<div class="top-bar">
+  <div class="status-text" id="status">离线模式 - 等待加载</div>
+  <label class="auto-scroll-check"><input type="checkbox" id="auto-scroll" checked> 自动滚动</label>
+  <label class="auto-wrap-check"><input type="checkbox" id="auto-wrap"> 自动换行</label>
+</div>
+
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-button active" data-tab="chat">聊天记录</button>
+  <button class="tab-button" data-tab="console">控制台</button>
+  <button class="tab-button" data-tab="joinquit">断开连接</button>
+  <button class="tab-button" data-tab="grim">仅看关键词</button>
+  <button class="tab-button" data-tab="playerip">登录查询</button>
+</div>
+
+<div class="panel-container">
+  <div id="tab-chat" class="tab-content active">
+    <div class="sub-header"><span>聊天记录</span><div class="scroll-buttons"><button id="chat-scroll-top" class="scroll-btn">↑</button><button id="chat-scroll-bottom" class="scroll-btn">↓</button></div></div>
+    <textarea id="chat-text" class="log-textarea" readonly wrap="off"></textarea>
+  </div>
+  <div id="tab-console" class="tab-content">
+    <div style="display:flex;flex-direction:column;height:100%;flex:1;min-height:0;">
+      <div class="sub-header">
+        <span>控制台日志</span>
+        <div class="line-control">
+          <button id="copy-console-btn">复制</button>
+          <div class="scroll-buttons"><button id="scroll-top-btn" class="scroll-btn" title="顶部">↑</button><button id="scroll-bottom-btn" class="scroll-btn" title="底部">↓</button></div>
+          <div id="log-load-progress" style="font-size:12px;color:#aaa;white-space:nowrap;"></div>
+          <label class="filter-errors-check"><input type="checkbox" id="filter-errors" checked> 屏蔽报错</label>
+        </div>
+      </div>
+      <div id="monaco-container" style="width:100%;height:100%;position:relative;"></div>
+    </div>
+  </div>
+  <div id="tab-joinquit" class="tab-content">
+    <div class="sub-header"><span>断开连接</span><div class="scroll-buttons"><button id="joinquit-scroll-top" class="scroll-btn">↑</button><button id="joinquit-scroll-bottom" class="scroll-btn">↓</button></div></div>
+    <textarea id="joinquit-text" class="log-textarea" readonly wrap="off"></textarea>
+  </div>
+  <div id="tab-grim" class="tab-content">
+    <div class="sub-header"><span>仅看关键词</span><span class="config-toggle" id="grim-config-toggle">⚙ 配置关键词</span></div>
+    <div id="grim-config-panel" class="config-panel" style="display:none;">
+      <div class="config-row"><label>关键词1：</label><input type="text" id="grim-left-keywords" placeholder="多个关键词用半角逗号分隔，如: warn,error"></div>
+      <div class="config-row"><label>关键词2：</label><input type="text" id="grim-right-keywords" placeholder="多个关键词用半角逗号分隔，如: [Server],warn,error"></div>
+      <div class="config-hint">💡 多个关键词用 半角逗号(英文输入法下的逗号) 分隔。但不要以逗号结尾</div>
+      <div class="config-actions"><button id="grim-apply-config">应用</button><button id="grim-reset-config">重置默认</button><button id="grim-cancel-config">取消</button></div>
+    </div>
+    <div class="grim-split-container">
+      <div class="grim-panel grim-left" id="grim-left-panel">
+        <div class="sub-header" style="border-radius:0;border-bottom:1px solid #3a3a3a;">包含 关键词1 的日志</div>
+        <textarea id="grim-text" class="log-textarea" readonly wrap="off"></textarea>
+      </div>
+      <div class="grim-divider" id="grim-divider" title="拖动调整左右宽度"></div>
+      <div class="grim-panel grim-right">
+        <div class="sub-header" style="border-radius:0;border-bottom:1px solid #3a3a3a;">包含 关键词2 的日志</div>
+        <textarea id="server-text" class="log-textarea" readonly wrap="off"></textarea>
+      </div>
+    </div>
+  </div>
+  <div id="tab-playerip" class="tab-content">
+    <div class="player-ip-container">
+      <div class="ip-record-area">
+        <div class="sub-header"><span>玩家登录IP记录<span id="ip-summary" style="color:#aaa;font-weight:400;font-size:13px;margin-left:10px"></span></span><div class="scroll-buttons"><button id="ip-scroll-top" class="scroll-btn">↑</button><button id="ip-scroll-bottom" class="scroll-btn">↓</button></div></div>
+        <div id="ip-panel" class="ip-panel"></div>
+      </div>
+      <div class="ip-query-area">
+        <div class="sub-header">IP归属地查询</div>
+        <div class="ip-query-row"><input id="ip-input" placeholder="输入 IPv4 地址，例如 117.159.10.44"><button id="query-ip-btn">查询</button></div>
+        <div id="ip-query-result" class="ip-query-result">等待查询</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ============ 1. 常量 ============ */
+const FILTER_KEYWORDS = ["failed to","PacketEvents caught an unhandled exception while calling your listener","\tat ","\t... ","java.lang.","io.netty.","ERROR","java.lang","at java","at knot","io.netty","java.util","Caused by","Failed to decode value","generated an exception while executing"];
+const FILTER_LOWER = FILTER_KEYWORDS.map(k => k.toLowerCase());
+const HIGHLIGHT_RULES = [
+  {keyword:"Server empty for",color:"#ff0000"},{keyword:"error",color:"#ff0000"},{keyword:"warn",color:"#fbff00"},
+  {keyword:"java.lang",color:"#fbff00"},{keyword:"IP limit exceeded",color:"#00ffea"},{keyword:"触发了",color:"#00ffea"},
+  {keyword:"反作弊",color:"#00ffea"},{keyword:"Grim",color:"#00ffea"},{keyword:"meteor",color:"#00ffea"},
+  {keyword:"liquid",color:"#00ffea"},{keyword:"wurst",color:"#00ffea"},{keyword:"Successfully filled",color:"#666666"},
+  {keyword:"Changed the block at",color:"#666666"},{keyword:"lost connection",color:"#666666"},{keyword:"left the game",color:"#666666"},
+  {keyword:"[voicechat]",color:"#666666"},{keyword:"Disconnecting",color:"#666666"},{keyword:"Thread RCON",color:"#666666"},
+  {keyword:"logged in with entity",color:"#3BF010"}
+];
+const DEFAULT_CONFIG = {leftKeywords:["触发了","[Server]"],rightKeywords:["[Server]"]};
+const BATCH = 10000;
+const TAB_SCROLL = {chat:'chatText',joinquit:'joinquitText',grim:'grimText',playerip:'ipPanel'};
+const SCROLL_BTNS = {
+  'chat-scroll-top':['chatText',0],'chat-scroll-bottom':['chatText',1],
+  'joinquit-scroll-top':['joinquitText',0],'joinquit-scroll-bottom':['joinquitText',1],
+  'ip-scroll-top':['ipPanel',0],'ip-scroll-bottom':['ipPanel',1]
+};
+
+/* ============ 2. 状态 ============ */
+const S = {
+  currentTab:'console', chatLines:[], joinQuitLines:[], grimLines:[], serverLines:[],
+  rawLines:[], ipRecords:[], expandedIps:new Set(),
+  autoScroll:true, autoWrap:false, filter:true,
+  anticheat:Object.assign({},DEFAULT_CONFIG),
+  total:0, processing:false,
+  editor:null, decorations:null
+};
+
+/* ============ 3. 工具 ============ */
+const atBottom = el => !el || el.scrollHeight - el.scrollTop - el.clientHeight <= 5;
+const cleanLine = l => l.replace(/\[Server thread\/INFO\]: (\[Not Secure\] )?/, "");
+const esc = s => s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+
+function scrollTo(el, bottom, dur = 200) {
+  if (!el) return;
+  if (el._anim) cancelAnimationFrame(el._anim);
+  const from = el.scrollTop;
+  if (!bottom && from === 0) return;
+  const t0 = performance.now();
+  const step = now => {
+    const t = Math.min((now - t0) / dur, 1), ease = t * (2 - t);
+    const target = bottom ? el.scrollHeight - el.clientHeight : 0;
+    el.scrollTop = Math.max(0, Math.min(from + (target - from) * ease, target));
+    if (t < 1) el._anim = requestAnimationFrame(step);
+    else { delete el._anim; if (!bottom) { S.autoScroll = false; E.autoScroll.checked = false; } }
+  };
+  el._anim = requestAnimationFrame(step);
+}
+
+function forEachBatch(total, size, onBatch, onDone) {
+  let i = 0;
+  (function next() {
+    const end = Math.min(i + size, total);
+    onBatch(i, end); i = end;
+    i < total ? setTimeout(next, 0) : onDone();
+  })();
+}
+
+/* ============ 4. IP 查询 API ============ */
+const IP_APIS = [
+  {n:'结果1', f:async ip => {
+    const r = await fetch("https://api.ip77.net/ip2/v4/",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:`ip=${encodeURIComponent(ip)}`});
+    const d = await r.json();
+    if (d.code !== 0 || !d.data) throw new Error(d.error || "查询失败");
+    const v = d.data;
+    return {loc:v.location || "未知", lng:v.longitude, lat:v.latitude, d:v.street_history?.length ? v.street_history.join("、") : "无街道信息"};
+  }},
+  {n:'结果2', f:async ip => {
+    const d = await (await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city,lat,lon,isp,org`)).json();
+    if (d.status !== "success") throw new Error(d.message || "查询失败");
+    return {loc:`${d.country} ${d.regionName} ${d.city}`, lng:d.lon, lat:d.lat, d:`ISP: ${d.isp || "未知"}`};
+  }},
+  {n:'结果3', f:async ip => {
+    const d = await (await fetch(`https://ipapi.co/${ip}/json/`)).json();
+    if (d.error) throw new Error(d.reason || "查询失败");
+    return {loc:`${d.country_name} ${d.region} ${d.city}`, lng:d.longitude, lat:d.latitude, d:`ASN: ${d.asn}`};
+  }},
+  {n:'结果4', f:async ip => {
+    const d = await (await fetch(`https://ipinfo.io/${ip}/json`)).json();
+    if (d.bogon || d.error) throw new Error(d.error || "查询失败");
+    const [lat, lng] = (d.loc || ",").split(",");
+    return {loc:`${d.country} ${d.region} ${d.city}`, lng, lat, d:`组织: ${d.org || "未知"}`};
+  }},
+  {n:'结果5', f:async ip => {
+    const d = await (await fetch(`https://ipwho.is/${ip}`)).json();
+    if (!d.success) throw new Error(d.message || "查询失败");
+    return {loc:`${d.country} ${d.region} ${d.city}`, lng:d.longitude, lat:d.latitude, d:`代理: ${d.proxy ? "是" : "否"} | ISP: ${d.isp || "未知"}`};
+  }}
+];
+
+/* ============ 5. UI 管理器 ============ */
+let E = {};   // 缓存 DOM 元素
+
+const UI = {
+  init() {
+    E = {
+      status: document.getElementById('status'),
+      autoScroll: document.getElementById('auto-scroll'),
+      autoWrap: document.getElementById('auto-wrap'),
+      filterErrors: document.getElementById('filter-errors'),
+      chatText: document.getElementById('chat-text'),
+      joinquitText: document.getElementById('joinquit-text'),
+      grimText: document.getElementById('grim-text'),
+      serverText: document.getElementById('server-text'),
+      ipPanel: document.getElementById('ip-panel'),
+      ipInput: document.getElementById('ip-input'),
+      ipResult: document.getElementById('ip-query-result'),
+      progress: document.getElementById('log-load-progress'),
+      grimLeft: document.getElementById('grim-left-keywords'),
+      grimRight: document.getElementById('grim-right-keywords'),
+      grimPanel: document.getElementById('grim-config-panel'),
+      grimToggle: document.getElementById('grim-config-toggle')
+    };
+    this.bindEvents();
+    this.setWrap(S.autoWrap);
+    this.loadConfig();
+    this.initMonaco();
+  },
+
+  /* ---------- Monaco ---------- */
+  initMonaco() {
+    const overlay = document.getElementById('loading-overlay');
+    require(['vs/editor/editor.main'], () => {
+      document.head.insertAdjacentHTML('beforeend', '<style>' +
+        HIGHLIGHT_RULES.map(r => `.color-${r.color.slice(1)}{color:${r.color}!important}`).join('') + '</style>');
+
+      S.editor = monaco.editor.create(document.getElementById('monaco-container'), {
+        value:'', language:'plaintext', theme:'vs-dark',
+        minimap:{enabled:true, renderCharacters:false},
+        wordWrap:S.autoWrap ? 'on' : 'off',
+        scrollBeyondLastLine:false, automaticLayout:true,
+        readOnly:true, lineNumbers:true, fontSize:13, lineHeight:20
+      });
+      S.editor.onDidScrollChange(() => this.syncAutoScroll());
+      overlay.style.display = 'none';
+    }, err => {
+      console.error('Monaco CDN 加载失败:', err);
+      overlay.innerHTML = '<div style="color:#ff4343;text-align:center;">加载 Monaco 引擎失败！<br>请检查网络连接后刷新页面。</div>';
+    });
+  },
+
+  revealEnd() {
+    if (S.editor) S.editor.revealLineInCenter(S.editor.getModel().getLineCount(), monaco.editor.ScrollType.Smooth);
+  },
+
+  refreshDecorations() {
+    if (!S.editor) return;
+    const model = S.editor.getModel(), lines = model.getLinesContent();
+    const rules = HIGHLIGHT_RULES.map(r => ({
+      re: new RegExp(r.keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'),
+      cls: 'color-' + r.color.slice(1)
+    }));
+    const decos = [];
+    lines.forEach((line, i) => {
+      const r = rules.find(r => r.re.test(line));
+      if (r) decos.push({range:new monaco.Range(i+1,1,i+1,1), options:{isWholeLine:true, inlineClassName:r.cls}});
+    });
+    if (S.decorations) S.decorations.clear();
+    S.decorations = S.editor.createDecorationsCollection(decos);
+  },
+
+  appendConsole(objs) {
+    if (!objs || !objs.length || !S.editor) return;
+    const valid = S.filter ? objs.filter(o => !o.filtered) : objs;
+    if (!valid.length) return;
+    const model = S.editor.getModel(), last = model.getLineCount();
+    const col = model.getLineMaxColumn(last);
+    model.pushEditOperations([], [{
+      range: new monaco.Range(last, col, last, col),
+      text: '\n' + valid.map(o => o.text).join('\n'),
+      forceMoveMarkers: true
+    }]);
+    if (S.autoScroll) this.revealEnd();
+    this.refreshDecorations();
+  },
+
+  reloadConsole() {
+    if (!S.editor || !S.rawLines) return;
+    S.editor.getModel().setValue(
+      S.rawLines.filter(o => !S.filter || !o.filtered).map(o => o.text).join('\n'));
+    this.refreshDecorations();
+    if (S.autoScroll) this.revealEnd();
+  },
+
+  /* ---------- 非控制台标签页 ---------- */
+  setTA(ta, v) {
+    if (!ta) return;
+    const s = ta.selectionStart, e = ta.selectionEnd;
+    ta.value = v;
+    if (v.length >= e) { ta.selectionStart = s; ta.selectionEnd = e; }
+    else if (v.length >= s) { ta.selectionStart = ta.selectionEnd = s; }
+  },
+
+  refreshOthers() {
+    this.setTA(E.chatText, S.chatLines.join('\n'));
+    this.setTA(E.joinquitText, [...S.joinQuitLines].sort((a, b) => {
+      const t1 = (a.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1];
+      const t2 = (b.match(/\[(\d{2}:\d{2}:\d{2})\]/) || [])[1];
+      return t1 && t2 ? t1.localeCompare(t2) : 0;
+    }).join('\n'));
+    this.setTA(E.grimText, S.grimLines.join('\n'));
+    this.setTA(E.serverText, S.serverLines.join('\n'));
+    if (S.currentTab === 'playerip') this.renderIp();
+  },
+
+  scrollBottomOf(tab) {
+    if (tab === 'console') { this.revealEnd(); return; }
+    const el = E[TAB_SCROLL[tab]];
+    if (el) scrollTo(el, true);
+    if (tab === 'grim') scrollTo(E.serverText, true);
+  },
+
+  syncAutoScroll() {
+    clearTimeout(this._syncTimer);
+    this._syncTimer = setTimeout(() => {
+      let ab = true;
+      if (S.editor) {
+        const e = S.editor;
+        if (e.getScrollHeight() - e.getScrollTop() - e.getLayoutInfo().height > 5) ab = false;
+      }
+      if (ab) for (const k of ['chatText','joinquitText','grimText','serverText','ipPanel']) {
+        if (E[k] && !atBottom(E[k])) { ab = false; break; }
+      }
+      if (E.autoScroll.checked !== ab) { E.autoScroll.checked = ab; S.autoScroll = ab; }
+    }, 100);
+  },
+
+  setWrap(on) {
+    const ws = on ? 'pre-wrap' : 'pre', ww = on ? 'break-word' : 'normal';
+    ['chatText','joinquitText','grimText','serverText'].forEach(k => {
+      if (E[k]) { E[k].style.whiteSpace = ws; E[k].style.wordWrap = ww; }
+    });
+    if (S.editor) S.editor.updateOptions({wordWrap: on ? 'on' : 'off'});
+    S.autoWrap = on;
+  },
+
+  /* ---------- 反作弊配置 ---------- */
+  loadConfig() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('anticheatConfig'));
+      if (saved?.leftKeywords && saved?.rightKeywords) S.anticheat = saved;
+    } catch (e) {}
+    E.grimLeft.value = S.anticheat.leftKeywords.join(',');
+    E.grimRight.value = S.anticheat.rightKeywords.join(',');
+  },
+
+  setConfig(cfg, msg) {
+    S.anticheat = cfg;
+    localStorage.setItem('anticheatConfig', JSON.stringify(cfg));
+    E.grimLeft.value = cfg.leftKeywords.join(',');
+    E.grimRight.value = cfg.rightKeywords.join(',');
+    this.reclassify();
+    E.grimPanel.style.display = 'none';
+    this.showStatus(msg, 2000);
+  },
+
+  applyConfig() {
+    const parse = id => E[id].value.trim().split(',').map(k => k.trim()).filter(Boolean);
+    this.setConfig({leftKeywords: parse('grimLeft'), rightKeywords: parse('grimRight')}, '反作弊关键词已更新');
+  },
+
+  resetConfig() {
+    this.setConfig(Object.assign({}, DEFAULT_CONFIG), '已重置为默认关键词');
+  },
+
+  reclassify() {
+    const {leftKeywords, rightKeywords} = S.anticheat;
+    const lines = S.rawLines, total = lines.length;
+    const newGrim = [], newServer = [];
+    E.progress.style.display = 'block';
+    forEachBatch(total, 5000, (start, end) => {
+      for (let i = start; i < end; i++) {
+        const line = lines[i].text, cleaned = cleanLine(line);
+        if (leftKeywords.some(k => line.includes(k))) newGrim.push(cleaned);
+        if (rightKeywords.some(k => line.includes(k))) newServer.push(cleaned);
+      }
+      const pct = total ? Math.round(end / total * 100) : 100;
+      E.status.innerText = `正在重新分类反作弊日志... ${end}/${total} (${pct}%)`;
+      E.progress.innerText = ` 🔄 重新过滤 ${end}/${total} (${pct}%)`;
+    }, () => {
+      S.grimLines = newGrim; S.serverLines = newServer;
+      this.refreshOthers();
+      E.progress.style.display = 'none';
+      E.status.innerText = `${S.total} 行日志已加载`;
+      if (S.currentTab === 'grim' && S.autoScroll) {
+        scrollTo(E.grimText, true); scrollTo(E.serverText, true);
+      }
+    });
+  },
+
+  /* ---------- IP 面板 ---------- */
+  renderIp() {
+    const map = new Map();
+    for (const {ip, time, player} of S.ipRecords) {
+      let e = map.get(ip);
+      if (!e) map.set(ip, e = {r: [], p: new Set()});
+      e.r.push({time, player}); e.p.add(player);
+    }
+    if (!map.size) {
+      E.ipPanel.innerHTML = '<div style="color:#aaa;padding:12px;text-align:center;">无登录记录</div>'; document.getElementById('ip-summary').textContent = '0个玩家，0个IP地址';
+      return;
+    }
+    const parts = [];
+    for (const [ip, d] of map) {
+      const players = [...d.p].sort().join(' // ');
+      const ex = S.expandedIps.has(ip);
+      const rows = [...d.r].sort((a, b) => a.time.localeCompare(b.time))
+        .map(r => `<div class="login-record-row"><span class="login-record-time">${r.time}</span><span class="login-record-player">${esc(r.player)}</span></div>`).join('');
+      parts.push(`<div class="ip-card" data-ip="${ip}"><div class="ip-header" data-ip="${ip}"><span class="toggle-icon">${ex ? '▼' : '▶'}</span><span class="ip-address ${d.p.size > 1 ? 'multi-player' : 'single-player'}" data-ip="${ip}">${ip}</span><span class="stats">(${d.r.length}次登录, ${d.p.size}个玩家: ${players})</span></div><div class="ip-details ${ex ? 'expanded' : ''}" data-ip="${ip}">${rows}</div></div>`);
+    }
+    E.ipPanel.innerHTML = parts.join(''); document.getElementById('ip-summary').textContent = [...map.values()].reduce((s,d)=>s+d.p.size,0)+'个玩家，'+map.size+'个IP地址';
+    if (S.autoScroll && S.currentTab === 'playerip') scrollTo(E.ipPanel, true);
+  },
+
+  onIpClick(e) {
+    const addr = e.target.closest('.ip-address');
+    if (addr) {
+      const ip = addr.dataset.ip;
+      if (ip) { E.ipInput.value = ip; this.queryIp(ip); }
+      e.stopPropagation(); return;
+    }
+    const header = e.target.closest('.ip-header');
+    if (!header) return;
+    const ip = header.dataset.ip;
+    if (!ip) return;
+    const det = E.ipPanel.querySelector(`.ip-details[data-ip="${ip}"]`);
+    const icon = header.querySelector('.toggle-icon');
+    if (!det) return;
+    if (det.classList.contains('expanded')) {
+      det.classList.remove('expanded'); if (icon) icon.textContent = '▶'; S.expandedIps.delete(ip);
+    } else {
+      det.classList.add('expanded'); if (icon) icon.textContent = '▼'; S.expandedIps.add(ip);
+    }
+  },
+
+  queryIp(ip) {
+    ip = (ip || '').trim();
+    if (!ip) { E.ipResult.innerText = '请输入 IP'; return; }
+    E.ipResult.innerHTML = IP_APIS.map((a, i) =>
+      `<div id="ip-r${i}" style="white-space:pre-wrap;font-family:monospace;padding:4px 0;">\n\n【${a.n}】\n查询中...</div>`).join('');
+    IP_APIS.forEach((a, i) => a.f(ip).then(d => {
+      const el = document.getElementById('ip-r' + i);
+      if (el) el.innerText = `\n\n【${a.n}】\n位置: ${d.loc}\n经纬度: ${d.lng},${d.lat}\n详细: ${d.d}`;
+    }).catch(err => {
+      const el = document.getElementById('ip-r' + i);
+      if (el) el.innerText = `\n\n【${a.n}】\n失败: ${err.message}`;
+    }));
+  },
+
+  /* ---------- 杂项 ---------- */
+  async copyConsole() {
+    if (!S.editor) return this.showStatus("无内容可复制", 2000);
+    const text = S.editor.getValue();
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    this.showStatus("已复制内容", 2000);
+  },
+
+  showStatus(msg, timeout) {
+    const el = E.status, orig = el.innerText;
+    el.innerText = msg;
+    if (timeout > 0) setTimeout(() => { if (el.innerText === msg) el.innerText = orig; }, timeout);
+  },
+
+  switchTab(tab) {
+    S.currentTab = tab;
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    if (tab === 'console') { if (S.editor) S.editor.layout(); }
+    else if (tab === 'playerip') this.renderIp();
+    else if (tab === 'grim') {
+      this.setTA(E.grimText, S.grimLines.join('\n'));
+      this.setTA(E.serverText, S.serverLines.join('\n'));
+    } else this.refreshOthers();
+
+    if (S.autoScroll) this.scrollBottomOf(tab);
+  },
+
+  bindEvents() {
+    const t = this;
+    E.autoScroll.onchange = () => { S.autoScroll = E.autoScroll.checked; if (S.autoScroll) t.scrollBottomOf(S.currentTab); };
+    E.autoWrap.onchange = () => t.setWrap(E.autoWrap.checked);
+    E.filterErrors.onchange = () => {
+      S.filter = E.filterErrors.checked;
+      t.reloadConsole();
+      t.showStatus(`屏蔽报错: ${S.filter ? '开启' : '关闭'}`, 2000);
+    };
+
+    document.getElementById('scroll-top-btn').onclick = () => { if (S.editor) S.editor.revealLine(1); };
+    document.getElementById('scroll-bottom-btn').onclick = () => t.revealEnd();
+    document.getElementById('copy-console-btn').onclick = () => t.copyConsole();
+
+    for (const id in SCROLL_BTNS) {
+      const [key, bottom] = SCROLL_BTNS[id];
+      const btn = document.getElementById(id);
+      if (btn) btn.onclick = () => scrollTo(E[key], !!bottom);
+    }
+
+    document.getElementById('query-ip-btn').onclick = () => t.queryIp(E.ipInput.value);
+    E.ipInput.onkeypress = e => { if (e.key === 'Enter') t.queryIp(E.ipInput.value); };
+    E.ipPanel.onclick = e => t.onIpClick(e);
+
+    for (const k of ['chatText','joinquitText','grimText','serverText','ipPanel']) {
+      const node = E[k];
+      if (!node) continue;
+      node.onscroll = () => {
+        const ab = atBottom(node);
+        if (E.autoScroll.checked !== ab) { E.autoScroll.checked = ab; S.autoScroll = ab; }
+      };
+    }
+
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.onclick = () => t.switchTab(btn.dataset.tab);
+    });
+
+    E.grimToggle.onclick = () => {
+      E.grimPanel.style.display = E.grimPanel.style.display === 'none' ? 'flex' : 'none';
+    };
+    document.getElementById('grim-apply-config').onclick = () => t.applyConfig();
+    document.getElementById('grim-reset-config').onclick = () => t.resetConfig();
+    document.getElementById('grim-cancel-config').onclick = () => {
+      E.grimPanel.style.display = 'none';
+      E.grimLeft.value = S.anticheat.leftKeywords.join(',');
+      E.grimRight.value = S.anticheat.rightKeywords.join(',');
+    };
+  }
+};
+
+/* ============ 6. 加载日志 ============ */
+function loadLog(text) {
+  if (S.processing) return;
+  S.processing = true;
+  document.getElementById('upload-overlay').style.display = 'none';
+
+  S.chatLines = []; S.joinQuitLines = []; S.grimLines = []; S.serverLines = [];
+  S.rawLines = []; S.ipRecords = [];
+  if (S.editor) {
+    S.editor.getModel().setValue('');
+    if (S.decorations) S.decorations.clear();
+  }
+
+  const lines = text.split(/\r?\n/), total = lines.length;
+  S.total = total;
+  const prog = E.progress;
+  prog.style.display = 'block';
+
+  forEachBatch(total, BATCH, (start, end) => {
+    const objs = [];
+    for (let i = start; i < end; i++) {
+      const line = lines[i];
+      const lower = line.toLowerCase();
+      const filtered = FILTER_LOWER.some(k => lower.includes(k));
+      objs.push({text: line, filtered});
+      S.rawLines.push({text: line, filtered});
+      if (filtered) continue;
+
+      const cleaned = cleanLine(line);
+      if (/聊|\[Not Secure\]|\[Server\]|\[Rcon\]|\[TEAM_ONLY\]|\[SHOUT\]/.test(line) || /<[a-zA-Z0-9_]+>/.test(line))
+        S.chatLines.push(cleaned);
+      if (/lost connection|left the game|Disconnecting/.test(line)) S.joinQuitLines.push(cleaned);
+      if (S.anticheat.leftKeywords.some(k => line.includes(k))) S.grimLines.push(cleaned);
+      if (S.anticheat.rightKeywords.some(k => line.includes(k))) S.serverLines.push(cleaned);
+
+      if (line.includes('logged in')) {
+        const tm = line.match(/\[(\d{2}:\d{2}:\d{2})\]/);
+        const pm = line.match(/([a-zA-Z0-9_]+)\s*\[\/(\d+\.\d+\.\d+\.\d+):\d+\]/);
+        if (tm && pm) S.ipRecords.push({time: tm[1], player: pm[1], ip: pm[2]});
+      }
+    }
+    if (objs.length) UI.appendConsole(objs);
+
+    const pct = total ? Math.round(end / total * 100) : 100;
+    E.status.innerText = `加载中... ${end}/${total} (${pct}%)`;
+    prog.innerText = `加载日志 ${end}/${total} (${pct}%)`;
+  }, () => {
+    prog.style.display = 'none';
+    const visible = S.filter ? S.rawLines.filter(o => !o.filtered).length : S.rawLines.length;
+    E.status.innerText = `一共 ${total} 行日志，屏蔽部分后有 ${visible} 行可见`;
+    S.processing = false;
+    UI.refreshOthers();
+    UI.refreshDecorations();
+    if (S.autoScroll) UI.revealEnd();
+  });
+}
+
+function readFile(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => loadLog(e.target.result);
+  r.onerror = () => alert('读取文件失败');
+  r.readAsText(file, 'UTF-8');
+}
+
+/* ============ 7. 反作弊分隔条 ============ */
+(function () {
+  const divider = document.getElementById('grim-divider');
+  const left = document.getElementById('grim-left-panel');
+  const box = divider?.parentElement;
+  if (!divider || !left || !box) return;
+
+  let drag = false, sx = 0, sw = 0;
+  const setW = p => left.style.width = Math.min(90, Math.max(10, p)) + '%';
+  const cx = e => e.touches ? e.touches[0].clientX : e.clientX;
+
+  const move = e => {
+    if (!drag) return;
+    e.preventDefault();
+    const aw = box.getBoundingClientRect().width - divider.offsetWidth;
+    if (aw > 0) setW((sw + cx(e) - sx) / aw * 100);
+  };
+
+  const end = () => {
+    if (!drag) return;
+    drag = false;
+    divider.classList.remove('dragging');
+    document.body.style.userSelect = document.body.style.webkitUserSelect = '';
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', end);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', end);
+    document.removeEventListener('touchcancel', end);
+  };
+
+  const start = e => {
+    e.preventDefault();
+    drag = true;
+    divider.classList.add('dragging');
+    sx = cx(e);
+    sw = left.getBoundingClientRect().width;
+    document.body.style.userSelect = document.body.style.webkitUserSelect = 'none';
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', end);
+    document.addEventListener('touchmove', move, {passive: false});
+    document.addEventListener('touchend', end);
+    document.addEventListener('touchcancel', end);
+  };
+
+  divider.addEventListener('mousedown', start);
+  divider.addEventListener('touchstart', start, {passive: false});
+  divider.addEventListener('dblclick', () => setW(50));
+})();
+
+/* ============ 8. 启动 ============ */
+document.addEventListener('DOMContentLoaded', () => {
+  UI.init();
+
+  const fileInput = document.getElementById('file-input');
+  const textInput = document.getElementById('text-input');
+
+  fileInput.addEventListener('change', () => { if (!S.processing) readFile(fileInput.files[0]); });
+
+  document.getElementById('submit-log-btn').addEventListener('click', () => {
+    if (S.processing) return;
+    const text = textInput.value;
+    if (text.trim()) loadLog(text);
+    else alert('请粘贴日志内容或选择文件');
+  });
+
+  document.body.addEventListener('dragover', e => e.preventDefault());
+  document.body.addEventListener('drop', e => {
+    e.preventDefault();
+    if (e.dataTransfer.files.length) readFile(e.dataTransfer.files[0]);
+  });
+
+  E.progress.style.display = 'none';
+});
+})();
+</script>
+</body>
+</html>
