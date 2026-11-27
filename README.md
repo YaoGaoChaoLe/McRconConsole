@@ -68,7 +68,7 @@ source myenv/bin/activate
 pip install -r requirements.txt --only-binary=gevent
 
 # 如果中国大陆网络安装很慢，那就用这个：
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
+pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --only-binary=gevent
 ```
 
 ### 3. 写好配置文件 & 运行
