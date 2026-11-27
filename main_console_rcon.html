@@ -159,13 +159,16 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/editor/editor.main.min.css" />
+    <script src="/vendor/socket.io.min.js"></script>
+    <script src="/vendor/echarts.min.js"></script>
+    <link rel="stylesheet" data-name="vs/editor/editor.main" href="/vendor/monaco/vs/editor/editor.main.css" />
     <script>
-        var require = { paths: { vs: 'https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' } };
+        window.MonacoEnvironment = {
+            getWorkerUrl: function() { return '/vendor/monaco/vs/base/worker/workerMain.js'; }
+        };
+        var require = { paths: { vs: '/vendor/monaco/vs' } };
     </script>
-    <script src="https://fastly.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+    <script src="/vendor/monaco/vs/loader.js"></script>
 </head>
 
 <body>
@@ -1702,7 +1705,25 @@
             }
 
             async function initServerSelect() {
-                w.serverList = await (await fetch('/api/servers')).json();
+                var resp;
+                try {
+                    resp = await fetch('/api/servers');
+                } catch (err) {
+                    throw new Error('无法连接后端服务（获取服务器列表）：' + err.message + '。请确认后端已启动、端口正确。');
+                }
+                if (!resp.ok) {
+                    throw new Error('获取服务器列表失败：后端返回 HTTP ' + resp.status + '，请检查后端日志。');
+                }
+                var list;
+                try {
+                    list = await resp.json();
+                } catch (err) {
+                    throw new Error('获取服务器列表失败：后端响应不是有效 JSON，请检查后端日志。');
+                }
+                if (!Array.isArray(list) || list.length === 0) {
+                    throw new Error('服务器列表为空，请检查 config.yml 中的服务器配置。');
+                }
+                w.serverList = list;
                 var sel = document.getElementById('server-select');
                 sel.innerHTML = w.serverList.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
                 w.currentServer = w.serverList[0];
@@ -1712,23 +1733,52 @@
 
             async function c() {
                 var password = await promptPassword();
+
+                // 阶段1：认证
+                var authResp;
                 try {
-                    if ((await S.apiFetch('/api/auth', {}, password)).status === 401) {
-                        alert('密码错误');
-                        return c();
-                    }
-                    w.apiPassword = password;
-                    h.showStatus('验证成功，加载数据...', 2000);
-                    h.elements.immersiveBtn.style.display = 'flex';
-                    h.elements.rconToggleBtn.style.display = 'flex';
+                    authResp = await S.apiFetch('/api/auth', {}, password);
+                } catch (err) {
+                    alert('无法连接后端服务：' + err.message + '\n请确认后端已启动、访问端口正确、网络畅通。');
+                    return c();
+                }
+                if (authResp.status === 401) {
+                    alert('密码错误');
+                    return c();
+                }
+                if (!authResp.ok) {
+                    alert('认证接口异常：后端返回 HTTP ' + authResp.status + '\n请检查后端日志。');
+                    return c();
+                }
+                w.apiPassword = password;
+                h.showStatus('验证成功，加载数据...', 2000);
+                h.elements.immersiveBtn.style.display = 'flex';
+                h.elements.rconToggleBtn.style.display = 'flex';
+
+                // 阶段2：服务器列表
+                try {
                     await initServerSelect();
+                } catch (err) {
+                    alert(err.message);
+                    return c();
+                }
+
+                // 阶段3：加载服务器数据
+                try {
                     await loadServerData(w.currentServer, password);
+                } catch (err) {
+                    alert('加载服务器数据失败：' + err.message + '\n请检查后端日志，以及该服务器的日志路径配置。');
+                    return c();
+                }
+
+                // 阶段4：界面初始化
+                try {
                     a.init();
                     await l('stats');
                     h.showStatus('就绪', 2000);
                     h.centerRconWindow();
                 } catch (err) {
-                    alert('网络错误，请检查后端');
+                    alert('界面初始化失败：' + err.message + '\n请按 F12 打开控制台查看详细堆栈。');
                     return c();
                 }
             }

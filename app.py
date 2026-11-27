@@ -50,6 +50,10 @@ def create_app(config, rcon_manager, db, socketio_instance):
     def main_console():
         return send_from_directory(BASE_DIR, 'main_console_rcon.html')
 
+    @app.route('/vendor/<path:filename>')
+    def vendor_files(filename):
+        return send_from_directory(os.path.join(BASE_DIR, 'vendor'), filename)
+
     @app.route('/api/auth')
     def auth_check():
         auth = request.headers.get('Authorization')

@@ -90,6 +90,6 @@ if __name__ == '__main__':
     performance_monitor.start()
 
     print("=" * 60)
-    print(f"访问服务: http://{cfg.HOST}:{cfg.PORT}/main_console_rcon.html  密码: {cfg.ADMIN_PASSWORD}")
+    print(f"访问服务: http://127.0.0.1:{cfg.PORT}/main_console_rcon.html  密码: {cfg.ADMIN_PASSWORD}")
     print("=" * 60)
     socketio.run(app, host=cfg.HOST, port=cfg.PORT, debug=False)

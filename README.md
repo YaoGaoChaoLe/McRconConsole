@@ -5,10 +5,9 @@
 如果您**只分析日志**，这个会适合你：
 
 - https://yaogaochaole.github.io/McRconConsole/
-- 选择你的服务器日志文件`latest.log`，即可分析日志。
+- 选择你的服务器日志文件 `latest.log`，即可分析日志。
 ---
----
----
+
 # 主要项目——McRconConsole 实时在线控制台
 
 ## McRconConsole - 主要功能：
@@ -25,14 +24,14 @@
 
 ## 下载并使用
 
-1. 下载: https://github.com/YaoGaoChaoLe/McRconConsole/releases
+1. 下载: [点我下载](https://github.com/YaoGaoChaoLe/McRconConsole/releases)
 
 2. 打开 服务器的配置文件 `server.properties`:
-   - 将默认的`enable-rcon=false` 改成 `enable-rcon=true`
+   - 将默认的 `enable-rcon=false` 改成 `enable-rcon=true`
    - 将默认为空的 `rcon.password` 随便设一个密码，确保它不是空的。
    - 如果需要管理多个服务器：请确保 各个服务器配置中的`rcon.port`端口号不能一样。
 
-3. 打开 本项目的`config.yml`，填写正确的配置。
+3. 打开 本项目的 `config.yml`，填写正确的配置。
 
 4. 运行 `McRconConsole.exe`。
 ## 一切准备就绪，祝您使用愉快！
@@ -67,17 +66,17 @@ source myenv/bin/activate
 # 安装依赖：
 pip install -r requirements.txt --only-binary=gevent
 
-# 如果中国大陆网络安装很慢，那就用这个：
-pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --only-binary=gevent
+# 中国大陆镜像安装：
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
 ```
 
 ### 3. 写好配置文件 & 运行
 
 1. 打开 服务器的配置文件 `server.properties`
-   - 将默认的`enable-rcon=false` 改成 `enable-rcon=true`
+   - 将默认的 `enable-rcon=false` 改成 `enable-rcon=true`
    - 将默认为空的 `rcon.password` 随便设一个密码，确保它不是空的。
    - 如果需要管理多个服务器：请确保 各个服务器配置中的`rcon.port`端口号不能一样。
-2. 打开 本项目的`config.yml`，填写正确的配置。
+2. 打开 本项目的 `config.yml`，填写正确的配置。
 3. 运行 `python main.py`
 
 ---

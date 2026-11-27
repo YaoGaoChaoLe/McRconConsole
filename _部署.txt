@@ -1,5 +1,5 @@
 # 创建虚拟环境
-D:\_Project\Python\python_main\x64\python.exe -m venv myenv
+D:\_Project\Python\python_x64\python.exe -m venv myenv
 
 # 激活虚拟环境
 myenv\Scripts\activate
@@ -33,7 +33,7 @@ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --onl
 
 
 #  ====== 别管这个 =======
-
+使用cmd打包：
 pyinstaller -F -n McRconConsole ^
   --collect-all gevent ^
   --collect-all engineio ^
@@ -42,8 +42,9 @@ pyinstaller -F -n McRconConsole ^
   --hidden-import engineio.async_drivers.threading ^
   main.py
 
-.\
+.\发行文件目录需要包含：
+    McRconConsole.exe + vendor
     config.yml
     custom_features.py
     main_console_rcon.html
-    McRconConsole.exe
+    
