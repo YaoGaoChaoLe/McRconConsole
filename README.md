@@ -10,15 +10,10 @@
 
 # 主要项目——McRconConsole 实时在线控制台
 
-## McRconConsole - 主要功能：
+## 主要功能：
+<img width="2313" height="8116" alt="1" src="https://github.com/user-attachments/assets/c768491d-c85f-4749-833e-1dac9ae0177d" />
 
-- 实时日志 – 实时推送 latest.log 日志，高亮日志行、过滤某些日志行。
-- 聊天记录 – 单独提取玩家聊天记录
-- 远程命令 – 通过rcon发送任意mc Server游戏命令,例如/kick /ban /op ...
-- 在线人数统计 – 自动绘制人数曲线图。
-- 性能监控 – 实时展示CPU各核心使用率、内存占用、网络上下行速率。
-- 玩家IP记录 – 可视化进过服务器的玩家IP，快捷查询ip地址，以及通过ip辨别那些玩家开小号。
-- 反作弊日志 – 仅展示包含某些关键词的日志行，方便展示反作弊日志或满足其它需求
+## 其它功能：
 - 服务器崩溃处理 – 自动检查服务器是否崩溃。崩溃后可以发送邮件进行提示、执行预设的批处理脚本（例如自动重启服务器）
 - 扩展代码 – `custom_features.py` 允许你注入自己的新代码。
 
@@ -46,41 +41,36 @@
 
 
 ---
-## 从源代码部署
+## 开发者 —— 从源码部署
+```
+# 创建虚拟环境
+{{你的python位置}}\python.exe -m venv myenv
+# D:\_Project\Python\python_x64\python.exe -m venv myenv
 
-### 1. 创建、进入 虚拟环境（可选）（推荐）
-
-```bash
-# Windows：
-python -m venv myenv
+# 激活/进入虚拟环境
 myenv\Scripts\activate
 
-# Linux / macOS；
-python -m venv myenv
-source myenv/bin/activate
+# 安装环境
+pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --only-binary=gevent
 ```
 
-### 2. 安装依赖
-
-```bash
-# 安装依赖：
-pip install -r requirements.txt --only-binary=gevent
-
-# 中国大陆镜像安装：
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/ --only-binary=gevent
+使用cmd打包
 ```
-
-### 3. 写好配置文件 & 运行
-
-1. 打开 服务器的配置文件 `server.properties`
-   - 将默认的 `enable-rcon=false` 改成 `enable-rcon=true`
-   - 将默认为空的 `rcon.password` 随便设一个密码，确保它不是空的。
-   - 如果需要管理多个服务器：请确保 各个服务器配置中的`rcon.port`端口号不能一样。
-2. 打开 本项目的 `config.yml`，填写正确的配置。
-3. 运行 `python main.py`
-
----
-
+pyinstaller -F -n McRconConsole ^
+  --collect-all gevent ^
+  --collect-all engineio ^
+  --collect-all flask_socketio ^
+  --hidden-import engineio.async_drivers.gevent ^
+  --hidden-import engineio.async_drivers.threading ^
+  main.py
+```
+发行文件目录需要包含：
+```
+ McRconConsole.exe + vendor
+ config.yml
+ custom_features.py
+ main_console_rcon.html
+```
 [MIT 许可证](LICENSE)。
 
 如有好的建议或功能需求，请通过 GitHub 反馈。
