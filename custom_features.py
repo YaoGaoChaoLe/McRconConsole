@@ -23,4 +23,4 @@ def 扩展_自定义功能(line, server_name):
             return
 
         print(f"[CHEAT] 在 [{server_name}] 踢出玩家: {player}")
-        rcon_manager.send_command(server_name, f"ban-ip {player} 因为发送了某些消息，被踢出")
+        rcon_manager.send_command(server_name, f"kick {player} 因为发送了某些消息，被踢出")
